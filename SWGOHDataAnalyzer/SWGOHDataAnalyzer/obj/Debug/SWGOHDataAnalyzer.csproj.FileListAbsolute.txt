@@ -12,3 +12,17 @@ C:\Users\klarsen\source\repos\SWGOHDataAnalyzer\SWGOHDataAnalyzer\bin\Debug\Newt
 C:\Users\klarsen\source\repos\SWGOHDataAnalyzer\SWGOHDataAnalyzer\obj\Debug\SWGOHDataAnalyzer.csproj.CopyComplete
 C:\Users\klarsen\source\repos\SWGOHDataAnalyzer\SWGOHDataAnalyzer\obj\Debug\SWGOHDataAnalyzer.exe
 C:\Users\klarsen\source\repos\SWGOHDataAnalyzer\SWGOHDataAnalyzer\obj\Debug\SWGOHDataAnalyzer.pdb
+C:\Users\klarsen\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHDataAnalyzer\bin\Debug\SWGOHDataAnalyzer.exe.config
+C:\Users\klarsen\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHDataAnalyzer\bin\Debug\SWGOHDataAnalyzer.exe
+C:\Users\klarsen\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHDataAnalyzer\bin\Debug\SWGOHDataAnalyzer.pdb
+C:\Users\klarsen\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHDataAnalyzer\bin\Debug\Newtonsoft.Json.dll
+C:\Users\klarsen\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHDataAnalyzer\bin\Debug\SWGOHInterface.dll
+C:\Users\klarsen\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHDataAnalyzer\bin\Debug\SWGOHMessageSystem.dll
+C:\Users\klarsen\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHDataAnalyzer\bin\Debug\SWGOHMessageSystem.pdb
+C:\Users\klarsen\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHDataAnalyzer\bin\Debug\SWGOHInterface.pdb
+C:\Users\klarsen\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHDataAnalyzer\bin\Debug\Newtonsoft.Json.xml
+C:\Users\klarsen\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHDataAnalyzer\obj\Debug\SWGOHDataAnalyzer.csprojAssemblyReference.cache
+C:\Users\klarsen\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHDataAnalyzer\obj\Debug\SWGOHDataAnalyzer.csproj.CoreCompileInputs.cache
+C:\Users\klarsen\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHDataAnalyzer\obj\Debug\SWGOHDataAnalyzer.csproj.CopyComplete
+C:\Users\klarsen\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHDataAnalyzer\obj\Debug\SWGOHDataAnalyzer.exe
+C:\Users\klarsen\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHDataAnalyzer\obj\Debug\SWGOHDataAnalyzer.pdb
