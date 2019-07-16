@@ -1,0 +1,6 @@
+C:\Users\klarsen\source\repos\SWGOHDataAnalyzer\MessageSystem\bin\Debug\MessageSystem.dll
+C:\Users\klarsen\source\repos\SWGOHDataAnalyzer\MessageSystem\bin\Debug\MessageSystem.pdb
+C:\Users\klarsen\source\repos\SWGOHDataAnalyzer\MessageSystem\obj\Debug\MessageSystem.csprojAssemblyReference.cache
+C:\Users\klarsen\source\repos\SWGOHDataAnalyzer\MessageSystem\obj\Debug\MessageSystem.csproj.CoreCompileInputs.cache
+C:\Users\klarsen\source\repos\SWGOHDataAnalyzer\MessageSystem\obj\Debug\MessageSystem.dll
+C:\Users\klarsen\source\repos\SWGOHDataAnalyzer\MessageSystem\obj\Debug\MessageSystem.pdb

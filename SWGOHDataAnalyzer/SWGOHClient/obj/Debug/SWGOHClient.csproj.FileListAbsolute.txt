@@ -1,0 +1,9 @@
+C:\Users\klarsen\source\repos\SWGOHDataAnalyzer\SWGOHClient\bin\Debug\SWGOHClient.dll
+C:\Users\klarsen\source\repos\SWGOHDataAnalyzer\SWGOHClient\bin\Debug\SWGOHClient.pdb
+C:\Users\klarsen\source\repos\SWGOHDataAnalyzer\SWGOHClient\bin\Debug\Newtonsoft.Json.dll
+C:\Users\klarsen\source\repos\SWGOHDataAnalyzer\SWGOHClient\bin\Debug\Newtonsoft.Json.xml
+C:\Users\klarsen\source\repos\SWGOHDataAnalyzer\SWGOHClient\obj\Debug\SWGOHClient.csprojAssemblyReference.cache
+C:\Users\klarsen\source\repos\SWGOHDataAnalyzer\SWGOHClient\obj\Debug\SWGOHClient.csproj.CoreCompileInputs.cache
+C:\Users\klarsen\source\repos\SWGOHDataAnalyzer\SWGOHClient\obj\Debug\SWGOHClient.csproj.CopyComplete
+C:\Users\klarsen\source\repos\SWGOHDataAnalyzer\SWGOHClient\obj\Debug\SWGOHClient.dll
+C:\Users\klarsen\source\repos\SWGOHDataAnalyzer\SWGOHClient\obj\Debug\SWGOHClient.pdb
