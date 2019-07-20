@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SWGOHInterface", "SWGOHClie
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SWGOHMessageSystem", "MessageSystem\SWGOHMessageSystem.csproj", "{8F00307A-B80A-4450-B388-4395D602D656}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SWGOHDBInterface", "SWGOHDBInterface\SWGOHDBInterface.csproj", "{88661601-0E1B-44A7-9AD1-948C37FFCD92}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{8F00307A-B80A-4450-B388-4395D602D656}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8F00307A-B80A-4450-B388-4395D602D656}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8F00307A-B80A-4450-B388-4395D602D656}.Release|Any CPU.Build.0 = Release|Any CPU
+		{88661601-0E1B-44A7-9AD1-948C37FFCD92}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{88661601-0E1B-44A7-9AD1-948C37FFCD92}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{88661601-0E1B-44A7-9AD1-948C37FFCD92}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{88661601-0E1B-44A7-9AD1-948C37FFCD92}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
