@@ -102,29 +102,40 @@ VALUES (@player_name, @player_power, @toon, @toon_power, @toon_level, @is_ship, 
         {
             List<SQLiteParameter> sqlParams = new List<SQLiteParameter>();
 
-            sqlParams.Add(new SQLiteParameter("@player_name", "Kyles Fart"));
-            sqlParams.Add(new SQLiteParameter("@player_power", 1000000));
-            sqlParams.Add(new SQLiteParameter("@toon", "Kyles Toon Fart"));
-            sqlParams.Add(new SQLiteParameter("@toon_power", 12345));
-            sqlParams.Add(new SQLiteParameter("@toon_level", 85));
-            sqlParams.Add(new SQLiteParameter("@is_ship", 0));
-            sqlParams.Add(new SQLiteParameter("@gear_level", 13));
-            sqlParams.Add(new SQLiteParameter("@rarity", 7));
-            sqlParams.Add(new SQLiteParameter("@health", 22222));
-            sqlParams.Add(new SQLiteParameter("@protection", 22222));
-            sqlParams.Add(new SQLiteParameter("@speed", 222));
-            sqlParams.Add(new SQLiteParameter("@p_offense", 222));
-            sqlParams.Add(new SQLiteParameter("@s_offense", 222));
-            sqlParams.Add(new SQLiteParameter("@p_defense", 222));
-            sqlParams.Add(new SQLiteParameter("@s_defense", 222));
-            sqlParams.Add(new SQLiteParameter("@p_crit_chance", 222));
-            sqlParams.Add(new SQLiteParameter("@s_cirt_chance", 222));
-            sqlParams.Add(new SQLiteParameter("@potency", 222));
-            sqlParams.Add(new SQLiteParameter("@tenacity", 222));
-            sqlParams.Add(new SQLiteParameter("@total_zetas", 3));
-            sqlParams.Add(new SQLiteParameter("@zeta_one", "Kyles Zeta Fart"));
-            sqlParams.Add(new SQLiteParameter("@zeta_two", "Kyles Zetaer Fart"));
-            sqlParams.Add(new SQLiteParameter("@zeta_three", "Kyles Zetaist Fart"));
+            int isShip = unit.UnitData.Gear.Count > 0 ? 0 : 1;
+            List<string> zetas = new List<string>();
+
+            foreach(string zeta in unit.UnitData.AppliedZetas)
+            {
+                if(unit.UnitData.UnitAbilities.FirstOrDefault(a => a.AbilityId == zeta) != null)
+                {
+                    zetas.Add(unit.UnitData.UnitAbilities.FirstOrDefault(a => a.AbilityId == zeta).AbilityName);
+                }
+            }
+
+            sqlParams.Add(new SQLiteParameter("@player_name", playerName));
+            sqlParams.Add(new SQLiteParameter("@player_power", playerPower));
+            sqlParams.Add(new SQLiteParameter("@toon", unit.UnitData.Name));
+            sqlParams.Add(new SQLiteParameter("@toon_power", unit.UnitData.Power));
+            sqlParams.Add(new SQLiteParameter("@toon_level", unit.UnitData.Level));
+            sqlParams.Add(new SQLiteParameter("@is_ship", isShip));
+            sqlParams.Add(new SQLiteParameter("@gear_level", unit.UnitData.GearLevel));
+            sqlParams.Add(new SQLiteParameter("@rarity", unit.UnitData.Rarity));
+            sqlParams.Add(new SQLiteParameter("@health", unit.UnitData.UnitStats.Health));
+            sqlParams.Add(new SQLiteParameter("@protection", unit.UnitData.UnitStats.Protection));
+            sqlParams.Add(new SQLiteParameter("@speed", unit.UnitData.UnitStats.Speed));
+            sqlParams.Add(new SQLiteParameter("@p_offense", unit.UnitData.UnitStats.PhysicalOffense));
+            sqlParams.Add(new SQLiteParameter("@s_offense", unit.UnitData.UnitStats.SpecialOffense));
+            sqlParams.Add(new SQLiteParameter("@p_defense", Math.Round(unit.UnitData.UnitStats.PhysicalDefense, 2)));
+            sqlParams.Add(new SQLiteParameter("@s_defense", Math.Round(unit.UnitData.UnitStats.SpeicalDefense, 2)));
+            sqlParams.Add(new SQLiteParameter("@p_crit_chance", Math.Round(unit.UnitData.UnitStats.PhysicalCriticalChance, 2)));
+            sqlParams.Add(new SQLiteParameter("@s_cirt_chance", Math.Round(unit.UnitData.UnitStats.SpecialCriticalChance, 2)));
+            sqlParams.Add(new SQLiteParameter("@potency", Math.Round(unit.UnitData.UnitStats.Potency*100, 2)));
+            sqlParams.Add(new SQLiteParameter("@tenacity", Math.Round(unit.UnitData.UnitStats.Tenacity*100, 2)));
+            sqlParams.Add(new SQLiteParameter("@total_zetas", unit.UnitData.AppliedZetas.Count));
+            sqlParams.Add(new SQLiteParameter("@zeta_one", zetas.ElementAtOrDefault(0)));
+            sqlParams.Add(new SQLiteParameter("@zeta_two", zetas.ElementAtOrDefault(1)));
+            sqlParams.Add(new SQLiteParameter("@zeta_three", zetas.ElementAtOrDefault(2)));
 
             return sqlParams.ToArray();
         }
