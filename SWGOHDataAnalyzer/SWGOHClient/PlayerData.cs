@@ -10,6 +10,9 @@ namespace SWGOHInterface
     public class PlayerData
     {
         [JsonProperty("name")]
-        public string name { get; set; }
+        public string Name { get; set; }
+
+        [JsonProperty("galactic_power")]
+        public int PlayerPower { get; set; }
     }
 }

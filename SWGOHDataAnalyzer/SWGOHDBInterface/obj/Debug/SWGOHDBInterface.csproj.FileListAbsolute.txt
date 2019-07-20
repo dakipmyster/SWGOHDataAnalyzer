@@ -19,3 +19,5 @@ C:\Users\klarsen\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHDBInt
 C:\Users\klarsen\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHDBInterface\bin\Debug\Newtonsoft.Json.dll
 C:\Users\klarsen\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHDBInterface\bin\Debug\SWGOHInterface.pdb
 C:\Users\klarsen\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHDBInterface\bin\Debug\Newtonsoft.Json.xml
+C:\Users\klarsen\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHDBInterface\bin\Debug\SWGOHMessageSystem.dll
+C:\Users\klarsen\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHDBInterface\bin\Debug\SWGOHMessageSystem.pdb

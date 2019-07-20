@@ -33,7 +33,7 @@ namespace SWGOHInterface
         {
             var response = await m_httpClient.GetAsync($"https://swgoh.gg/api/player/714669639");
             var converted = JsonConvert.DeserializeObject<Player>(await response.Content.ReadAsStringAsync());
-            return converted.PlayerData.name;
+            return converted.PlayerData.Name;
         }
 
         /// <summary>
