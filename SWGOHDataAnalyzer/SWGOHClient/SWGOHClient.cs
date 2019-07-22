@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using System.Text;
+using System.Net;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 
@@ -14,6 +14,7 @@ namespace SWGOHInterface
         private HttpClient m_httpClient;
 
         public Guild Guild;
+        public HttpStatusCode ResponseCode;
 
         /// <summary>
         /// Consturctor
@@ -41,9 +42,13 @@ namespace SWGOHInterface
         /// </summary>
         /// <returns></returns>
         public async Task GetGuildData()
-        {
+        {            
             var response = await m_httpClient.GetAsync($"https://swgoh.gg/api/guild/{m_GuildId}");
-            Guild = JsonConvert.DeserializeObject<Guild>(await response.Content.ReadAsStringAsync());
+
+            if(response.StatusCode == HttpStatusCode.OK)
+                Guild = JsonConvert.DeserializeObject<Guild>(await response.Content.ReadAsStringAsync());
+
+            ResponseCode = response.StatusCode;
         }
 
     }
