@@ -87,6 +87,10 @@
       <Project>{88661601-0e1b-44a7-9ad1-948c37ffcd92}</Project>
       <Name>SWGOHDBInterface</Name>
     </ProjectReference>
+    <ProjectReference Include="..\SWGOHReportBuilder\SWGOHReportBuilder.csproj">
+      <Project>{3d39a4cb-14e3-41d1-a13e-f1e69d00e290}</Project>
+      <Name>SWGOHReportBuilder</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\System.Data.SQLite.Core.1.0.111.0\build\net46\System.Data.SQLite.Core.targets" Condition="Exists('..\packages\System.Data.SQLite.Core.1.0.111.0\build\net46\System.Data.SQLite.Core.targets')" />

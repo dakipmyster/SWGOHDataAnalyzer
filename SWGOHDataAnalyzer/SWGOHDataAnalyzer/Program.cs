@@ -2,6 +2,7 @@
 using SWGOHMessage;
 using SWGOHInterface;
 using SWGOHDBInterface;
+using SWGOHReportBuilder;
 using System.Net;
 using System;
 
@@ -13,7 +14,7 @@ namespace SWGOHDataAnalyzer
         {   
             while(true)
             {
-                switch(SWGOHMessageSystem.InputMessage(@"\r\nEnter the number option from the menu below to perform the task
+                switch(SWGOHMessageSystem.InputMessage(@"Enter the number option from the menu below to perform the task
 
 1. Create Snapshot
 2. Compare Snapshots
@@ -31,15 +32,16 @@ namespace SWGOHDataAnalyzer
                     default:
                         SWGOHMessageSystem.OutputMessage("Invalid selection, try again");
                         break;
-                }
-
-                
+                }                
             }
         }
 
-        private static Task CompareSnapshots()
+        private static async Task CompareSnapshots()
         {
-            throw new NotImplementedException();
+            ReportBuilder builder = new ReportBuilder();
+
+            if (builder.CanRunReport())
+                await builder.BuildReport();
         }
 
         private static async Task GetGuildData()

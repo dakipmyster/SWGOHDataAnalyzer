@@ -7,6 +7,7 @@ using System.IO;
 using System.Data.SQLite;
 using SWGOHInterface;
 using SWGOHMessage;
+using System.Data;
 
 namespace SWGOHDBInterface
 {
@@ -16,13 +17,14 @@ namespace SWGOHDBInterface
 
         private string m_folderPath = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\\SWGOHDataAnalyzer";
         private string m_dbTableName;
-        private List<string> m_tableList = new List<string>();
         private string m_dbName = "SWGOH.db";
         #endregion
 
         #region Public Members
 
-        public bool HasOldSnapshots => m_tableList.Count() > 0;
+        public bool HasOldSnapshots => Tables.Count() > 1;
+
+        public List<string> Tables { get; } = new List<string>();
 
         #endregion
 
@@ -43,6 +45,11 @@ namespace SWGOHDBInterface
             CollectTables();
         }
 
+        public DBInterface()
+        {
+            CollectTables();
+        }
+
         private void CollectTables()
         {
             string sql = "SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%'";
@@ -53,11 +60,11 @@ namespace SWGOHDBInterface
 
                 using (SQLiteCommand command = new SQLiteCommand(sql, m_dbConnection))
                 {
-                    command.CommandType = System.Data.CommandType.Text;
+                    command.CommandType = CommandType.Text;
                     using (SQLiteDataReader reader = command.ExecuteReader())
                     {
                         while (reader.Read())
-                            m_tableList.Add(reader.GetString(0));
+                            Tables.Add(reader.GetString(0));
                     }
                 }
             }
@@ -185,6 +192,31 @@ VALUES (@player_name, @player_power, @toon, @toon_power, @toon_level, @is_ship, 
                     command.ExecuteNonQuery();
                 }
             }
+        }
+
+        public DataTable ExecuteQueryAndReturnResults(string sql, SQLiteParameter[] parameters)
+        {
+            DataTable table = new DataTable();
+
+            using (SQLiteConnection m_dbConnection = new SQLiteConnection($"Data Source={m_folderPath}\\{m_dbName}"))
+            {
+                m_dbConnection.Open();
+
+                using (SQLiteCommand command = new SQLiteCommand(sql, m_dbConnection))
+                {
+                    command.CommandType = CommandType.Text;
+
+                    if(parameters != null)
+                        command.Parameters.AddRange(parameters);
+
+                    using (SQLiteDataReader reader = command.ExecuteReader())
+                    {
+                        table.Load(reader);
+                    }
+                }
+            }
+
+            return table;
         }
     }
 }
