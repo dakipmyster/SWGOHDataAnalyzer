@@ -15,9 +15,12 @@ namespace SWGOHReportBuilder
         private string m_oldSnapshot;
         private string m_newSnapshot;
 
+        internal List<PlayerData> PlayerData { get; set; }
+
         public DataBuilder()
         {
             m_dbInterface = new DBInterface();
+            PlayerData = new List<PlayerData>();
         }
 
         public bool CanRunReport()
@@ -59,9 +62,7 @@ SELECT DISTINCT player_name, player_power, 'Old' as 'State'
 FROM {m_oldSnapshot}";
 
             DataTable results = m_dbInterface.ExecuteQueryAndReturnResults(sqlQuery, null);
-
-            List<PlayerData> playerData = new List<PlayerData>();
-
+                        
             foreach(DataRow row in results.Rows)
             {
                 string playerName = row["player_name"].ToString();
@@ -70,13 +71,13 @@ FROM {m_oldSnapshot}";
 
                 PlayerData player;
 
-                if (playerData.Exists(a => a.PlayerName == playerName))
-                    player = playerData.First(a => a.PlayerName == playerName);
+                if (PlayerData.Exists(a => a.PlayerName == playerName))
+                    player = PlayerData.First(a => a.PlayerName == playerName);
                 else
                 {
                     player = new PlayerData();
                     player.PlayerName = playerName;
-                    playerData.Add(player);
+                    PlayerData.Add(player);
                 }
 
                 if (state == "New")
@@ -85,17 +86,13 @@ FROM {m_oldSnapshot}";
                     player.OldGalaticPower = power;
             }
 
-            playerData = playerData.Where(a => a.OldGalaticPower != 0 && a.NewGalaticPower != 0).ToList();
+            PlayerData = PlayerData.Where(a => a.OldGalaticPower != 0 && a.NewGalaticPower != 0).ToList();
 
-            foreach(PlayerData player in playerData)
+            foreach(PlayerData player in PlayerData)
             {
                 player.GalaticPowerDifference = player.NewGalaticPower - player.OldGalaticPower;
                 player.GalaticPowerPercentageDifference = Math.Round(Decimal.Divide(player.GalaticPowerDifference, player.OldGalaticPower) * 100, 3);
             }
-
-            playerData = playerData.OrderBy(a => a.GalaticPowerDifference).ToList();
-
-            playerData = playerData.OrderBy(a => a.GalaticPowerPercentageDifference).ToList();
         }
 
         

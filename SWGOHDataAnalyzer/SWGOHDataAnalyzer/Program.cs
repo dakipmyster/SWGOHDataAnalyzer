@@ -41,7 +41,7 @@ namespace SWGOHDataAnalyzer
             ReportBuilder builder = new ReportBuilder();
 
             if (builder.CanRunReport())
-                await builder.BuildReport();
+                await builder.CompileReport();
         }
 
         private static async Task GetGuildData()
