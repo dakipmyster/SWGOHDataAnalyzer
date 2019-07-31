@@ -45,3 +45,9 @@ C:\Users\klarsen\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHRepor
 C:\Users\klarsen\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHReportBuilder\bin\Debug\itext.sign.xml
 C:\Users\klarsen\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHReportBuilder\bin\Debug\itext.styledxmlparser.xml
 C:\Users\klarsen\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHReportBuilder\bin\Debug\itext.svg.xml
+C:\Users\klarsen\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHReportBuilder\bin\Debug\x86\e_sqlite3.dll
+C:\Users\klarsen\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHReportBuilder\bin\Debug\x64\e_sqlite3.dll
+C:\Users\klarsen\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHReportBuilder\bin\Debug\SQLitePCLRaw.batteries_green.dll
+C:\Users\klarsen\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHReportBuilder\bin\Debug\SQLitePCLRaw.batteries_v2.dll
+C:\Users\klarsen\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHReportBuilder\bin\Debug\SQLitePCLRaw.core.dll
+C:\Users\klarsen\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHReportBuilder\bin\Debug\SQLitePCLRaw.provider.e_sqlite3.dll

@@ -194,7 +194,7 @@ VALUES (@player_name, @player_power, @toon, @toon_power, @toon_level, @is_ship, 
             }
         }
 
-        public DataTable ExecuteQueryAndReturnResults(string sql, SQLiteParameter[] parameters)
+        public async Task<DataTable> ExecuteQueryAndReturnResults(string sql, SQLiteParameter[] parameters)
         {
             DataTable table = new DataTable();
 
@@ -208,15 +208,15 @@ VALUES (@player_name, @player_power, @toon, @toon_power, @toon_level, @is_ship, 
 
                     if(parameters != null)
                         command.Parameters.AddRange(parameters);
-
+                    
                     using (SQLiteDataReader reader = command.ExecuteReader())
                     {
                         table.Load(reader);
                     }
                 }
             }
-
-            return table;
+                        
+            return await Task.FromResult(table);
         }
     }
 }
