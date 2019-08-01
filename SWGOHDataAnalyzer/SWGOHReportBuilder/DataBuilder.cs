@@ -222,7 +222,7 @@ FROM {m_oldSnapshot} WHERE is_ship = 0";
             UnitData = UnitData.Where(a => a.OldGalaticPower != 0 && a.NewGalaticPower != 0).ToList();
 
             foreach (UnitData unit in UnitData)
-                unit.PowerDifference = unit.NewGalaticPower - unit.OldGalaticPower;
+                unit.PowerDifference = unit.NewPower - unit.OldPower;
         }
     }
 }

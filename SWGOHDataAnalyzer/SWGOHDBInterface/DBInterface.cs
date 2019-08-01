@@ -90,8 +90,8 @@ namespace SWGOHDBInterface
 
                                 //Yes, the SQL Injection again
                                 cmd.CommandText = $@"INSERT INTO {m_dbTableName}
-(player_name, player_power, toon, toon_power, toon_level, is_ship, gear_level, rarity, health, protection, speed, p_offense, s_offense, p_defense, s_defense, p_crit_chance, s_crit_chance, potency, tenacity, total_zetas, zeta_one, zeta_two, zeta_three) 
-VALUES (@player_name, @player_power, @toon, @toon_power, @toon_level, @is_ship, @gear_level, @rarity, @health, @protection, @speed, @p_offense, @s_offense, @p_defense, @s_defense, @p_crit_chance, @s_cirt_chance, @potency, @tenacity, @total_zetas, @zeta_one, @zeta_two, @zeta_three) ;";
+(player_name, player_power, toon, toon_power, toon_level, is_ship, gear_level, rarity, health, protection, speed, p_offense, s_offense, p_defense, s_defense, p_crit_chance, s_crit_chance, potency, tenacity, total_zetas, zeta_one, zeta_two, zeta_three, pull_date) 
+VALUES (@player_name, @player_power, @toon, @toon_power, @toon_level, @is_ship, @gear_level, @rarity, @health, @protection, @speed, @p_offense, @s_offense, @p_defense, @s_defense, @p_crit_chance, @s_cirt_chance, @potency, @tenacity, @total_zetas, @zeta_one, @zeta_two, @zeta_three, @pull_date) ;";
 
 
                                 cmd.ExecuteNonQuery();
@@ -143,6 +143,7 @@ VALUES (@player_name, @player_power, @toon, @toon_power, @toon_level, @is_ship, 
             sqlParams.Add(new SQLiteParameter("@zeta_one", zetas.ElementAtOrDefault(0)));
             sqlParams.Add(new SQLiteParameter("@zeta_two", zetas.ElementAtOrDefault(1)));
             sqlParams.Add(new SQLiteParameter("@zeta_three", zetas.ElementAtOrDefault(2)));
+            sqlParams.Add(new SQLiteParameter("@pull_date", DateTime.Now));
 
             return sqlParams.ToArray();
         }
@@ -178,7 +179,8 @@ VALUES (@player_name, @player_power, @toon, @toon_power, @toon_level, @is_ship, 
     total_zetas int,
     zeta_one varchar(50),
     zeta_two varchar(50),
-    zeta_three varchar(50)
+    zeta_three varchar(50),
+    pull_date, date
 
 )";
 

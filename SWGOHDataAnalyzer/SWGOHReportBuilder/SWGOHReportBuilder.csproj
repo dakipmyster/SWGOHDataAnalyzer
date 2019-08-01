@@ -105,6 +105,7 @@
     <Compile Include="ReportBuilder.cs" />
     <Compile Include="ShipData.cs" />
     <Compile Include="UnitData.cs" />
+    <Compile Include="Unlock.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MessageSystem\SWGOHMessageSystem.csproj">
