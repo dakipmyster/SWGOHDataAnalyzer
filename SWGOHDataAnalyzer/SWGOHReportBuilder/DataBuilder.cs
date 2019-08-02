@@ -139,8 +139,6 @@ FROM {m_oldSnapshot} WHERE is_ship = 1";
                     ship.OldGalaticPower = power;
                 }
             }
-
-            ShipData = ShipData.Where(a => a.OldGalaticPower != 0 && a.NewGalaticPower != 0).ToList();
         }
 
         internal async Task CollectUnitData()
@@ -198,6 +196,7 @@ FROM {m_oldSnapshot} WHERE is_ship = 0";
                     unit.NewLevel = unitLevel;
                     unit.CurrentHealth = Convert.ToDecimal(row["health"].ToString());
                     unit.CurrentProtection = Convert.ToDecimal(row["protection"].ToString());
+                    unit.CurrentTankiest = unit.CurrentHealth + unit.CurrentProtection;
                     unit.CurrentSpeed = Convert.ToDecimal(row["speed"].ToString());
                     unit.CurrentPhysicalOffense = Convert.ToDecimal(row["p_offense"].ToString());
                     unit.CurrentSpecialOffense = Convert.ToDecimal(row["s_offense"].ToString());
@@ -218,9 +217,7 @@ FROM {m_oldSnapshot} WHERE is_ship = 0";
                     unit.OldLevel = unitLevel;
                 }
             }
-
-            UnitData = UnitData.Where(a => a.OldGalaticPower != 0 && a.NewGalaticPower != 0).ToList();
-
+            
             foreach (UnitData unit in UnitData)
                 unit.PowerDifference = unit.NewPower - unit.OldPower;
         }

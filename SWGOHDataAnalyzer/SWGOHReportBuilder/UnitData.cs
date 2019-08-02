@@ -32,6 +32,8 @@ namespace SWGOHReportBuilder
 
         public decimal CurrentProtection { get; set; }
 
+        public decimal CurrentTankiest { get; set; }
+
         public decimal CurrentSpeed { get; set; }
 
         public decimal CurrentPhysicalOffense { get; set; }
