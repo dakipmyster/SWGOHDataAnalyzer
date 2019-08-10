@@ -75,7 +75,15 @@ namespace SWGOHReportBuilder
 
             pdfString.Append(@"<html><head><style>
 table, th, td {
-  border: 1px solid black;
+  border: 1px solid black; 
+}
+table {
+  border-collapse: collapse;
+  page-break-inside:avoid
+}
+tr:nth-child(even) {background-color: #f2f2f2;}
+th, td {
+  padding: 2px;
 }
 </style></head><body>");
             List<Task> tasks = new List<Task>();
@@ -115,9 +123,7 @@ table, th, td {
             string folderPath = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\\SWGOHDataAnalyzer\\{fileName}.pdf";
 
             using (FileStream fs = File.Open(folderPath, FileMode.OpenOrCreate))
-            {
                 HtmlConverter.ConvertToPdf(pdfString.ToString(),fs, new ConverterProperties());
-            }
 
             SWGOHMessageSystem.OutputMessage($"Report saved at {folderPath}");
         }
@@ -128,214 +134,65 @@ table, th, td {
 
             sb.AppendLine($"This section goes over a specific character to highlight and will rotate every report.  This iteration is {toonName}.  The report takes the top 10 of {toonName}'s stats");
             sb.AppendLine("<p/>");
-            sb.AppendLine("<b>Health</b>");
-            sb.AppendLine("<table>");
-            sb.AppendLine("<tr>");
-            sb.AppendLine("<th>Player Name</th>");
-            sb.AppendLine("<th>Total Health</th>");
-            sb.AppendLine("</tr>");
-            foreach (UnitData unit in m_dataBuilder.UnitData.Where(b => b.UnitName == toonName).OrderByDescending(a => a.CurrentHealth).Take(10))
-            {
-                sb.AppendLine("<tr>");
-                sb.AppendLine($"<td>{unit.PlayerName}</td>");
-                sb.AppendLine($"<td>{unit.CurrentHealth}</td>");
-                sb.AppendLine("</tr>");
-            }
-            sb.AppendLine("</table>");
-            sb.AppendLine("<p/>");
 
-            sb.AppendLine("<b>Protection</b>");
-            sb.AppendLine("<table>");
-            sb.AppendLine("<tr>");
-            sb.AppendLine("<th>Player Name</th>");
-            sb.AppendLine("<th>Total Protection</th>");
-            sb.AppendLine("</tr>");
-            foreach (UnitData unit in m_dataBuilder.UnitData.Where(b => b.UnitName == toonName).OrderByDescending(a => a.CurrentProtection).Take(10))
-            {
-                sb.AppendLine("<tr>");
-                sb.AppendLine($"<td>{unit.PlayerName}</td>");
-                sb.AppendLine($"<td>{unit.CurrentProtection}</td>");
-                sb.AppendLine("</tr>");
-            }
-            sb.AppendLine("</table>");
-            sb.AppendLine("<p/>");
+            sb.AppendLine(HTMLConstructor.TableGroupStart());           
 
-            sb.AppendLine("<b>Tankiest (Health + Protection)</b>");
-            sb.AppendLine("<table>");
-            sb.AppendLine("<tr>");
-            sb.AppendLine("<th>Player Name</th>");
-            sb.AppendLine("<th>Total Tankiest</th>");
-            sb.AppendLine("</tr>");
-            foreach (UnitData unit in m_dataBuilder.UnitData.Where(b => b.UnitName == toonName).OrderByDescending(a => a.CurrentTankiest).Take(10))
-            {
-                sb.AppendLine("<tr>");
-                sb.AppendLine($"<td>{unit.PlayerName}</td>");
-                sb.AppendLine($"<td>{unit.CurrentTankiest}</td>");
-                sb.AppendLine("</tr>");
-            }
-            sb.AppendLine("</table>");
-            sb.AppendLine("<p/>");
+            sb.Append(HTMLConstructor.AddTable(new string[] { "Player Name", "Health" }, TakeTopXOfStatAndReturnTableData(10, "CurrentHealth", new string[] {"PlayerName", "CurrentHealth" }, toonName), "Health"));
 
-            sb.AppendLine("<b>Speed</b>");
-            sb.AppendLine("<table>");
-            sb.AppendLine("<tr>");
-            sb.AppendLine("<th>Player Name</th>");
-            sb.AppendLine("<th>Total Speed</th>");
-            sb.AppendLine("</tr>");
-            foreach (UnitData unit in m_dataBuilder.UnitData.Where(b => b.UnitName == toonName).OrderByDescending(a => a.CurrentSpeed).Take(10))
-            {
-                sb.AppendLine("<tr>");
-                sb.AppendLine($"<td>{unit.PlayerName}</td>");
-                sb.AppendLine($"<td>{unit.CurrentSpeed}</td>");
-                sb.AppendLine("</tr>");
-            }
-            sb.AppendLine("</table>");
-            sb.AppendLine("<p/>");
+            sb.Append(HTMLConstructor.TableGroupNext());
 
-            sb.AppendLine("<b>Physical Offense</b>");
-            sb.AppendLine("<table>");
-            sb.AppendLine("<tr>");
-            sb.AppendLine("<th>Player Name</th>");
-            sb.AppendLine("<th>Total Physical Offense</th>");
-            sb.AppendLine("</tr>");
-            foreach (UnitData unit in m_dataBuilder.UnitData.Where(b => b.UnitName == toonName).OrderByDescending(a => a.CurrentPhysicalOffense).Take(10))
-            {
-                sb.AppendLine("<tr>");
-                sb.AppendLine($"<td>{unit.PlayerName}</td>");
-                sb.AppendLine($"<td>{unit.CurrentPhysicalOffense}</td>");
-                sb.AppendLine("</tr>");
-            }
-            sb.AppendLine("</table>");
-            sb.AppendLine("<p/>");
+            sb.Append(HTMLConstructor.AddTable(new string[] { "Player Name", "Protection" }, TakeTopXOfStatAndReturnTableData(10, "CurrentProtection", new string[] { "PlayerName", "CurrentProtection" }, toonName), "Protection"));
+            
+            sb.Append(HTMLConstructor.TableGroupNext());
+           
+            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Tankiest" }, TakeTopXOfStatAndReturnTableData(10, "CurrentTankiest", new string[] { "PlayerName", "CurrentTankiest" }, toonName), "Tankiest"));
 
-            sb.AppendLine("<b>Special Offense</b>");
-            sb.AppendLine("<table>");
-            sb.AppendLine("<tr>");
-            sb.AppendLine("<th>Player Name</th>");
-            sb.AppendLine("<th>Total Special Offense</th>");
-            sb.AppendLine("</tr>");
-            foreach (UnitData unit in m_dataBuilder.UnitData.Where(b => b.UnitName == toonName).OrderByDescending(a => a.CurrentSpecialOffense).Take(10))
-            {
-                sb.AppendLine("<tr>");
-                sb.AppendLine($"<td>{unit.PlayerName}</td>");
-                sb.AppendLine($"<td>{unit.CurrentSpecialOffense}</td>");
-                sb.AppendLine("</tr>");
-            }
-            sb.AppendLine("</table>");
-            sb.AppendLine("<p/>");
+            sb.AppendLine(HTMLConstructor.TableGroupEnd());
+            sb.AppendLine(HTMLConstructor.TableGroupStart());
 
-            sb.AppendLine("<b>Physical Defense</b>");
-            sb.AppendLine("<table>");
-            sb.AppendLine("<tr>");
-            sb.AppendLine("<th>Player Name</th>");
-            sb.AppendLine("<th>Total Physical Defense</th>");
-            sb.AppendLine("</tr>");
-            foreach (UnitData unit in m_dataBuilder.UnitData.Where(b => b.UnitName == toonName).OrderByDescending(a => a.CurrentPhysicalDefense).Take(10))
-            {
-                sb.AppendLine("<tr>");
-                sb.AppendLine($"<td>{unit.PlayerName}</td>");
-                sb.AppendLine($"<td>{unit.CurrentPhysicalDefense}</td>");
-                sb.AppendLine("</tr>");
-            }
-            sb.AppendLine("</table>");
-            sb.AppendLine("<p/>");
+            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Speed" }, TakeTopXOfStatAndReturnTableData(10, "CurrentSpeed", new string[] { "PlayerName", "CurrentSpeed" }, toonName), "Speed"));
 
-            sb.AppendLine("<b>Special Defense</b>");
-            sb.AppendLine("<table>");
-            sb.AppendLine("<tr>");
-            sb.AppendLine("<th>Player Name</th>");
-            sb.AppendLine("<th>Total Special Defense</th>");
-            sb.AppendLine("</tr>");
-            foreach (UnitData unit in m_dataBuilder.UnitData.Where(b => b.UnitName == toonName).OrderByDescending(a => a.CurrentSpecialDefense).Take(10))
-            {
-                sb.AppendLine("<tr>");
-                sb.AppendLine($"<td>{unit.PlayerName}</td>");
-                sb.AppendLine($"<td>{unit.CurrentSpecialDefense}</td>");
-                sb.AppendLine("</tr>");
-            }
-            sb.AppendLine("</table>");
-            sb.AppendLine("<p/>");
+            sb.Append(HTMLConstructor.TableGroupNext());
 
-            sb.AppendLine("<b>Physical Crit Chance</b>");
-            sb.AppendLine("<table>");
-            sb.AppendLine("<tr>");
-            sb.AppendLine("<th>Player Name</th>");            
-            sb.AppendLine("<th>Total Physical Crit Chance</th>");
-            sb.AppendLine("</tr>");
-            foreach (UnitData unit in m_dataBuilder.UnitData.Where(b => b.UnitName == toonName).OrderByDescending(a => a.CurrentPhysicalCritChance).Take(10))
-            {
-                sb.AppendLine("<tr>");
-                sb.AppendLine($"<td>{unit.PlayerName}</td>");
-                sb.AppendLine($"<td>{unit.CurrentPhysicalCritChance}</td>");
-                sb.AppendLine("</tr>");
-            }
-            sb.AppendLine("</table>");
-            sb.AppendLine("<p/>");
+            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "PO" }, TakeTopXOfStatAndReturnTableData(10, "CurrentPhysicalOffense", new string[] { "PlayerName", "CurrentPhysicalOffense" }, toonName), "Physical Offense"));
 
-            sb.AppendLine("<b>Special Crit Chance</b>");
-            sb.AppendLine("<table>");
-            sb.AppendLine("<tr>");
-            sb.AppendLine("<th>Player Name</th>");
-            sb.AppendLine("<th>Total Special Crit Chance</th>");
-            sb.AppendLine("</tr>");
-            foreach (UnitData unit in m_dataBuilder.UnitData.Where(b => b.UnitName == toonName).OrderByDescending(a => a.CurrentSpecialCritChance).Take(10))
-            {
-                sb.AppendLine("<tr>");
-                sb.AppendLine($"<td>{unit.PlayerName}</td>");
-                sb.AppendLine($"<td>{unit.CurrentSpecialCritChance}</td>");
-                sb.AppendLine("</tr>");
-            }
-            sb.AppendLine("</table>");
-            sb.AppendLine("<p/>");
+            sb.Append(HTMLConstructor.TableGroupNext());
+             
+            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "SO" }, TakeTopXOfStatAndReturnTableData(10, "CurrentSpecialOffense", new string[] { "PlayerName", "CurrentSpecialOffense" }, toonName), "Special Offense"));
 
-            sb.AppendLine("<b>Potency</b>");
-            sb.AppendLine("<table>");
-            sb.AppendLine("<tr>");
-            sb.AppendLine("<th>Player Name</th>");
-            sb.AppendLine("<th>Total Potency</th>");
-            sb.AppendLine("</tr>");
-            foreach (UnitData unit in m_dataBuilder.UnitData.Where(b => b.UnitName == toonName).OrderByDescending(a => a.CurrentPotency).Take(10))
-            {
-                sb.AppendLine("<tr>");
-                sb.AppendLine($"<td>{unit.PlayerName}</td>");
-                sb.AppendLine($"<td>{unit.CurrentPotency}</td>");
-                sb.AppendLine("</tr>");
-            }
-            sb.AppendLine("</table>");
-            sb.AppendLine("<p/>");
+            sb.AppendLine(HTMLConstructor.TableGroupEnd());
+            sb.AppendLine(HTMLConstructor.TableGroupStart());
 
-            sb.AppendLine("<b>Tenacity</b>");
-            sb.AppendLine("<table>");
-            sb.AppendLine("<tr>");
-            sb.AppendLine("<th>Player Name</th>");
-            sb.AppendLine("<th>Total Tenacity</th>");
-            sb.AppendLine("</tr>");
-            foreach (UnitData unit in m_dataBuilder.UnitData.Where(b => b.UnitName == toonName).OrderByDescending(a => a.CurrentTenacity).Take(10))
-            {
-                sb.AppendLine("<tr>");
-                sb.AppendLine($"<td>{unit.PlayerName}</td>");
-                sb.AppendLine($"<td>{unit.CurrentTenacity}</td>");
-                sb.AppendLine("</tr>");
-            }
-            sb.AppendLine("</table>");
-            sb.AppendLine("<p/>");
+            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "PD" }, TakeTopXOfStatAndReturnTableData(10, "CurrentPhysicalDefense", new string[] { "PlayerName", "CurrentPhysicalDefense" }, toonName), "Physical Defense"));
 
-            sb.AppendLine("<b>Highest Galatic Power</b>");
-            sb.AppendLine("<table>");
-            sb.AppendLine("<tr>");
-            sb.AppendLine("<th>Player Name</th>");
-            sb.AppendLine("<th>Galatic Power</th>");
-            sb.AppendLine("<th>Gear Level</th>");
-            sb.AppendLine("</tr>");
-            foreach (UnitData unit in m_dataBuilder.UnitData.Where(b => b.UnitName == toonName).OrderByDescending(a => a.NewGalaticPower).Take(10))
-            {
-                sb.AppendLine("<tr>");
-                sb.AppendLine($"<td>{unit.PlayerName}</td>");
-                sb.AppendLine($"<td>{unit.NewPower}</td>");
-                sb.AppendLine($"<td>{unit.NewGearLevel}</td>");
-                sb.AppendLine("</tr>");
-            }
-            sb.AppendLine("</table>");
+            sb.Append(HTMLConstructor.TableGroupNext());
+
+            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "SD" }, TakeTopXOfStatAndReturnTableData(10, "CurrentSpecialDefense", new string[] { "PlayerName", "CurrentSpecialDefense" }, toonName), "Special Defense"));
+
+            sb.Append(HTMLConstructor.TableGroupNext());
+
+            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "PCC" }, TakeTopXOfStatAndReturnTableData(10, "CurrentPhysicalCritChance", new string[] { "PlayerName", "CurrentPhysicalCritChance" }, toonName), "Physical CC"));
+
+            sb.AppendLine(HTMLConstructor.TableGroupEnd());
+            sb.AppendLine(HTMLConstructor.TableGroupStart());
+
+            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "SCC" }, TakeTopXOfStatAndReturnTableData(10, "CurrentSpecialCritChance", new string[] { "PlayerName", "CurrentSpecialCritChance" }, toonName), "Special CC"));
+
+            sb.Append(HTMLConstructor.TableGroupNext());
+             
+            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Potency" }, TakeTopXOfStatAndReturnTableData(10, "CurrentPotency", new string[] { "PlayerName", "CurrentPotency" }, toonName), "Potency"));
+
+            sb.Append(HTMLConstructor.TableGroupNext());
+
+            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Tenacity" }, TakeTopXOfStatAndReturnTableData(10, "CurrentTenacity", new string[] { "PlayerName", "CurrentTenacity" }, toonName), "Tenacity"));
+
+            sb.AppendLine(HTMLConstructor.TableGroupEnd());
+            sb.AppendLine(HTMLConstructor.TableGroupStart());
+
+            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Galatic Power", "Gear Level" }, TakeTopXOfStatAndReturnTableData(10, "NewPower", new string[] { "PlayerName", "NewPower", "NewGearLevel" }, toonName), "Highest Galatic Power"));
+
+            sb.AppendLine(HTMLConstructor.TableGroupEnd());
+
             sb.AppendLine("<p/>");
 
             m_characterHighlight = sb.ToString();
@@ -1041,220 +898,61 @@ table, th, td {
 
             sb.AppendLine("This section highlights the top 20 toons of various stats.  Only the stats that are affected by mods with multiple primary or secondary capabilities are highlighted here (IE Crit Damage only has a single primary stat increase, so its a easly obtained ceiling).");
             sb.AppendLine("<p/>");
-            sb.AppendLine("<b>Health</b>");
-            sb.AppendLine("<table>");
-            sb.AppendLine("<tr>");
-            sb.AppendLine("<th>Player Name</th>");
-            sb.AppendLine("<th>Toon</th>");
-            sb.AppendLine("<th>Total Health</th>");
-            sb.AppendLine("</tr>");
-            foreach (UnitData unit in m_dataBuilder.UnitData.OrderByDescending(a => a.CurrentHealth).Take(20))
-            {
-                sb.AppendLine("<tr>");
-                sb.AppendLine($"<td>{unit.PlayerName}</td>");
-                sb.AppendLine($"<td>{unit.UnitName}</td>");
-                sb.AppendLine($"<td>{unit.CurrentHealth}</td>");
-                sb.AppendLine("</tr>");
-            }
-            sb.AppendLine("</table>");
-            sb.AppendLine("<p/>");
 
-            sb.AppendLine("<b>Protection</b>");
-            sb.AppendLine("<table>");
-            sb.AppendLine("<tr>");
-            sb.AppendLine("<th>Player Name</th>");
-            sb.AppendLine("<th>Toon</th>");
-            sb.AppendLine("<th>Total Protection</th>");
-            sb.AppendLine("</tr>");
-            foreach (UnitData unit in m_dataBuilder.UnitData.OrderByDescending(a => a.CurrentProtection).Take(20))
-            {
-                sb.AppendLine("<tr>");
-                sb.AppendLine($"<td>{unit.PlayerName}</td>");
-                sb.AppendLine($"<td>{unit.UnitName}</td>");
-                sb.AppendLine($"<td>{unit.CurrentProtection}</td>");
-                sb.AppendLine("</tr>");
-            }
-            sb.AppendLine("</table>");
-            sb.AppendLine("<p/>");
+            sb.AppendLine(HTMLConstructor.TableGroupStart());
 
-            sb.AppendLine("<b>Tankiest (Health + Protection)</b>");
-            sb.AppendLine("<table>");
-            sb.AppendLine("<tr>");
-            sb.AppendLine("<th>Player Name</th>");
-            sb.AppendLine("<th>Toon</th>");
-            sb.AppendLine("<th>Total Tankiest</th>");
-            sb.AppendLine("</tr>");
-            foreach (UnitData unit in m_dataBuilder.UnitData.OrderByDescending(a => a.CurrentTankiest).Take(20))
-            {
-                sb.AppendLine("<tr>");
-                sb.AppendLine($"<td>{unit.PlayerName}</td>");
-                sb.AppendLine($"<td>{unit.UnitName}</td>");
-                sb.AppendLine($"<td>{unit.CurrentTankiest}</td>");
-                sb.AppendLine("</tr>");
-            }
-            sb.AppendLine("</table>");
-            sb.AppendLine("<p/>");
+            sb.Append(HTMLConstructor.AddTable(new string[] { "Player Name", "Toon", "Health" }, TakeTopXOfStatAndReturnTableData(20, "CurrentHealth", new string[] { "PlayerName", "UnitName", "CurrentHealth" }), "Health"));
 
-            sb.AppendLine("<b>Speed</b>");
-            sb.AppendLine("<table>");
-            sb.AppendLine("<tr>");
-            sb.AppendLine("<th>Player Name</th>");
-            sb.AppendLine("<th>Toon</th>");
-            sb.AppendLine("<th>Total Speed</th>");
-            sb.AppendLine("</tr>");
-            foreach (UnitData unit in m_dataBuilder.UnitData.OrderByDescending(a => a.CurrentSpeed).Take(20))
-            {
-                sb.AppendLine("<tr>");
-                sb.AppendLine($"<td>{unit.PlayerName}</td>");
-                sb.AppendLine($"<td>{unit.UnitName}</td>");
-                sb.AppendLine($"<td>{unit.CurrentSpeed}</td>");
-                sb.AppendLine("</tr>");
-            }
-            sb.AppendLine("</table>");
-            sb.AppendLine("<p/>");
+            sb.Append(HTMLConstructor.TableGroupNext());
 
-            sb.AppendLine("<b>Physical Offense</b>");
-            sb.AppendLine("<table>");
-            sb.AppendLine("<tr>");
-            sb.AppendLine("<th>Player Name</th>");
-            sb.AppendLine("<th>Toon</th>");
-            sb.AppendLine("<th>Total Physical Offense</th>");
-            sb.AppendLine("</tr>");
-            foreach (UnitData unit in m_dataBuilder.UnitData.OrderByDescending(a => a.CurrentPhysicalOffense).Take(20))
-            {
-                sb.AppendLine("<tr>");
-                sb.AppendLine($"<td>{unit.PlayerName}</td>");
-                sb.AppendLine($"<td>{unit.UnitName}</td>");
-                sb.AppendLine($"<td>{unit.CurrentPhysicalOffense}</td>");
-                sb.AppendLine("</tr>");
-            }
-            sb.AppendLine("</table>");
-            sb.AppendLine("<p/>");
+            sb.Append(HTMLConstructor.AddTable(new string[] { "Player Name", "Toon", "Protection" }, TakeTopXOfStatAndReturnTableData(20, "CurrentProtection", new string[] { "PlayerName", "UnitName", "CurrentProtection" }), "Protection"));
 
-            sb.AppendLine("<b>Special Offense</b>");
-            sb.AppendLine("<table>");
-            sb.AppendLine("<tr>");
-            sb.AppendLine("<th>Player Name</th>");
-            sb.AppendLine("<th>Toon</th>");
-            sb.AppendLine("<th>Total Special Offense</th>");
-            sb.AppendLine("</tr>");
-            foreach (UnitData unit in m_dataBuilder.UnitData.OrderByDescending(a => a.CurrentSpecialOffense).Take(20))
-            {
-                sb.AppendLine("<tr>");
-                sb.AppendLine($"<td>{unit.PlayerName}</td>");
-                sb.AppendLine($"<td>{unit.UnitName}</td>");
-                sb.AppendLine($"<td>{unit.CurrentSpecialOffense}</td>");
-                sb.AppendLine("</tr>");
-            }
-            sb.AppendLine("</table>");
-            sb.AppendLine("<p/>");
+            sb.AppendLine(HTMLConstructor.TableGroupEnd());
+            sb.AppendLine(HTMLConstructor.TableGroupStart());
 
-            sb.AppendLine("<b>Physical Defense</b>");
-            sb.AppendLine("<table>");
-            sb.AppendLine("<tr>");
-            sb.AppendLine("<th>Player Name</th>");
-            sb.AppendLine("<th>Toon</th>");
-            sb.AppendLine("<th>Total Physical Defense</th>");
-            sb.AppendLine("</tr>");
-            foreach (UnitData unit in m_dataBuilder.UnitData.OrderByDescending(a => a.CurrentPhysicalDefense).Take(20))
-            {
-                sb.AppendLine("<tr>");
-                sb.AppendLine($"<td>{unit.PlayerName}</td>");
-                sb.AppendLine($"<td>{unit.UnitName}</td>");
-                sb.AppendLine($"<td>{unit.CurrentPhysicalDefense}</td>");
-                sb.AppendLine("</tr>");
-            }
-            sb.AppendLine("</table>");
-            sb.AppendLine("<p/>");
+            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Toon", "Tankiest" }, TakeTopXOfStatAndReturnTableData(20, "CurrentTankiest", new string[] { "PlayerName", "UnitName", "CurrentTankiest" }), "Tankiest"));
 
-            sb.AppendLine("<b>Special Defense</b>");
-            sb.AppendLine("<table>");
-            sb.AppendLine("<tr>");
-            sb.AppendLine("<th>Player Name</th>");
-            sb.AppendLine("<th>Toon</th>");
-            sb.AppendLine("<th>Total Special Defense</th>");
-            sb.AppendLine("</tr>");
-            foreach (UnitData unit in m_dataBuilder.UnitData.OrderByDescending(a => a.CurrentSpecialDefense).Take(20))
-            {
-                sb.AppendLine("<tr>");
-                sb.AppendLine($"<td>{unit.PlayerName}</td>");
-                sb.AppendLine($"<td>{unit.UnitName}</td>");
-                sb.AppendLine($"<td>{unit.CurrentSpecialDefense}</td>");
-                sb.AppendLine("</tr>");
-            }
-            sb.AppendLine("</table>");
-            sb.AppendLine("<p/>");
+            sb.Append(HTMLConstructor.TableGroupNext());
 
-            sb.AppendLine("<b>Physical Crit Chance</b>");
-            sb.AppendLine("<table>");
-            sb.AppendLine("<tr>");
-            sb.AppendLine("<th>Player Name</th>");
-            sb.AppendLine("<th>Toon</th>");
-            sb.AppendLine("<th>Total Physical Crit Chance</th>");
-            sb.AppendLine("</tr>");
-            foreach (UnitData unit in m_dataBuilder.UnitData.OrderByDescending(a => a.CurrentPhysicalCritChance).Take(20))
-            {
-                sb.AppendLine("<tr>");
-                sb.AppendLine($"<td>{unit.PlayerName}</td>");
-                sb.AppendLine($"<td>{unit.UnitName}</td>");
-                sb.AppendLine($"<td>{unit.CurrentPhysicalCritChance}</td>");
-                sb.AppendLine("</tr>");
-            }
-            sb.AppendLine("</table>");
-            sb.AppendLine("<p/>");
+            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Toon", "Speed" }, TakeTopXOfStatAndReturnTableData(20, "CurrentSpeed", new string[] { "PlayerName", "UnitName", "CurrentSpeed" }), "Speed"));
 
-            sb.AppendLine("<b>Special Crit Chance</b>");
-            sb.AppendLine("<table>");
-            sb.AppendLine("<tr>");
-            sb.AppendLine("<th>Player Name</th>");
-            sb.AppendLine("<th>Toon</th>");
-            sb.AppendLine("<th>Total Special Crit Chance</th>");
-            sb.AppendLine("</tr>");
-            foreach (UnitData unit in m_dataBuilder.UnitData.OrderByDescending(a => a.CurrentSpecialCritChance).Take(20))
-            {
-                sb.AppendLine("<tr>");
-                sb.AppendLine($"<td>{unit.PlayerName}</td>");
-                sb.AppendLine($"<td>{unit.UnitName}</td>");
-                sb.AppendLine($"<td>{unit.CurrentSpecialCritChance}</td>");
-                sb.AppendLine("</tr>");
-            }
-            sb.AppendLine("</table>");
-            sb.AppendLine("<p/>");
+            sb.AppendLine(HTMLConstructor.TableGroupEnd());
+            sb.AppendLine(HTMLConstructor.TableGroupStart());
 
-            sb.AppendLine("<b>Potency</b>");
-            sb.AppendLine("<table>");
-            sb.AppendLine("<tr>");
-            sb.AppendLine("<th>Player Name</th>");
-            sb.AppendLine("<th>Toon</th>");
-            sb.AppendLine("<th>Total Potency</th>");
-            sb.AppendLine("</tr>");
-            foreach (UnitData unit in m_dataBuilder.UnitData.OrderByDescending(a => a.CurrentPotency).Take(20))
-            {
-                sb.AppendLine("<tr>");
-                sb.AppendLine($"<td>{unit.PlayerName}</td>");
-                sb.AppendLine($"<td>{unit.UnitName}</td>");
-                sb.AppendLine($"<td>{unit.CurrentPotency}</td>");
-                sb.AppendLine("</tr>");
-            }
-            sb.AppendLine("</table>");
-            sb.AppendLine("<p/>");
+            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Toon", "PO" }, TakeTopXOfStatAndReturnTableData(20, "CurrentPhysicalOffense", new string[] { "PlayerName", "UnitName", "CurrentPhysicalOffense" }), "Physical Offense"));
 
-            sb.AppendLine("<b>Tenacity</b>");
-            sb.AppendLine("<table>");
-            sb.AppendLine("<tr>");
-            sb.AppendLine("<th>Player Name</th>");
-            sb.AppendLine("<th>Toon</th>");
-            sb.AppendLine("<th>Total Tenacity</th>");
-            sb.AppendLine("</tr>");
-            foreach (UnitData unit in m_dataBuilder.UnitData.OrderByDescending(a => a.CurrentTenacity).Take(20))
-            {
-                sb.AppendLine("<tr>");
-                sb.AppendLine($"<td>{unit.PlayerName}</td>");
-                sb.AppendLine($"<td>{unit.UnitName}</td>");
-                sb.AppendLine($"<td>{unit.CurrentTenacity}</td>");
-                sb.AppendLine("</tr>");
-            }
-            sb.AppendLine("</table>");
+            sb.Append(HTMLConstructor.TableGroupNext());
+
+            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Toon", "SO" }, TakeTopXOfStatAndReturnTableData(20, "CurrentSpecialOffense", new string[] { "PlayerName", "UnitName", "CurrentSpecialOffense" }), "Special Offense"));
+
+            sb.AppendLine(HTMLConstructor.TableGroupEnd());
+            sb.AppendLine(HTMLConstructor.TableGroupStart());
+
+            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Toon", "PD" }, TakeTopXOfStatAndReturnTableData(20, "CurrentPhysicalDefense", new string[] { "PlayerName", "UnitName", "CurrentPhysicalDefense" }), "Physical Defense"));
+
+            sb.Append(HTMLConstructor.TableGroupNext());
+
+            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Toon", "SD" }, TakeTopXOfStatAndReturnTableData(20, "CurrentSpecialDefense", new string[] { "PlayerName", "UnitName", "CurrentSpecialDefense" }), "Special Defense"));
+
+            sb.AppendLine(HTMLConstructor.TableGroupEnd());
+            sb.AppendLine(HTMLConstructor.TableGroupStart());
+
+            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Toon", "PCC" }, TakeTopXOfStatAndReturnTableData(20, "CurrentPhysicalCritChance", new string[] { "PlayerName", "UnitName", "CurrentPhysicalCritChance" }), "Physical CC"));
+
+            sb.Append(HTMLConstructor.TableGroupNext());
+
+            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Toon", "SCC" }, TakeTopXOfStatAndReturnTableData(20, "CurrentSpecialCritChance", new string[] { "PlayerName", "UnitName", "CurrentSpecialCritChance" }), "Special CC"));
+
+            sb.AppendLine(HTMLConstructor.TableGroupEnd());
+            sb.AppendLine(HTMLConstructor.TableGroupStart());
+
+            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Toon", "Potency" }, TakeTopXOfStatAndReturnTableData(20, "CurrentPotency", new string[] { "PlayerName", "UnitName", "CurrentPotency" }), "Potency"));
+
+            sb.Append(HTMLConstructor.TableGroupNext());
+
+            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Toon", "Tenacity" }, TakeTopXOfStatAndReturnTableData(20, "CurrentTenacity", new string[] { "PlayerName", "UnitName", "CurrentTenacity" }), "Tenacity"));
+
+            sb.AppendLine(HTMLConstructor.TableGroupEnd());
             sb.AppendLine("<p/>");
 
             m_topTwentySection = sb.ToString();
@@ -1391,18 +1089,28 @@ table, th, td {
 
             await Task.CompletedTask;
         }
+
+        private string TakeTopXOfStatAndReturnTableData(int amount, string stat, string[] properties, string toonName = null)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            IEnumerable<UnitData> units;
+
+            if (!String.IsNullOrEmpty(toonName))
+                units = m_dataBuilder.UnitData.Where(b => b.UnitName == toonName).OrderByDescending(a => a.GetType().GetProperty(stat).GetValue(a, null)).Take(amount);
+            else
+                units = m_dataBuilder.UnitData.OrderByDescending(a => a.GetType().GetProperty(stat).GetValue(a, null)).Take(amount);
+
+            foreach (UnitData unit in units)
+            {
+                sb.AppendLine("<tr>");
+                foreach (string property in properties)
+                    sb.AppendLine($"<td>{unit.GetType().GetProperty(property).GetValue(unit, null)}</td>");
+
+                sb.AppendLine("</tr>");
+            }
+
+            return sb.ToString();
+        }
     }
 }
-
-/*
-Top 10 of every stat
-Who 7* toon
-Who G13 toon
-Top 10 GP jump by number
-Top 10 GP jump by percentage of their previous/current GP (edited) 
-Kyle L 2:59 PM
-Gold Group Members
-Zetas Applied
-Kyle L 3:34 PM
-Journey or Legendary unlock
-*/
