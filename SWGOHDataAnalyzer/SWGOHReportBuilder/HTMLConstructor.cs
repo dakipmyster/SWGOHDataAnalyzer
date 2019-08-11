@@ -8,15 +8,11 @@ namespace SWGOHReportBuilder
 {
     public static class HTMLConstructor
     {
-        public static string TableGroupStart(bool noBorder = false)
+        public static string TableGroupStart()
         {
             StringBuilder sb = new StringBuilder();
 
-            if(noBorder)
-                sb.AppendLine("<table border=\"0\">");
-            else
-                sb.AppendLine("<table>");
-
+            sb.AppendLine("<table>");
             sb.AppendLine("<tr valign=\"top\">");
             sb.AppendLine("<td>");
 
@@ -51,15 +47,16 @@ namespace SWGOHReportBuilder
             sb.AppendLine("<table>");
 
             if (!String.IsNullOrEmpty(tableLabel))
-            {
-                sb.AppendLine("<tr>");
-                sb.AppendLine($"<th colspan= \"{headers.Length.ToString()}\">{tableLabel}</th>");
+            {                
+                sb.AppendLine("<tr style=\"border: 1px solid black\" bgcolor =\"yellow\">");
+                sb.AppendLine($"<th style=\"border: 1px solid black\" colspan=\"{headers.Length.ToString()}\">{tableLabel}</th>");
                 sb.AppendLine("</tr>");
+                sb.AppendLine("<tr/>");
             }
 
-            sb.AppendLine("<tr>");
-            foreach(string header in headers)            
-                sb.AppendLine($"<th>{header}</th>");
+            sb.AppendLine("<tr style=\"border: 1px solid black\" bgcolor=\"orange\">");
+            foreach (string header in headers)            
+                sb.AppendLine($"<th style=\"border: 1px solid black\">{header}</th>");
             
             sb.AppendLine("</tr>");
             sb.AppendLine(tableData);

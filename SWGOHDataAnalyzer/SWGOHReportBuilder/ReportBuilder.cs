@@ -74,9 +74,6 @@ namespace SWGOHReportBuilder
             string toonName = SWGOHMessageSystem.InputMessage("Please enter in the name of the toon you wish to highlight in the report.");
 
             pdfString.Append(@"<html><head><style>
-th, td {
-  border: 1px solid black; 
-}
 table {
   border-collapse: collapse;
   page-break-inside:avoid
@@ -375,7 +372,7 @@ th, td{
                 StringBuilder goldTeamBuilder = new StringBuilder();
 
                 if (teamCount == 1)
-                    sb.AppendLine(HTMLConstructor.TableGroupStart(true));
+                    sb.AppendLine(HTMLConstructor.TableGroupStart());
 
                 foreach(var player in goldTeam.Value)
                 {
