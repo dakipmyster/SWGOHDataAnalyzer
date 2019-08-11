@@ -74,7 +74,7 @@ namespace SWGOHReportBuilder
             string toonName = SWGOHMessageSystem.InputMessage("Please enter in the name of the toon you wish to highlight in the report.");
 
             pdfString.Append(@"<html><head><style>
-table, th, td {
+th, td {
   border: 1px solid black; 
 }
 table {
@@ -82,7 +82,7 @@ table {
   page-break-inside:avoid
 }
 tr:nth-child(even) {background-color: #f2f2f2;}
-th, td {
+th, td{
   padding: 2px;
 }
 </style></head><body>");
@@ -95,7 +95,7 @@ th, td {
             tasks.Add(JourneyOrLegendaryUnlock());
             tasks.Add(JourneyPrepared());
             tasks.Add(GoldMembers());
-            tasks.Add(FormatPlayerGPDifferences());
+            tasks.Add(PlayerGPDifferences());
             tasks.Add(UnitGPDifferences());
             tasks.Add(TopTwentySection());
             tasks.Add(DetailedData());
@@ -205,26 +205,20 @@ th, td {
             StringBuilder sb = new StringBuilder();
 
             sb.AppendLine("This section highlights the top 20 toons who have had the greatest GP increase.");
-            sb.AppendLine("<table>");
-            sb.AppendLine("<tr>");
-            sb.AppendLine("<th>Player Name</th>");
-            sb.AppendLine("<th>Toon</th>");
-            sb.AppendLine("<th>Old Power</th>");
-            sb.AppendLine("<th>New Power</th>");
-            sb.AppendLine("<th>Difference in Power</th>");
-            sb.AppendLine("</tr>");
+            
+            StringBuilder unitGPDiff = new StringBuilder();
             foreach (UnitData unit in m_filteredUnitData.OrderByDescending(a => a.PowerDifference).Take(20))
-            {                
-                sb.AppendLine("<tr>");
-                sb.AppendLine($"<td>{unit.PlayerName}</td>");
-                sb.AppendLine($"<td>{unit.UnitName}</td>");
-                sb.AppendLine($"<td>{unit.OldPower}</td>");
-                sb.AppendLine($"<td>{unit.NewPower}</td>");
-                sb.AppendLine($"<td>{unit.PowerDifference}</td>");
-                sb.AppendLine("</tr>");                
+            {
+                unitGPDiff.AppendLine("<tr>");
+                unitGPDiff.AppendLine($"<td>{unit.PlayerName}</td>");
+                unitGPDiff.AppendLine($"<td>{unit.UnitName}</td>");
+                unitGPDiff.AppendLine($"<td>{unit.OldPower}</td>");
+                unitGPDiff.AppendLine($"<td>{unit.NewPower}</td>");
+                unitGPDiff.AppendLine($"<td>{unit.PowerDifference}</td>");
+                unitGPDiff.AppendLine("</tr>");                
             }
 
-            sb.AppendLine("</table>");
+            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Toon", "Old Power", "New Power", "Power Increase" }, unitGPDiff.ToString()));
             sb.AppendLine("<p/>");
 
             m_UnitGPDifferences = sb.ToString();
@@ -235,6 +229,7 @@ th, td {
         private async Task GoldMembers()
         {
             StringBuilder sb = new StringBuilder();
+            Dictionary<string, List<string>> goldTeams = new Dictionary<string, List<string>>();
             List<UnitData> rebels = new List<UnitData>();
             List<UnitData> jkr = new List<UnitData>();
             List<UnitData> dr = new List<UnitData>();
@@ -252,238 +247,80 @@ th, td {
 
             sb.AppendLine("This section is to showcase players who have invested the gear and zetas for 'meta' or key toons of factions");
             sb.AppendLine("<p/>");
-            sb.AppendLine("Rebels team. Commander Luke Skywalker(lead, binds all things), Han Solo(Shoots First), Chewie(all), R2-D2(Number Crunch), C-3PO(Oh My Goodness!)");
-            sb.AppendLine("<table>");
-            sb.AppendLine("<tr>");
-            sb.AppendLine("<th>Player Name</th>");
-            sb.AppendLine("</tr>");
+            sb.AppendLine("<b>Rebels Team.</b> Commander Luke Skywalker(lead, binds all things), Han Solo(Shoots First), Chewie(all), R2-D2(Number Crunch), C-3PO(Oh My Goodness!)");
+            sb.AppendLine("<p/>");
+            sb.AppendLine("<b>JKR Team.</b> Grand Master Yoda(Battle Meditation), Jolee Bindo(That Looks Pretty Bad), Bastila Shan, General Kenobi, Jedi Knight Revan(all)");
+            sb.AppendLine("<p/>");
+            sb.AppendLine("<b>DR Team.</b> Darth Revan(all), Bastila Shan (Fallen)(Sith Apprentice) HK-47(Self-Reconstruction), Darth Malak(all)");
+            sb.AppendLine("<p/>");
+            sb.AppendLine("<b>Trimitive Team.</b> Darth Traya(all), Darth Sion(Lord of Pain), Darth Nihilus(Lord of Hunger)");
+            sb.AppendLine("<p/>");
+            sb.AppendLine("<b>Resistance Team.</b> Rey (Jedi Training)(Inspirational Presence), Finn, BB-8(Roll with the Punches), Amilyn Holdo");
+            sb.AppendLine("<p/>");
+            sb.AppendLine("<b>Bounty Hunter Team.</b> Bossk(On The Hunt), Jango Fett, Boba Fett, Embo, Dengar");
+            sb.AppendLine("<p/>");
+            sb.AppendLine("<b>Nightsister Team.</b> Mother Talzin(The Great Mother) Asajj Ventress, Old Daka, Nightsister Zombie");
+            sb.AppendLine("<p/>");
+            sb.AppendLine("<b>Troopers Team.</b> General Veers(Aggressive Tactician), Colonel Starck, Range Trooper");
+            sb.AppendLine("<p/>");
+            sb.AppendLine("<b>Old Republic Team.</b> Juhani, Carth Onasi(lead), Zaalbar(Mission's Guardian), Mission Vao(Me and Big Z Forever), Canderous Ordo");
+            sb.AppendLine("<p/>");
+            sb.AppendLine("<b>Sepratist Droid Team.</b> General Grievous(all), B1 Battle Droid(Droid Battalion), B2 Super Battle Droid, Droideka, IG-100 MagnaGuard");
+            sb.AppendLine("<p/>");
+            sb.AppendLine("<b>Bugs Team.</b> Geonosian Brood Alpha(all), Geonosian Soldier, Geonosian Spy, Poggle the Lesser, Sun Fac");
+            sb.AppendLine("<p/>");
+            sb.AppendLine("<b>Galatic Republic Team.</b> Padmé Amidala(all), Jedi Knight Anakin, Ahsoka Tano, General Kenobi");
+            sb.AppendLine("<p/>");
+            sb.AppendLine("<b>Ewok Team.</b> Chief Chirpa(Simple Tactics), Wicket, Logray, Paploo");
+            sb.AppendLine("<p/>");
+            sb.AppendLine("<b>First Order Team.</b> Kylo Ren (Unmasked)(all), Kylo Ren, First Order Officer, First Order Executioner");
 
             rebels.AddRange(m_dataBuilder.UnitData.Where(a => a.UnitName == "Commander Luke Skywalker" && a.NewGearLevel > 11 && a.NewZetas.Contains("It Binds All Things")));
             rebels.AddRange(m_dataBuilder.UnitData.Where(a => a.UnitName == "Han Solo" && a.NewGearLevel > 11 && a.NewZetas.Contains("Shoots First")));
             rebels.AddRange(m_dataBuilder.UnitData.Where(a => a.UnitName == "Chewbacca" && a.NewGearLevel > 11 && a.NewZetas.Contains("Loyal Friend") && a.NewZetas.Contains("Raging Wookiee")));
             rebels.AddRange(m_dataBuilder.UnitData.Where(a => a.UnitName == "R2-D2" && a.NewGearLevel > 11 && a.NewZetas.Contains("Number Crunch")));
             rebels.AddRange(m_dataBuilder.UnitData.Where(a => a.UnitName == "C-3PO" && a.NewGearLevel > 11 && a.NewZetas.Contains("Oh My Goodness!")));
-
-            var groupedRebels = rebels.Select(a => a.PlayerName).ToList().GroupBy(b => b);
-            foreach(var player in groupedRebels)
-            {
-                if(player.Count() == 5)
-                {
-                    sb.AppendLine("<tr>");
-                    sb.AppendLine($"<td>{player.Key}</td>");
-                    sb.AppendLine("</tr>");
-                }
-            }        
-
-            sb.AppendLine("</table>");
-            sb.AppendLine("<p/>");
-
-            sb.AppendLine("JKR team. Grand Master Yoda(Battle Meditation), Jolee Bindo(That Looks Pretty Bad), Bastila Shan, General Kenobi, Jedi Knight Revan(all)");
-            sb.AppendLine("<table>");
-            sb.AppendLine("<tr>");
-            sb.AppendLine("<th>Player Name</th>");
-            sb.AppendLine("</tr>");
-
+            
             jkr.AddRange(m_dataBuilder.UnitData.Where(a => a.UnitName == "Jolee Bindo" && a.NewGearLevel > 11 && a.NewZetas.Contains("That Looks Pretty Bad")));
             jkr.AddRange(m_dataBuilder.UnitData.Where(a => a.UnitName == "Grand Master Yoda" && a.NewGearLevel > 11 && a.NewZetas.Contains("Battle Meditation")));
             jkr.AddRange(m_dataBuilder.UnitData.Where(a => a.UnitName == "Bastila Shan" && a.NewGearLevel > 11));
             jkr.AddRange(m_dataBuilder.UnitData.Where(a => a.UnitName == "General Kenobi" && a.NewGearLevel > 11));
             jkr.AddRange(m_dataBuilder.UnitData.Where(a => a.UnitName == "Jedi Knight Revan" && a.NewGearLevel > 11 && a.NewZetas.Contains("Direct Focus") && a.NewZetas.Contains("Hero") && a.NewZetas.Contains("General")));
 
-            var groupedJKR = jkr.Select(a => a.PlayerName).ToList().GroupBy(b => b);
-            foreach (var player in groupedJKR)
-            {
-                if (player.Count() == 5)
-                {
-                    sb.AppendLine("<tr>");
-                    sb.AppendLine($"<td>{player.Key}</td>");
-                    sb.AppendLine("</tr>");
-                }
-            }
-
-            sb.AppendLine("</table>");
-            sb.AppendLine("<p/>");
-
-            sb.AppendLine("DR team. Darth Revan(all), Bastila Shan (Fallen)(Sith Apprentice) HK-47(Self-Reconstruction), Darth Malak(all)");
-            sb.AppendLine("<table>");
-            sb.AppendLine("<tr>");
-            sb.AppendLine("<th>Player Name</th>");
-            sb.AppendLine("</tr>");
-
             dr.AddRange(m_dataBuilder.UnitData.Where(a => a.UnitName == "HK-47" && a.NewGearLevel > 11 && a.NewZetas.Contains("Self-Reconstruction")));
             dr.AddRange(m_dataBuilder.UnitData.Where(a => a.UnitName == "Bastila Shan (Fallen)" && a.NewGearLevel > 11 && a.NewZetas.Contains("Sith Apprentice")));
             dr.AddRange(m_dataBuilder.UnitData.Where(a => a.UnitName == "Darth Malak" && a.NewGearLevel > 11 && a.NewZetas.Contains("Gnawing Terror") && a.NewZetas.Contains("Jaws of Life")));
             dr.AddRange(m_dataBuilder.UnitData.Where(a => a.UnitName == "Darth Revan" && a.NewGearLevel > 11 && a.NewZetas.Contains("Lord of the Sith") && a.NewZetas.Contains("Conqueror") && a.NewZetas.Contains("Villain")));
 
-            var groupedDR = dr.Select(a => a.PlayerName).ToList().GroupBy(b => b);
-            foreach (var player in groupedDR)
-            {
-                if (player.Count() == 4)
-                {
-                    sb.AppendLine("<tr>");
-                    sb.AppendLine($"<td>{player.Key}</td>");
-                    sb.AppendLine("</tr>");
-                }
-            }
-
-            sb.AppendLine("</table>");
-            sb.AppendLine("<p/>");
-
-            sb.AppendLine("Trimitive team. Darth Traya(all), Darth Sion(Lord of Pain), Darth Nihilus(Lord of Hunger)");
-            sb.AppendLine("<table>");
-            sb.AppendLine("<tr>");
-            sb.AppendLine("<th>Player Name</th>");
-            sb.AppendLine("</tr>");
-
             trimitive.AddRange(m_dataBuilder.UnitData.Where(a => a.UnitName == "Darth Sion" && a.NewGearLevel > 11 && a.NewZetas.Contains("Lord of Pain")));
             trimitive.AddRange(m_dataBuilder.UnitData.Where(a => a.UnitName == "Darth Nihilus" && a.NewGearLevel > 11 && a.NewZetas.Contains("Lord of Hunger")));
             trimitive.AddRange(m_dataBuilder.UnitData.Where(a => a.UnitName == "Darth Traya" && a.NewGearLevel > 11 && a.NewZetas.Contains("Lord of Betrayal") && a.NewZetas.Contains("Compassion is Weakness")));
-
-            var groupedTrimitive = trimitive.Select(a => a.PlayerName).ToList().GroupBy(b => b);
-            foreach (var player in groupedTrimitive)
-            {
-                if (player.Count() == 3)
-                {
-                    sb.AppendLine("<tr>");
-                    sb.AppendLine($"<td>{player.Key}</td>");
-                    sb.AppendLine("</tr>");
-                }
-            }
-
-            sb.AppendLine("</table>");
-            sb.AppendLine("<p/>");
-
-            sb.AppendLine("Resistance team. Rey (Jedi Training)(Inspirational Presence), Finn, BB-8(Roll with the Punches), Amilyn Holdo");
-            sb.AppendLine("<table>");
-            sb.AppendLine("<tr>");
-            sb.AppendLine("<th>Player Name</th>");
-            sb.AppendLine("</tr>");
 
             resistance.AddRange(m_dataBuilder.UnitData.Where(a => a.UnitName == "BB-8" && a.NewGearLevel > 11 && a.NewZetas.Contains("Roll with the Punches")));
             resistance.AddRange(m_dataBuilder.UnitData.Where(a => a.UnitName == "Rey (Jedi Training)" && a.NewGearLevel > 11 && a.NewZetas.Contains("Inspirational Presence")));
             resistance.AddRange(m_dataBuilder.UnitData.Where(a => a.UnitName == "Finn" && a.NewGearLevel > 11));
             resistance.AddRange(m_dataBuilder.UnitData.Where(a => a.UnitName == "Amilyn Holdo" && a.NewGearLevel > 11));
-
-            var groupedResistance = resistance.Select(a => a.PlayerName).ToList().GroupBy(b => b);
-            foreach (var player in groupedResistance)
-            {
-                if (player.Count() == 4)
-                {
-                    sb.AppendLine("<tr>");
-                    sb.AppendLine($"<td>{player.Key}</td>");
-                    sb.AppendLine("</tr>");
-                }
-            }
-
-            sb.AppendLine("</table>");
-            sb.AppendLine("<p/>");
             
-            sb.AppendLine("Bounty Hunter team. Bossk(On The Hunt), Jango Fett, Boba Fett, Embo, Dengar");
-            sb.AppendLine("<table>");
-            sb.AppendLine("<tr>");
-            sb.AppendLine("<th>Player Name</th>");
-            sb.AppendLine("</tr>");
-
             bountyHunter.AddRange(m_dataBuilder.UnitData.Where(a => a.UnitName == "Bossk" && a.NewGearLevel > 11 && a.NewZetas.Contains("On The Hunt")));
             bountyHunter.AddRange(m_dataBuilder.UnitData.Where(a => a.UnitName == "Jango Fett" && a.NewGearLevel > 11));
             bountyHunter.AddRange(m_dataBuilder.UnitData.Where(a => a.UnitName == "Boba Fett" && a.NewGearLevel > 11));
             bountyHunter.AddRange(m_dataBuilder.UnitData.Where(a => a.UnitName == "Embo" && a.NewGearLevel > 11));
             bountyHunter.AddRange(m_dataBuilder.UnitData.Where(a => a.UnitName == "Dengar" && a.NewGearLevel > 11));
 
-            var groupedBH = bountyHunter.Select(a => a.PlayerName).ToList().GroupBy(b => b);
-            foreach (var player in groupedBH)
-            {
-                if (player.Count() == 5)
-                {
-                    sb.AppendLine("<tr>");
-                    sb.AppendLine($"<td>{player.Key}</td>");
-                    sb.AppendLine("</tr>");
-                }
-            }
-
-            sb.AppendLine("</table>");
-            sb.AppendLine("<p/>");
-
-            sb.AppendLine("Nightsister team. Mother Talzin(The Great Mother) Asajj Ventress, Old Daka, Nightsister Zombie");
-            sb.AppendLine("<table>");
-            sb.AppendLine("<tr>");
-            sb.AppendLine("<th>Player Name</th>");
-            sb.AppendLine("</tr>");
-
             nightsister.AddRange(m_dataBuilder.UnitData.Where(a => a.UnitName == "Mother Talzin" && a.NewGearLevel > 11 && a.NewZetas.Contains("The Great Mother")));
             nightsister.AddRange(m_dataBuilder.UnitData.Where(a => a.UnitName == "Nightsister Zombie" && a.NewGearLevel > 11));
             nightsister.AddRange(m_dataBuilder.UnitData.Where(a => a.UnitName == "Old Daka" && a.NewGearLevel > 11));
             nightsister.AddRange(m_dataBuilder.UnitData.Where(a => a.UnitName == "Asajj Ventress" && a.NewGearLevel > 11));
 
-            var groupedNS = nightsister.Select(a => a.PlayerName).ToList().GroupBy(b => b);
-            foreach (var player in groupedNS)
-            {
-                if (player.Count() == 4)
-                {
-                    sb.AppendLine("<tr>");
-                    sb.AppendLine($"<td>{player.Key}</td>");
-                    sb.AppendLine("</tr>");
-                }
-            }
-
-            sb.AppendLine("</table>");
-            sb.AppendLine("<p/>");
-
-            sb.AppendLine("Troopers team. General Veers(Aggressive Tactician), Colonel Starck, Range Trooper");
-            sb.AppendLine("<table>");
-            sb.AppendLine("<tr>");
-            sb.AppendLine("<th>Player Name</th>");
-            sb.AppendLine("</tr>");
-
             trooper.AddRange(m_dataBuilder.UnitData.Where(a => a.UnitName == "General Veers" && a.NewGearLevel > 11 && a.NewZetas.Contains("Aggressive Tactician")));
             trooper.AddRange(m_dataBuilder.UnitData.Where(a => a.UnitName == "Colonel Starck" && a.NewGearLevel > 11));
             trooper.AddRange(m_dataBuilder.UnitData.Where(a => a.UnitName == "Range Trooper" && a.NewGearLevel > 11));
             
-            var groupedTrooper = trooper.Select(a => a.PlayerName).ToList().GroupBy(b => b);
-            foreach (var player in groupedTrooper)
-            {
-                if (player.Count() == 3)
-                {
-                    sb.AppendLine("<tr>");
-                    sb.AppendLine($"<td>{player.Key}</td>");
-                    sb.AppendLine("</tr>");
-                }
-            }
-
-            sb.AppendLine("</table>");
-            sb.AppendLine("<p/>");
-
-            sb.AppendLine("Old Republic team. Juhani, Carth Onasi(lead), Zaalbar(Mission's Guardian), Mission Vao(Me and Big Z Forever), Canderous Ordo");
-            sb.AppendLine("<table>");
-            sb.AppendLine("<tr>");
-            sb.AppendLine("<th>Player Name</th>");
-            sb.AppendLine("</tr>");
-
             oldRepublic.AddRange(m_dataBuilder.UnitData.Where(a => a.UnitName == "Carth Onasi" && a.NewGearLevel > 11 && a.NewZetas.Contains("Soldier of the Old Republic")));
             oldRepublic.AddRange(m_dataBuilder.UnitData.Where(a => a.UnitName == "Mission Vao" && a.NewGearLevel > 11 && a.NewZetas.Contains("Me and Big Z Forever")));
             oldRepublic.AddRange(m_dataBuilder.UnitData.Where(a => a.UnitName == "Canderous Ordo" && a.NewGearLevel > 11));
             oldRepublic.AddRange(m_dataBuilder.UnitData.Where(a => a.UnitName == "Juhani" && a.NewGearLevel > 11));
             oldRepublic.AddRange(m_dataBuilder.UnitData.Where(a => a.UnitName == "Zaalbar" && a.NewGearLevel > 11 && a.NewZetas.Contains("Mission's Guardian")));
-
-            var groupedOR = oldRepublic.Select(a => a.PlayerName).ToList().GroupBy(b => b);
-            foreach (var player in groupedOR)
-            {
-                if (player.Count() == 5)
-                {
-                    sb.AppendLine("<tr>");
-                    sb.AppendLine($"<td>{player.Key}</td>");
-                    sb.AppendLine("</tr>");
-                }
-            }
-
-            sb.AppendLine("</table>");
-            sb.AppendLine("<p/>");
-
-            sb.AppendLine("Sepratist Droid team. General Grievous(all), B1 Battle Droid(Droid Battalion), B2 Super Battle Droid, Droideka, IG-100 MagnaGuard");
-            sb.AppendLine("<table>");
-            sb.AppendLine("<tr>");
-            sb.AppendLine("<th>Player Name</th>");
-            sb.AppendLine("</tr>");
 
             sepratistDroid.AddRange(m_dataBuilder.UnitData.Where(a => a.UnitName == "B1 Battle Droid" && a.NewGearLevel > 11 && a.NewZetas.Contains("Droid Battalion")));
             sepratistDroid.AddRange(m_dataBuilder.UnitData.Where(a => a.UnitName == "B2 Super Battle Droid" && a.NewGearLevel > 11));
@@ -491,121 +328,76 @@ th, td {
             sepratistDroid.AddRange(m_dataBuilder.UnitData.Where(a => a.UnitName == "IG-100 MagnaGuard" && a.NewGearLevel > 11));
             sepratistDroid.AddRange(m_dataBuilder.UnitData.Where(a => a.UnitName == "General Grievous" && a.NewGearLevel > 11 && a.NewZetas.Contains("Daunting Presence") && a.NewZetas.Contains("Metalloid Monstrosity")));
 
-            var groupedSepDroid = sepratistDroid.Select(a => a.PlayerName).ToList().GroupBy(b => b);
-            foreach (var player in groupedSepDroid)
-            {
-                if (player.Count() == 5)
-                {
-                    sb.AppendLine("<tr>");
-                    sb.AppendLine($"<td>{player.Key}</td>");
-                    sb.AppendLine("</tr>");
-                }
-            }
-
-            sb.AppendLine("</table>");
-            sb.AppendLine("<p/>");
-
-            sb.AppendLine("Bugs team. Geonosian Brood Alpha(all), Geonosian Soldier, Geonosian Spy, Poggle the Lesser, Sun Fac");
-            sb.AppendLine("<table>");
-            sb.AppendLine("<tr>");
-            sb.AppendLine("<th>Player Name</th>");
-            sb.AppendLine("</tr>");
-                        
             bugs.AddRange(m_dataBuilder.UnitData.Where(a => a.UnitName == "Geonosian Soldier" && a.NewGearLevel > 11));
             bugs.AddRange(m_dataBuilder.UnitData.Where(a => a.UnitName == "Geonosian Spy" && a.NewGearLevel > 11));
             bugs.AddRange(m_dataBuilder.UnitData.Where(a => a.UnitName == "Poggle the Lesser" && a.NewGearLevel > 11));
             bugs.AddRange(m_dataBuilder.UnitData.Where(a => a.UnitName == "Sun Fac" && a.NewGearLevel > 11));
             bugs.AddRange(m_dataBuilder.UnitData.Where(a => a.UnitName == "Geonosian Brood Alpha" && a.NewGearLevel > 11 && a.NewZetas.Contains("Queen's Will") && a.NewZetas.Contains("Geonosian Swarm")));
 
-            var groupedBugs = bugs.Select(a => a.PlayerName).ToList().GroupBy(b => b);
-            foreach (var player in groupedBugs)
-            {
-                if (player.Count() == 5)
-                {
-                    sb.AppendLine("<tr>");
-                    sb.AppendLine($"<td>{player.Key}</td>");
-                    sb.AppendLine("</tr>");
-                }
-            }
-
-            sb.AppendLine("</table>");
-            sb.AppendLine("<p/>");
-
-            sb.AppendLine("Galatic Republic team. Padmé Amidala(all), Jedi Knight Anakin, Ahsoka Tano, General Kenobi");
-            sb.AppendLine("<table>");
-            sb.AppendLine("<tr>");
-            sb.AppendLine("<th>Player Name</th>");
-            sb.AppendLine("</tr>");
-
             galaticRepublic.AddRange(m_dataBuilder.UnitData.Where(a => a.UnitName == "Jedi Knight Anakin" && a.NewGearLevel > 11));
             galaticRepublic.AddRange(m_dataBuilder.UnitData.Where(a => a.UnitName == "Ahsoka Tano" && a.NewGearLevel > 11));
             galaticRepublic.AddRange(m_dataBuilder.UnitData.Where(a => a.UnitName == "General Kenobi" && a.NewGearLevel > 11));
             galaticRepublic.AddRange(m_dataBuilder.UnitData.Where(a => a.UnitName == "Padmé Amidala" && a.NewGearLevel > 11 && a.NewZetas.Contains("Always a Choice") && a.NewZetas.Contains("Unwavering Courage")));
-
-            var groupedGR = galaticRepublic.Select(a => a.PlayerName).ToList().GroupBy(b => b);
-            foreach (var player in groupedGR)
-            {
-                if (player.Count() == 4)
-                {
-                    sb.AppendLine("<tr>");
-                    sb.AppendLine($"<td>{player.Key}</td>");
-                    sb.AppendLine("</tr>");
-                }
-            }
-
-            sb.AppendLine("</table>");
-            sb.AppendLine("<p/>");
-
-            sb.AppendLine("Ewok team. Chief Chirpa(Simple Tactics), Wicket, Logray, Paploo");
-            sb.AppendLine("<table>");
-            sb.AppendLine("<tr>");
-            sb.AppendLine("<th>Player Name</th>");
-            sb.AppendLine("</tr>");
 
             ewok.AddRange(m_dataBuilder.UnitData.Where(a => a.UnitName == "Chief Chirpa" && a.NewGearLevel > 11 && a.NewZetas.Contains("Simple Tactics")));
             ewok.AddRange(m_dataBuilder.UnitData.Where(a => a.UnitName == "Logray" && a.NewGearLevel > 11));
             ewok.AddRange(m_dataBuilder.UnitData.Where(a => a.UnitName == "Paploo" && a.NewGearLevel > 11));
             ewok.AddRange(m_dataBuilder.UnitData.Where(a => a.UnitName == "Wicket" && a.NewGearLevel > 11));
 
-            var groupedEwok = ewok.Select(a => a.PlayerName).ToList().GroupBy(b => b);
-            foreach (var player in groupedEwok)
-            {
-                if (player.Count() == 4)
-                {
-                    sb.AppendLine("<tr>");
-                    sb.AppendLine($"<td>{player.Key}</td>");
-                    sb.AppendLine("</tr>");
-                }
-            }
-
-            sb.AppendLine("</table>");
-            sb.AppendLine("<p/>");
-
-            sb.AppendLine("First Order team. Kylo Ren (Unmasked)(all), Kylo Ren, First Order Officer, First Order Executioner");
-            sb.AppendLine("<table>");
-            sb.AppendLine("<tr>");
-            sb.AppendLine("<th>Player Name</th>");
-            sb.AppendLine("</tr>");
-                        
             firstOrder.AddRange(m_dataBuilder.UnitData.Where(a => a.UnitName == "First Order Officer" && a.NewGearLevel > 11));
             firstOrder.AddRange(m_dataBuilder.UnitData.Where(a => a.UnitName == "First Order Executioner" && a.NewGearLevel > 11));
             firstOrder.AddRange(m_dataBuilder.UnitData.Where(a => a.UnitName == "Kylo Ren" && a.NewGearLevel > 11));
             firstOrder.AddRange(m_dataBuilder.UnitData.Where(a => a.UnitName == "Kylo Ren (Unmasked)" && a.NewGearLevel > 11 && a.NewZetas.Contains("Scarred") && a.NewZetas.Contains("Merciless Pursuit")));
 
-            var groupedFO = firstOrder.Select(a => a.PlayerName).ToList().GroupBy(b => b);
-            foreach (var player in groupedFO)
+            goldTeams.Add("Rebels Team", FindGoldTeamPlayers(rebels.Select(a => a.PlayerName).ToList().GroupBy(b => b), 5));
+            goldTeams.Add("JKR Team", FindGoldTeamPlayers(jkr.Select(a => a.PlayerName).ToList().GroupBy(b => b), 5));
+            goldTeams.Add("DR Team", FindGoldTeamPlayers(dr.Select(a => a.PlayerName).ToList().GroupBy(b => b), 4));
+            goldTeams.Add("Trimitive Team", FindGoldTeamPlayers(trimitive.Select(a => a.PlayerName).ToList().GroupBy(b => b), 3));
+            goldTeams.Add("Resistance Team", FindGoldTeamPlayers(resistance.Select(a => a.PlayerName).ToList().GroupBy(b => b), 4));
+            goldTeams.Add("Bounty Hunter Team", FindGoldTeamPlayers(bountyHunter.Select(a => a.PlayerName).ToList().GroupBy(b => b), 5));
+            goldTeams.Add("Nightsister Team", FindGoldTeamPlayers(nightsister.Select(a => a.PlayerName).ToList().GroupBy(b => b), 4));
+            goldTeams.Add("Troopers Team", FindGoldTeamPlayers(trooper.Select(a => a.PlayerName).ToList().GroupBy(b => b), 3));
+            goldTeams.Add("Old Republic Team", FindGoldTeamPlayers(oldRepublic.Select(a => a.PlayerName).ToList().GroupBy(b => b), 5));
+            goldTeams.Add("Sepratist Droid Team", FindGoldTeamPlayers(sepratistDroid.Select(a => a.PlayerName).ToList().GroupBy(b => b), 5));
+            goldTeams.Add("Bugs Team", FindGoldTeamPlayers(bugs.Select(a => a.PlayerName).ToList().GroupBy(b => b), 5));
+            goldTeams.Add("Galatic Republic Team", FindGoldTeamPlayers(galaticRepublic.Select(a => a.PlayerName).ToList().GroupBy(b => b), 4));
+            goldTeams.Add("Ewok Team", FindGoldTeamPlayers(ewok.Select(a => a.PlayerName).ToList().GroupBy(b => b), 4));
+            goldTeams.Add("First Order Team", FindGoldTeamPlayers(firstOrder.Select(a => a.PlayerName).ToList().GroupBy(b => b), 4));
+
+            var goldTeamsList = goldTeams.ToList();
+
+            goldTeamsList.Sort((pair1, pair2) => pair2.Value.Count.CompareTo(pair1.Value.Count));
+            int teamCount = 0;
+
+            foreach(var goldTeam in goldTeamsList)
             {
-                if (player.Count() == 4)
+                teamCount++;
+                StringBuilder goldTeamBuilder = new StringBuilder();
+
+                if (teamCount == 1)
+                    sb.AppendLine(HTMLConstructor.TableGroupStart(true));
+
+                foreach(var player in goldTeam.Value)
                 {
-                    sb.AppendLine("<tr>");
-                    sb.AppendLine($"<td>{player.Key}</td>");
-                    sb.AppendLine("</tr>");
+                    goldTeamBuilder.AppendLine("<tr>");
+                    goldTeamBuilder.AppendLine($"<td>{player}</td>");
+                    goldTeamBuilder.AppendLine("</tr>");
                 }
+
+                sb.AppendLine(HTMLConstructor.AddTable(new string[] { goldTeam.Key }, goldTeamBuilder.ToString()));
+
+                if (teamCount == 5)
+                {
+                    sb.AppendLine(HTMLConstructor.TableGroupEnd());
+                    teamCount = 0;
+                }
+                else
+                    sb.AppendLine(HTMLConstructor.TableGroupNext());
             }
-            
-            sb.AppendLine("</table>");
-            sb.AppendLine("<p/>");
-            
+
+            if(teamCount != 0)
+                sb.AppendLine(HTMLConstructor.TableGroupEnd());
+
             m_goldMembers = sb.ToString();
 
             await Task.CompletedTask;
@@ -622,12 +414,7 @@ th, td {
             List<string> jediTrainingReyLocked = new List<string>();
 
             sb.AppendLine("This section highlights all of the players whom are awaitng the return of Journey Toons. This only factors in if the player meets the min requirement in game to participate in the event to unlock the toon");
-            sb.AppendLine("<table>");
-            sb.AppendLine("<tr>");
-            sb.AppendLine("<th>Player Name</th>");
-            sb.AppendLine("<th>Toon</th>");
-            sb.AppendLine("</tr>");
-
+            
             foreach(PlayerData player in m_dataBuilder.PlayerData)
             {
                 if (m_dataBuilder.UnitData.Where(a => a.PlayerName == player.PlayerName && a.UnitName == "Darth Malak").Count() == 0)
@@ -730,15 +517,16 @@ th, td {
                 }
             }
 
+            StringBuilder prepaired = new StringBuilder();
             foreach (Unlock unlock in unlocks.OrderBy(a => a.PlayerName))
             {
-                sb.AppendLine("<tr>");
-                sb.AppendLine($"<td>{unlock.PlayerName}</td>");
-                sb.AppendLine($"<td>{unlock.UnitOrShipName}</td>");
-                sb.AppendLine("</tr>");
+                prepaired.AppendLine("<tr>");
+                prepaired.AppendLine($"<td>{unlock.PlayerName}</td>");
+                prepaired.AppendLine($"<td>{unlock.UnitOrShipName}</td>");
+                prepaired.AppendLine("</tr>");
             }
+            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Toon" }, prepaired.ToString()));
 
-            sb.AppendLine("</table>");
             sb.AppendLine("<p/>");
 
             m_journeyPrepared = sb.ToString();
@@ -751,12 +539,7 @@ th, td {
             StringBuilder sb = new StringBuilder();
             List<Unlock> unlocks = new List<Unlock>();
 
-            sb.AppendLine("This section highlights all players who have unlocked a Legendary or Journey toon/ship.");
-            sb.AppendLine("<table>");
-            sb.AppendLine("<tr>");
-            sb.AppendLine("<th>Player Name</th>");
-            sb.AppendLine("<th>Toon</th>");
-            sb.AppendLine("</tr>");
+            sb.AppendLine("This section highlights all players who have unlocked a Legendary or Journey toon/ship.");            
 
             var filteredUnitList = m_dataBuilder.UnitData.Where(a => a.OldRarity == 0 && a.NewRarity != 0 && m_filteredPlayerNames.Contains(a.PlayerName) && (
                 a.UnitName == "Jedi Knight Revan" || 
@@ -783,17 +566,18 @@ th, td {
             )).ToList();
 
             foreach (ShipData ship in filteredShipList.OrderBy(a => a.PlayerName))
-                unlocks.Add(new Unlock(ship.PlayerName, ship.ShipName));          
+                unlocks.Add(new Unlock(ship.PlayerName, ship.ShipName));
 
+            StringBuilder unlockedRows = new StringBuilder();
             foreach(Unlock unlock in unlocks.OrderBy(a => a.PlayerName))
             {
-                sb.AppendLine("<tr>");
-                sb.AppendLine($"<td>{unlock.PlayerName}</td>");
-                sb.AppendLine($"<td>{unlock.UnitOrShipName}</td>");
-                sb.AppendLine("</tr>");
+                unlockedRows.AppendLine("<tr>");
+                unlockedRows.AppendLine($"<td>{unlock.PlayerName}</td>");
+                unlockedRows.AppendLine($"<td>{unlock.UnitOrShipName}</td>");
+                unlockedRows.AppendLine("</tr>");
             }
 
-            sb.AppendLine("</table>");
+            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Toon" }, unlockedRows.ToString()));
             sb.AppendLine("<p/>");
 
             m_journeyOrLegendaryUnlock = sb.ToString();
@@ -806,27 +590,24 @@ th, td {
             StringBuilder sb = new StringBuilder();
 
             sb.AppendLine("This section highlights all of the toons that have been given zetas since the last snapshot.");
-            sb.AppendLine("<table>");
-            sb.AppendLine("<tr>");
-            sb.AppendLine("<th>Player Name</th>");
-            sb.AppendLine("<th>Toon</th>");
-            sb.AppendLine("<th>Zetas</th>");
-            sb.AppendLine("</tr>");
+            
+            StringBuilder zetas = new StringBuilder();
             foreach (UnitData unit in m_filteredUnitData.OrderBy(a => a.PlayerName))
             {
                 if (unit.OldZetas.Count < unit.NewZetas.Count)
                 {
                     IEnumerable<string> zetaDifferences = unit.NewZetas.Except(unit.OldZetas);
 
-                    sb.AppendLine("<tr>");
-                    sb.AppendLine($"<td>{unit.PlayerName}</td>");
-                    sb.AppendLine($"<td>{unit.UnitName}</td>");
-                    sb.AppendLine($"<td>{string.Join(",", zetaDifferences.ToArray())}</td>");
-                    sb.AppendLine("</tr>");                    
+                    zetas.AppendLine("<tr>");
+                    zetas.AppendLine($"<td>{unit.PlayerName}</td>");
+                    zetas.AppendLine($"<td>{unit.UnitName}</td>");
+                    zetas.AppendLine($"<td>{string.Join(",", zetaDifferences.ToArray())}</td>");
+                    zetas.AppendLine("</tr>");                    
                 }
             }
 
-            sb.AppendLine("</table>");
+            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Toon", "Zetas" }, zetas.ToString()));
+
             sb.AppendLine("<p/>");
 
             m_zetasApplied = sb.ToString();
@@ -839,23 +620,9 @@ th, td {
             StringBuilder sb = new StringBuilder();
 
             sb.AppendLine("This section highlights all of the toons that have been geared to 13 since the last snapshot.");
-            sb.AppendLine("<table>");
-            sb.AppendLine("<tr>");
-            sb.AppendLine("<th>Player Name</th>");
-            sb.AppendLine("<th>Toon</th>");            
-            sb.AppendLine("</tr>");
-            foreach (UnitData unit in m_filteredUnitData.OrderBy(a => a.PlayerName))
-            {
-                if(unit.OldGearLevel < 13 && unit.NewGearLevel == 13)
-                {
-                    sb.AppendLine("<tr>");
-                    sb.AppendLine($"<td>{unit.PlayerName}</td>");
-                    sb.AppendLine($"<td>{unit.UnitName}</td>");
-                    sb.AppendLine("</tr>");
-                }
-            }
-            
-            sb.AppendLine("</table>");
+
+            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Toon" }, GetAllToonsOfGearLevelDifference(12)));
+
             sb.AppendLine("<p/>");
                         
             m_gearThirteenToons = sb.ToString();
@@ -867,24 +634,10 @@ th, td {
         {
             StringBuilder sb = new StringBuilder();
 
-            sb.AppendLine("This section highlights all of the toons that have been geared to 12 since the last snapshot.");
-            sb.AppendLine("<table>");
-            sb.AppendLine("<tr>");
-            sb.AppendLine("<th>Player Name</th>");
-            sb.AppendLine("<th>Toon</th>");
-            sb.AppendLine("</tr>");
-            foreach (UnitData unit in m_filteredUnitData.OrderBy(a => a.PlayerName))
-            {
-                if (unit.OldGearLevel < 12 && unit.NewGearLevel == 12)
-                {
-                    sb.AppendLine("<tr>");
-                    sb.AppendLine($"<td>{unit.PlayerName}</td>");
-                    sb.AppendLine($"<td>{unit.UnitName}</td>");
-                    sb.AppendLine("</tr>");
-                }
-            }
+            sb.AppendLine("This section highlights all of the toons that have been geared to 12 since the last snapshot.");            
 
-            sb.AppendLine("</table>");
+            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Toon" }, GetAllToonsOfGearLevelDifference(12)));
+
             sb.AppendLine("<p/>");
 
             m_gearTwelveToons = sb.ToString();
@@ -965,43 +718,37 @@ th, td {
             StringBuilder sb = new StringBuilder();
 
             sb.AppendLine("This section highlights all of the toons that have been 7*'ed since the last snapshot.");
-            sb.AppendLine("<table>");
-            sb.AppendLine("<tr>");
-            sb.AppendLine("<th>Player Name</th>");
-            sb.AppendLine("<th>Toon</th>");
-            sb.AppendLine("</tr>");
+           
+            StringBuilder units = new StringBuilder();
             foreach (UnitData unit in m_filteredUnitData.OrderBy(a => a.PlayerName))
             {
                 if (unit.OldRarity < 7 && unit.NewRarity == 7)
                 {
-                    sb.AppendLine("<tr>");
-                    sb.AppendLine($"<td>{unit.PlayerName}</td>");
-                    sb.AppendLine($"<td>{unit.UnitName}</td>");
-                    sb.AppendLine("</tr>");
+                    units.AppendLine("<tr>");
+                    units.AppendLine($"<td>{unit.PlayerName}</td>");
+                    units.AppendLine($"<td>{unit.UnitName}</td>");
+                    units.AppendLine("</tr>");
                 }
             }
-
-            sb.AppendLine("</table>");
+            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Toon" }, units.ToString()));
+                        
             sb.AppendLine("<p/>");
 
             sb.AppendLine("This section highlights all of the ships that have been 7*'ed since the last snapshot.");
-            sb.AppendLine("<table>");
-            sb.AppendLine("<tr>");
-            sb.AppendLine("<th>Player Name</th>");
-            sb.AppendLine("<th>Toon</th>");
-            sb.AppendLine("</tr>");
+
+            StringBuilder ships = new StringBuilder();
             foreach (ShipData ship in m_filteredShipData.OrderBy(a => a.PlayerName))
             {
                 if (ship.OldRarity < 7 && ship.NewRarity == 7)
                 {
-                    sb.AppendLine("<tr>");
-                    sb.AppendLine($"<td>{ship.PlayerName}</td>");
-                    sb.AppendLine($"<td>{ship.ShipName}</td>");
-                    sb.AppendLine("</tr>");
+                    ships.AppendLine("<tr>");
+                    ships.AppendLine($"<td>{ship.PlayerName}</td>");
+                    ships.AppendLine($"<td>{ship.ShipName}</td>");
+                    ships.AppendLine("</tr>");
                 }
             }
+            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Toon" }, units.ToString()));
 
-            sb.AppendLine("</table>");
             sb.AppendLine("<p/>");
 
             m_sevenStarSection = sb.ToString();
@@ -1009,48 +756,39 @@ th, td {
             await Task.CompletedTask;
         }
 
-        private async Task FormatPlayerGPDifferences()
+        private async Task PlayerGPDifferences()
         {
             StringBuilder sb = new StringBuilder();
 
             sb.AppendLine("This section goes over the Galatic Power (GP) differences for players between snapshots.  Here is the top ten players who have gained the most Galatic Power by total and by percentage from the previous snapshot.");
-            sb.AppendLine("<table>");
-            sb.AppendLine("<tr>");
-            sb.AppendLine("<th>Player Name</th>");
-            sb.AppendLine("<th>Previous Galatic Power</th>");
-            sb.AppendLine("<th>New Galatic Power</th>");
-            sb.AppendLine("<th>Galatic Power Increase</th>");
-            sb.AppendLine("</tr>");
+            
+            StringBuilder playerGPDiff = new StringBuilder();
             foreach (PlayerData player in m_dataBuilder.PlayerData.OrderByDescending(a => a.GalaticPowerDifference).Take(10))
             {
-                sb.AppendLine("<tr>");
-                sb.AppendLine($"<td>{player.PlayerName}</td>");
-                sb.AppendLine($"<td>{player.OldGalaticPower}</td>");
-                sb.AppendLine($"<td>{player.NewGalaticPower}</td>");
-                sb.AppendLine($"<td>{player.GalaticPowerDifference}</td>");
-                sb.AppendLine("</tr>");
+                playerGPDiff.AppendLine("<tr>");
+                playerGPDiff.AppendLine($"<td>{player.PlayerName}</td>");
+                playerGPDiff.AppendLine($"<td>{player.OldGalaticPower}</td>");
+                playerGPDiff.AppendLine($"<td>{player.NewGalaticPower}</td>");
+                playerGPDiff.AppendLine($"<td>{player.GalaticPowerDifference}</td>");
+                playerGPDiff.AppendLine("</tr>");
             }
 
-            sb.AppendLine("</table>");
+            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Previous Galatic Power", "New Galatic Power", "Galatic Power Increase" }, playerGPDiff.ToString()));
+
             sb.AppendLine("<p/>");
-            sb.AppendLine("<table>");
-            sb.AppendLine("<tr>");
-            sb.AppendLine("<th>Player Name</th>");
-            sb.AppendLine("<th>Previous Galatic Power</th>");
-            sb.AppendLine("<th>New Galatic Power</th>");
-            sb.AppendLine("<th>Galatic Power % Increase</th>");
-            sb.AppendLine("</tr>");
+                        
+            StringBuilder playerGPPercentDiff = new StringBuilder();
             foreach (PlayerData player in m_dataBuilder.PlayerData.OrderByDescending(a => a.GalaticPowerPercentageDifference).Take(10))
             {
-                sb.AppendLine("<tr>");
-                sb.AppendLine($"<td>{player.PlayerName}</td>");
-                sb.AppendLine($"<td>{player.OldGalaticPower}</td>");
-                sb.AppendLine($"<td>{player.NewGalaticPower}</td>");
-                sb.AppendLine($"<td>{player.GalaticPowerPercentageDifference}</td>");
-                sb.AppendLine("</tr>");
+                playerGPPercentDiff.AppendLine("<tr>");
+                playerGPPercentDiff.AppendLine($"<td>{player.PlayerName}</td>");
+                playerGPPercentDiff.AppendLine($"<td>{player.OldGalaticPower}</td>");
+                playerGPPercentDiff.AppendLine($"<td>{player.NewGalaticPower}</td>");
+                playerGPPercentDiff.AppendLine($"<td>{player.GalaticPowerPercentageDifference}</td>");
+                playerGPPercentDiff.AppendLine("</tr>");
             }
 
-            sb.AppendLine("</table>");
+            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Previous Galatic Power", "New Galatic Power", "Galatic Power % Increase" }, playerGPPercentDiff.ToString()));
             sb.AppendLine("<p/>");
 
             m_playerGPDifferences = sb.ToString();
@@ -1064,26 +802,21 @@ th, td {
             sb.AppendLine("For those who are interested, here is some full table data that the stats refer to.");
             sb.AppendLine("Here is the full list of players and their Galatic Power differences.");
 
-            sb.AppendLine("<table>");
-            sb.AppendLine("<tr>");
-            sb.AppendLine("<th>Player Name</th>");
-            sb.AppendLine("<th>Previous Galatic Power</th>");
-            sb.AppendLine("<th>New Galatic Power</th>");
-            sb.AppendLine("<th>Galatic Power Increase</th>");
-            sb.AppendLine("<th>Galatic Power % Increase</th>");
-            sb.AppendLine("</tr>");
+            sb.AppendLine("<p/>");
+            
+            StringBuilder detailedData = new StringBuilder();
             foreach (PlayerData player in m_dataBuilder.PlayerData.OrderBy(a => a.PlayerName).ToList())
             {
-                sb.AppendLine("<tr>");
-                sb.AppendLine($"<td>{player.PlayerName}</td>");
-                sb.AppendLine($"<td>{player.OldGalaticPower}</td>");
-                sb.AppendLine($"<td>{player.NewGalaticPower}</td>");
-                sb.AppendLine($"<td>{player.GalaticPowerDifference}</td>");
-                sb.AppendLine($"<td>{player.GalaticPowerPercentageDifference}</td>");
-                sb.AppendLine("</tr>");
+                detailedData.AppendLine("<tr>");
+                detailedData.AppendLine($"<td>{player.PlayerName}</td>");
+                detailedData.AppendLine($"<td>{player.OldGalaticPower}</td>");
+                detailedData.AppendLine($"<td>{player.NewGalaticPower}</td>");
+                detailedData.AppendLine($"<td>{player.GalaticPowerDifference}</td>");
+                detailedData.AppendLine($"<td>{player.GalaticPowerPercentageDifference}</td>");
+                detailedData.AppendLine("</tr>");
             }
 
-            sb.AppendLine("</table>");
+            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Previous Galatic Power", "New Galatic Power", "Galatic Power Increase", "Galatic Power % Increase" }, detailedData.ToString()));
 
             m_detailedData = sb.ToString();
 
@@ -1111,6 +844,35 @@ th, td {
             }
 
             return sb.ToString();
+        }
+
+        private string GetAllToonsOfGearLevelDifference(int gearLevel)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            foreach (UnitData unit in m_filteredUnitData.OrderBy(a => a.PlayerName))
+            {
+                if (unit.OldGearLevel < gearLevel && unit.NewGearLevel == gearLevel)
+                {
+                    sb.AppendLine("<tr>");
+                    sb.AppendLine($"<td>{unit.PlayerName}</td>");
+                    sb.AppendLine($"<td>{unit.UnitName}</td>");
+                    sb.AppendLine("</tr>");
+                }
+            }
+
+            return sb.ToString();
+        }
+
+        private List<string> FindGoldTeamPlayers(IEnumerable<IGrouping<string, string>> potentialPlayers, int count)
+        {
+            List<string> players = new List<string>();
+
+            foreach (var player in potentialPlayers)
+                if (player.Count() == count)
+                    players.Add(player.Key);
+
+            return players;
         }
     }
 }

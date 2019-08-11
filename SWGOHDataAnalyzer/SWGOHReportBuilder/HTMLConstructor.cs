@@ -8,12 +8,16 @@ namespace SWGOHReportBuilder
 {
     public static class HTMLConstructor
     {
-        public static string TableGroupStart()
+        public static string TableGroupStart(bool noBorder = false)
         {
             StringBuilder sb = new StringBuilder();
 
-            sb.AppendLine("<table>");
-            sb.AppendLine("<tr>");
+            if(noBorder)
+                sb.AppendLine("<table border=\"0\">");
+            else
+                sb.AppendLine("<table>");
+
+            sb.AppendLine("<tr valign=\"top\">");
             sb.AppendLine("<td>");
 
             return sb.ToString();
