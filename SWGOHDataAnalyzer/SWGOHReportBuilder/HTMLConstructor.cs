@@ -64,5 +64,18 @@ namespace SWGOHReportBuilder
 
             return sb.ToString();
         }
+
+        public static string AddTableData(string[] dataValues)
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine("<tr style=\"border: 1px solid black\">");
+
+            foreach (string data in dataValues)
+                sb.AppendLine($"<td style=\"border: 1px solid black\">{data}</td>");
+
+            sb.AppendLine("</tr>");
+
+            return sb.ToString();
+        }
     }
 }

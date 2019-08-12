@@ -84,7 +84,9 @@ th, td{
 }
 </style></head><body>");
             List<Task> tasks = new List<Task>();
-                        
+
+            pdfString.AppendLine("<a href=\"#testingthis\">Gold Teams</a>");
+
             tasks.Add(SevenStarSection());
             tasks.Add(GearTwelveToons());
             tasks.Add(GearThirteenToons());
@@ -205,15 +207,7 @@ th, td{
             
             StringBuilder unitGPDiff = new StringBuilder();
             foreach (UnitData unit in m_filteredUnitData.OrderByDescending(a => a.PowerDifference).Take(20))
-            {
-                unitGPDiff.AppendLine("<tr>");
-                unitGPDiff.AppendLine($"<td>{unit.PlayerName}</td>");
-                unitGPDiff.AppendLine($"<td>{unit.UnitName}</td>");
-                unitGPDiff.AppendLine($"<td>{unit.OldPower}</td>");
-                unitGPDiff.AppendLine($"<td>{unit.NewPower}</td>");
-                unitGPDiff.AppendLine($"<td>{unit.PowerDifference}</td>");
-                unitGPDiff.AppendLine("</tr>");                
-            }
+                unitGPDiff.AppendLine(HTMLConstructor.AddTableData(new string[] { unit.PlayerName, unit.UnitName, unit.OldPower.ToString(), unit.NewPower.ToString(), unit.PowerDifference.ToString() }));
 
             sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Toon", "Old Power", "New Power", "Power Increase" }, unitGPDiff.ToString()));
             sb.AppendLine("<p/>");
@@ -241,6 +235,8 @@ th, td{
             List<UnitData> galaticRepublic = new List<UnitData>();
             List<UnitData> ewok = new List<UnitData>();
             List<UnitData> firstOrder = new List<UnitData>();
+
+            sb.AppendLine("<div id=\"testingthis\"></div>");
 
             sb.AppendLine("This section is to showcase players who have invested the gear and zetas for 'meta' or key toons of factions");
             sb.AppendLine("<p/>");
@@ -375,11 +371,7 @@ th, td{
                     sb.AppendLine(HTMLConstructor.TableGroupStart());
 
                 foreach(var player in goldTeam.Value)
-                {
-                    goldTeamBuilder.AppendLine("<tr>");
-                    goldTeamBuilder.AppendLine($"<td>{player}</td>");
-                    goldTeamBuilder.AppendLine("</tr>");
-                }
+                    goldTeamBuilder.AppendLine(HTMLConstructor.AddTableData(new string[] { player }));
 
                 sb.AppendLine(HTMLConstructor.AddTable(new string[] { goldTeam.Key }, goldTeamBuilder.ToString()));
 
@@ -516,12 +508,8 @@ th, td{
 
             StringBuilder prepaired = new StringBuilder();
             foreach (Unlock unlock in unlocks.OrderBy(a => a.PlayerName))
-            {
-                prepaired.AppendLine("<tr>");
-                prepaired.AppendLine($"<td>{unlock.PlayerName}</td>");
-                prepaired.AppendLine($"<td>{unlock.UnitOrShipName}</td>");
-                prepaired.AppendLine("</tr>");
-            }
+                prepaired.AppendLine(HTMLConstructor.AddTableData(new string[] { unlock.PlayerName, unlock.UnitOrShipName }));
+
             sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Toon" }, prepaired.ToString()));
 
             sb.AppendLine("<p/>");
@@ -567,12 +555,7 @@ th, td{
 
             StringBuilder unlockedRows = new StringBuilder();
             foreach(Unlock unlock in unlocks.OrderBy(a => a.PlayerName))
-            {
-                unlockedRows.AppendLine("<tr>");
-                unlockedRows.AppendLine($"<td>{unlock.PlayerName}</td>");
-                unlockedRows.AppendLine($"<td>{unlock.UnitOrShipName}</td>");
-                unlockedRows.AppendLine("</tr>");
-            }
+                unlockedRows.AppendLine(HTMLConstructor.AddTableData(new string[] { unlock.PlayerName, unlock.UnitOrShipName }));
 
             sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Toon" }, unlockedRows.ToString()));
             sb.AppendLine("<p/>");
@@ -590,19 +573,9 @@ th, td{
             
             StringBuilder zetas = new StringBuilder();
             foreach (UnitData unit in m_filteredUnitData.OrderBy(a => a.PlayerName))
-            {
                 if (unit.OldZetas.Count < unit.NewZetas.Count)
-                {
-                    IEnumerable<string> zetaDifferences = unit.NewZetas.Except(unit.OldZetas);
-
-                    zetas.AppendLine("<tr>");
-                    zetas.AppendLine($"<td>{unit.PlayerName}</td>");
-                    zetas.AppendLine($"<td>{unit.UnitName}</td>");
-                    zetas.AppendLine($"<td>{string.Join(",", zetaDifferences.ToArray())}</td>");
-                    zetas.AppendLine("</tr>");                    
-                }
-            }
-
+                    zetas.AppendLine(HTMLConstructor.AddTableData(new string[] { unit.PlayerName, unit.UnitName, string.Join(",", unit.NewZetas.Except(unit.OldZetas).ToArray()) }));
+                
             sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Toon", "Zetas" }, zetas.ToString()));
 
             sb.AppendLine("<p/>");
@@ -718,15 +691,9 @@ th, td{
            
             StringBuilder units = new StringBuilder();
             foreach (UnitData unit in m_filteredUnitData.OrderBy(a => a.PlayerName))
-            {
                 if (unit.OldRarity < 7 && unit.NewRarity == 7)
-                {
-                    units.AppendLine("<tr>");
-                    units.AppendLine($"<td>{unit.PlayerName}</td>");
-                    units.AppendLine($"<td>{unit.UnitName}</td>");
-                    units.AppendLine("</tr>");
-                }
-            }
+                    units.AppendLine(HTMLConstructor.AddTableData(new string[] { unit.PlayerName, unit.UnitName }));
+
             sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Toon" }, units.ToString()));
                         
             sb.AppendLine("<p/>");
@@ -735,16 +702,9 @@ th, td{
 
             StringBuilder ships = new StringBuilder();
             foreach (ShipData ship in m_filteredShipData.OrderBy(a => a.PlayerName))
-            {
-                if (ship.OldRarity < 7 && ship.NewRarity == 7)
-                {
-                    ships.AppendLine("<tr>");
-                    ships.AppendLine($"<td>{ship.PlayerName}</td>");
-                    ships.AppendLine($"<td>{ship.ShipName}</td>");
-                    ships.AppendLine("</tr>");
-                }
-            }
-            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Toon" }, units.ToString()));
+                units.AppendLine(HTMLConstructor.AddTableData(new string[] { ship.PlayerName, ship.ShipName }));
+            
+            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Toon" }, ships.ToString()));
 
             sb.AppendLine("<p/>");
 
@@ -761,14 +721,7 @@ th, td{
             
             StringBuilder playerGPDiff = new StringBuilder();
             foreach (PlayerData player in m_dataBuilder.PlayerData.OrderByDescending(a => a.GalaticPowerDifference).Take(10))
-            {
-                playerGPDiff.AppendLine("<tr>");
-                playerGPDiff.AppendLine($"<td>{player.PlayerName}</td>");
-                playerGPDiff.AppendLine($"<td>{player.OldGalaticPower}</td>");
-                playerGPDiff.AppendLine($"<td>{player.NewGalaticPower}</td>");
-                playerGPDiff.AppendLine($"<td>{player.GalaticPowerDifference}</td>");
-                playerGPDiff.AppendLine("</tr>");
-            }
+                playerGPDiff.AppendLine(HTMLConstructor.AddTableData(new string[] { player.PlayerName, player.OldGalaticPower.ToString(), player.NewGalaticPower.ToString(), player.GalaticPowerDifference.ToString() }));
 
             sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Previous Galatic Power", "New Galatic Power", "Galatic Power Increase" }, playerGPDiff.ToString()));
 
@@ -776,14 +729,7 @@ th, td{
                         
             StringBuilder playerGPPercentDiff = new StringBuilder();
             foreach (PlayerData player in m_dataBuilder.PlayerData.OrderByDescending(a => a.GalaticPowerPercentageDifference).Take(10))
-            {
-                playerGPPercentDiff.AppendLine("<tr>");
-                playerGPPercentDiff.AppendLine($"<td>{player.PlayerName}</td>");
-                playerGPPercentDiff.AppendLine($"<td>{player.OldGalaticPower}</td>");
-                playerGPPercentDiff.AppendLine($"<td>{player.NewGalaticPower}</td>");
-                playerGPPercentDiff.AppendLine($"<td>{player.GalaticPowerPercentageDifference}</td>");
-                playerGPPercentDiff.AppendLine("</tr>");
-            }
+                playerGPPercentDiff.AppendLine(HTMLConstructor.AddTableData(new string[] { player.PlayerName, player.OldGalaticPower.ToString(), player.NewGalaticPower.ToString(), player.GalaticPowerPercentageDifference.ToString() }));
 
             sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Previous Galatic Power", "New Galatic Power", "Galatic Power % Increase" }, playerGPPercentDiff.ToString()));
             sb.AppendLine("<p/>");
@@ -803,15 +749,7 @@ th, td{
             
             StringBuilder detailedData = new StringBuilder();
             foreach (PlayerData player in m_dataBuilder.PlayerData.OrderBy(a => a.PlayerName).ToList())
-            {
-                detailedData.AppendLine("<tr>");
-                detailedData.AppendLine($"<td>{player.PlayerName}</td>");
-                detailedData.AppendLine($"<td>{player.OldGalaticPower}</td>");
-                detailedData.AppendLine($"<td>{player.NewGalaticPower}</td>");
-                detailedData.AppendLine($"<td>{player.GalaticPowerDifference}</td>");
-                detailedData.AppendLine($"<td>{player.GalaticPowerPercentageDifference}</td>");
-                detailedData.AppendLine("</tr>");
-            }
+                detailedData.AppendLine(HTMLConstructor.AddTableData(new string[] { player.PlayerName, player.OldGalaticPower.ToString(), player.NewGalaticPower.ToString(), player.GalaticPowerDifference.ToString(), player.GalaticPowerPercentageDifference.ToString() }));
 
             sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Previous Galatic Power", "New Galatic Power", "Galatic Power Increase", "Galatic Power % Increase" }, detailedData.ToString()));
 
@@ -833,11 +771,12 @@ th, td{
 
             foreach (UnitData unit in units)
             {
-                sb.AppendLine("<tr>");
-                foreach (string property in properties)
-                    sb.AppendLine($"<td>{unit.GetType().GetProperty(property).GetValue(unit, null)}</td>");
+                List<string> propertyValues = new List<string>();
 
-                sb.AppendLine("</tr>");
+                foreach (string property in properties)
+                    propertyValues.Add(unit.GetType().GetProperty(property).GetValue(unit, null).ToString());
+
+                sb.AppendLine(HTMLConstructor.AddTableData(propertyValues.ToArray()));
             }
 
             return sb.ToString();
@@ -848,15 +787,8 @@ th, td{
             StringBuilder sb = new StringBuilder();
 
             foreach (UnitData unit in m_filteredUnitData.OrderBy(a => a.PlayerName))
-            {
                 if (unit.OldGearLevel < gearLevel && unit.NewGearLevel == gearLevel)
-                {
-                    sb.AppendLine("<tr>");
-                    sb.AppendLine($"<td>{unit.PlayerName}</td>");
-                    sb.AppendLine($"<td>{unit.UnitName}</td>");
-                    sb.AppendLine("</tr>");
-                }
-            }
+                    sb.AppendLine(HTMLConstructor.AddTableData(new string[] { unit.PlayerName, unit.UnitName }));
 
             return sb.ToString();
         }
