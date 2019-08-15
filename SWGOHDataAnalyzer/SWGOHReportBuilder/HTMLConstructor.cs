@@ -77,5 +77,10 @@ namespace SWGOHReportBuilder
 
             return sb.ToString();
         }
+
+        public static string SectionHeader(string headerText)
+        {
+            return $"<h1><center>{headerText}</center></h1>";
+        }
     }
 }

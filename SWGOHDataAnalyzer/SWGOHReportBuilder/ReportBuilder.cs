@@ -522,7 +522,7 @@ div {
             //For Malak, we have to make sure they have at least 4 of the any toons and then specifically the revans ready since they are specifically required
             foreach (string player in malakLocked)
             {
-                if (m_dataBuilder.UnitData.Where(a => a.NewRarity == 7 && a.NewPower > 17499 && a.PlayerName == player &&
+                if (m_dataBuilder.UnitData.Where(a => a.NewRarity == 7 && a.NewPower > 16999 && a.PlayerName == player &&
                     (a.UnitName == "Bastila Shan (Fallen)" ||
                      a.UnitName == "Canderous Ordo" ||
                      a.UnitName == "Carth Onasi" ||
@@ -530,7 +530,7 @@ div {
                      a.UnitName == "Juhani")
                     ).Count() > 3)
                 {
-                    if (m_dataBuilder.UnitData.Where(a => a.NewRarity == 7 && a.NewPower > 17499 && a.PlayerName == player &&
+                    if (m_dataBuilder.UnitData.Where(a => a.NewRarity == 7 && a.NewPower > 16999 && a.PlayerName == player &&
                         (a.UnitName == "T3-M4" ||
                          a.UnitName == "Mission Vao" ||
                          a.UnitName == "Zaalbar" ||
@@ -538,8 +538,8 @@ div {
                          a.UnitName == "Bastila Shan")
                         ).Count() > 3)
                     {
-                        if (m_dataBuilder.UnitData.Where(a => a.NewRarity == 7 && a.NewPower > 17499 && a.PlayerName == player && a.UnitName == "Jedi Knight Revan").Count() == 1 &&
-                            m_dataBuilder.UnitData.Where(a => a.NewRarity == 7 && a.NewPower > 17499 && a.PlayerName == player && a.UnitName == "Darth Revan").Count() == 1)
+                        if (m_dataBuilder.UnitData.Where(a => a.NewRarity == 7 && a.NewPower > 16999 && a.PlayerName == player && a.UnitName == "Jedi Knight Revan").Count() == 1 &&
+                            m_dataBuilder.UnitData.Where(a => a.NewRarity == 7 && a.NewPower > 16999 && a.PlayerName == player && a.UnitName == "Darth Revan").Count() == 1)
                         {
                             unlocks.Add(new Unlock(player, "Darth Malak"));
                         }
@@ -641,7 +641,7 @@ div {
             sb.AppendLine("This section highlights all of the toons that have been geared to 13 since the last snapshot.");
             sb.AppendLine("</p>");
 
-            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Toon" }, GetAllToonsOfGearLevelDifference(12)));
+            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Toon" }, GetAllToonsOfGearLevelDifference(13)));
 
             sb.AppendLine("<p/></div>");
                         
@@ -760,7 +760,8 @@ div {
 
             StringBuilder ships = new StringBuilder();
             foreach (ShipData ship in m_filteredShipData.OrderBy(a => a.PlayerName))
-                units.AppendLine(HTMLConstructor.AddTableData(new string[] { ship.PlayerName, ship.ShipName }));
+                if (ship.OldRarity < 7 && ship.NewRarity == 7)
+                    ships.AppendLine(HTMLConstructor.AddTableData(new string[] { ship.PlayerName, ship.ShipName }));
             
             sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Toon" }, ships.ToString()));
 
@@ -776,7 +777,7 @@ div {
             StringBuilder sb = new StringBuilder();
 
             sb.AppendLine("<div id=\"playergpdiff\">");
-            sb.AppendLine(HTMLConstructor.SectionHeader("Gold Members"));
+            sb.AppendLine(HTMLConstructor.SectionHeader("Player GP Differences"));
             sb.AppendLine("This section goes over the Galatic Power (GP) differences for players between snapshots.  Here is the top ten players who have gained the most Galatic Power by total and by percentage from the previous snapshot.");
             sb.AppendLine("</p>");
             
@@ -810,13 +811,41 @@ div {
             sb.AppendLine("Here is the full list of players and their Galatic Power differences.");
             sb.AppendLine("<p/>");
             
-            StringBuilder detailedData = new StringBuilder();
+            StringBuilder detailedPlayerData = new StringBuilder();
             foreach (PlayerData player in m_dataBuilder.PlayerData.OrderBy(a => a.PlayerName).ToList())
-                detailedData.AppendLine(HTMLConstructor.AddTableData(new string[] { player.PlayerName, player.OldGalaticPower.ToString(), player.NewGalaticPower.ToString(), player.GalaticPowerDifference.ToString(), player.GalaticPowerPercentageDifference.ToString() }));
+                detailedPlayerData.AppendLine(HTMLConstructor.AddTableData(new string[] { player.PlayerName, player.OldGalaticPower.ToString(), player.NewGalaticPower.ToString(), player.GalaticPowerDifference.ToString(), player.GalaticPowerPercentageDifference.ToString() }));
 
-            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Previous Galatic Power", "New Galatic Power", "Galatic Power Increase", "Galatic Power % Increase" }, detailedData.ToString()));
+            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Previous Galatic Power", "New Galatic Power", "Galatic Power Increase", "Galatic Power % Increase" }, detailedPlayerData.ToString()));
+
+            sb.AppendLine("</div><div>");
+            sb.AppendLine("Here is the full list of toons within the guild, with their average stat in the guild and max.");
+
+            StringBuilder detailedUnitData = new StringBuilder();            
+            foreach (var unit in m_dataBuilder.UnitData.GroupBy(a => a.UnitName).ToList())
+            {                
+                detailedUnitData.AppendLine(HTMLConstructor.AddTableData(new string[] {
+                    unit.Key,
+                    m_dataBuilder.UnitData.Where(b => b.UnitName == unit.Key).Average(a => a.NewPower).ToString("#."),
+                    m_dataBuilder.UnitData.Where(b => b.UnitName == unit.Key).Max(a => a.NewPower).ToString(),
+                    m_dataBuilder.UnitData.Where(b => b.UnitName == unit.Key).Average(a => a.NewGearLevel).ToString("#."),
+                    m_dataBuilder.UnitData.Where(b => b.UnitName == unit.Key).Max(a => a.NewGearLevel).ToString(),
+                    m_dataBuilder.UnitData.Where(b => b.UnitName == unit.Key).Average(a => a.CurrentHealth).ToString("#."),
+                    m_dataBuilder.UnitData.Where(b => b.UnitName == unit.Key).Max(a => a.CurrentHealth).ToString(),
+                    m_dataBuilder.UnitData.Where(b => b.UnitName == unit.Key).Average(a => a.CurrentProtection).ToString("#."),
+                    m_dataBuilder.UnitData.Where(b => b.UnitName == unit.Key).Max(a => a.CurrentProtection).ToString(),
+                    m_dataBuilder.UnitData.Where(b => b.UnitName == unit.Key).Average(a => a.CurrentSpeed).ToString("#."),
+                    m_dataBuilder.UnitData.Where(b => b.UnitName == unit.Key).Max(a => a.CurrentSpeed).ToString(),
+                    m_dataBuilder.UnitData.Where(b => b.UnitName == unit.Key).Average(a => a.CurrentPhysicalOffense).ToString("#."),
+                    m_dataBuilder.UnitData.Where(b => b.UnitName == unit.Key).Max(a => a.CurrentPhysicalOffense).ToString(),
+                    m_dataBuilder.UnitData.Where(b => b.UnitName == unit.Key).Average(a => a.CurrentSpecialOffense).ToString("#."),
+                    m_dataBuilder.UnitData.Where(b => b.UnitName == unit.Key).Max(a => a.CurrentSpecialOffense).ToString(),
+                }));
+            }
+
+            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Toon", "Avg GP", "Max GP", "Avg Gear Lvl", "Max Gear Lvl", "Avg Health", "Max Health", "Avg Prot.", "Max Prot.", "Avg Speed", "Max Speed", "Avg PO", "Max PO", "Avg SO", "Max SO" }, detailedUnitData.ToString()));
 
             sb.AppendLine("</div>");
+
             m_detailedData = sb.ToString();
 
             await Task.CompletedTask;
