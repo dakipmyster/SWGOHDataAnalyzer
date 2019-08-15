@@ -3,11 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using SWGOHDBInterface;
 using SWGOHMessage;
 using System.IO;
 using iText.Html2pdf;
-using iText.Kernel.Pdf;
 
 namespace SWGOHReportBuilder
 {
@@ -26,6 +24,7 @@ namespace SWGOHReportBuilder
         string m_goldMembers;
         string m_detailedData;
         string m_characterHighlight;
+        string m_introduction;
 
         List<UnitData> m_filteredUnitData;
         List<ShipData> m_filteredShipData;
@@ -76,17 +75,20 @@ namespace SWGOHReportBuilder
             pdfString.Append(@"<html><head><style>
 table {
   border-collapse: collapse;
-  page-break-inside:avoid
+  page-break-inside:auto
 }
 tr:nth-child(even) {background-color: #f2f2f2;}
 th, td{
   padding: 2px;
 }
+div {
+  page-break-after: always;
+}
 </style></head><body>");
             List<Task> tasks = new List<Task>();
-
-            pdfString.AppendLine("<a href=\"#testingthis\">Gold Teams</a>");
-
+                        
+            //This section can process in any order
+            tasks.Add(IntroductionPage(toonName));
             tasks.Add(SevenStarSection());
             tasks.Add(GearTwelveToons());
             tasks.Add(GearThirteenToons());
@@ -104,6 +106,8 @@ th, td{
 
             SWGOHMessageSystem.OutputMessage("Rendering Report....");
 
+            //This section needs to be in order
+            pdfString.AppendLine(m_introduction);
             pdfString.AppendLine(m_playerGPDifferences);
             pdfString.AppendLine(m_UnitGPDifferences);
             pdfString.AppendLine(m_topTwentySection);
@@ -127,10 +131,39 @@ th, td{
             SWGOHMessageSystem.OutputMessage($"Report saved at {folderPath}");
         }
 
+        private async Task IntroductionPage(string toonName)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            sb.AppendLine("<div>");
+            sb.AppendLine(HTMLConstructor.SectionHeader("Contents"));
+            sb.AppendLine("<ol type=\"1\"");
+            sb.AppendLine("<li></li>");
+            sb.AppendLine("<li><a href=\"#playergpdiff\">Player GP Differences</a></li>");
+            sb.AppendLine("<li><a href=\"#unitgpdiff\">Unit GP Differences</a></li>");
+            sb.AppendLine("<li><a href=\"#toptwenty\">Top 20 Stats</a></li>");
+            sb.AppendLine("<li><a href=\"#sevenstar\">Seven Stars</a></li>");
+            sb.AppendLine("<li><a href=\"#geartwelve\">Gear 12 Toons</a></li>");
+            sb.AppendLine("<li><a href=\"#gearthirteen\">Gear 13 Toons</a></li>");
+            sb.AppendLine("<li><a href=\"#zetas\">Applied Zetas</a></li>");
+            sb.AppendLine("<li><a href=\"#toonunlock\">Journey or Legendary Unlocks</a></li>");
+            sb.AppendLine("<li><a href=\"#toonprep\">Players prepped for Journey Toons</a></li>");
+            sb.AppendLine($"<li><a href=\"#highlight\">Character Highlight: {toonName}</a></li>");
+            sb.AppendLine("<li><a href=\"#goldmembers\">Gold Teams</a></li>");
+            sb.AppendLine("<li><a href=\"#details\">Data Details</a></li>");
+            sb.AppendLine("</ol></div>");
+
+            m_introduction = sb.ToString();
+
+            await Task.CompletedTask;
+        }
+
         private async Task CharacterHighlight(string toonName)
         {
             StringBuilder sb = new StringBuilder();
 
+            sb.AppendLine("<div id=\"highlight\">");
+            sb.AppendLine(HTMLConstructor.SectionHeader("Character Highlight"));
             sb.AppendLine($"This section goes over a specific character to highlight and will rotate every report.  This iteration is {toonName}.  The report takes the top 10 of {toonName}'s stats");
             sb.AppendLine("<p/>");
 
@@ -192,7 +225,7 @@ th, td{
 
             sb.AppendLine(HTMLConstructor.TableGroupEnd());
 
-            sb.AppendLine("<p/>");
+            sb.AppendLine("<p/></div>");
 
             m_characterHighlight = sb.ToString();
 
@@ -203,14 +236,17 @@ th, td{
         {
             StringBuilder sb = new StringBuilder();
 
+            sb.AppendLine("<div id=\"unitgpdiff\">");
+            sb.AppendLine(HTMLConstructor.SectionHeader("Toon GP Differences"));
             sb.AppendLine("This section highlights the top 20 toons who have had the greatest GP increase.");
-            
+            sb.AppendLine("<p/>");
+
             StringBuilder unitGPDiff = new StringBuilder();
             foreach (UnitData unit in m_filteredUnitData.OrderByDescending(a => a.PowerDifference).Take(20))
                 unitGPDiff.AppendLine(HTMLConstructor.AddTableData(new string[] { unit.PlayerName, unit.UnitName, unit.OldPower.ToString(), unit.NewPower.ToString(), unit.PowerDifference.ToString() }));
 
             sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Toon", "Old Power", "New Power", "Power Increase" }, unitGPDiff.ToString()));
-            sb.AppendLine("<p/>");
+            sb.AppendLine("<p/></div>");
 
             m_UnitGPDifferences = sb.ToString();
 
@@ -236,9 +272,9 @@ th, td{
             List<UnitData> ewok = new List<UnitData>();
             List<UnitData> firstOrder = new List<UnitData>();
 
-            sb.AppendLine("<div id=\"testingthis\"></div>");
-
-            sb.AppendLine("This section is to showcase players who have invested the gear and zetas for 'meta' or key toons of factions");
+            sb.AppendLine("<div id=\"goldmembers\">");
+            sb.AppendLine(HTMLConstructor.SectionHeader("Gold Members"));
+            sb.AppendLine("This section is to showcase players who have invested the gear and zetas for 'meta' or key toons of factions");            
             sb.AppendLine("<p/>");
             sb.AppendLine("<b>Rebels Team.</b> Commander Luke Skywalker(lead, binds all things), Han Solo(Shoots First), Chewie(all), R2-D2(Number Crunch), C-3PO(Oh My Goodness!)");
             sb.AppendLine("<p/>");
@@ -267,6 +303,8 @@ th, td{
             sb.AppendLine("<b>Ewok Team.</b> Chief Chirpa(Simple Tactics), Wicket, Logray, Paploo");
             sb.AppendLine("<p/>");
             sb.AppendLine("<b>First Order Team.</b> Kylo Ren (Unmasked)(all), Kylo Ren, First Order Officer, First Order Executioner");
+
+            sb.AppendLine("</div><div>");
 
             rebels.AddRange(m_dataBuilder.UnitData.Where(a => a.UnitName == "Commander Luke Skywalker" && a.NewGearLevel > 11 && a.NewZetas.Contains("It Binds All Things")));
             rebels.AddRange(m_dataBuilder.UnitData.Where(a => a.UnitName == "Han Solo" && a.NewGearLevel > 11 && a.NewZetas.Contains("Shoots First")));
@@ -387,6 +425,7 @@ th, td{
             if(teamCount != 0)
                 sb.AppendLine(HTMLConstructor.TableGroupEnd());
 
+            sb.AppendLine("<p/></div>");
             m_goldMembers = sb.ToString();
 
             await Task.CompletedTask;
@@ -402,8 +441,10 @@ th, td{
             List<string> commanderLukeSkywalkerLocked = new List<string>();
             List<string> jediTrainingReyLocked = new List<string>();
 
+            sb.AppendLine("<div id=\"toonprep\">");
+            sb.AppendLine(HTMLConstructor.SectionHeader("Prepped Journey Players"));
             sb.AppendLine("This section highlights all of the players whom are awaitng the return of Journey Toons. This only factors in if the player meets the min requirement in game to participate in the event to unlock the toon");
-            
+            sb.AppendLine("</p>");
             foreach(PlayerData player in m_dataBuilder.PlayerData)
             {
                 if (m_dataBuilder.UnitData.Where(a => a.PlayerName == player.PlayerName && a.UnitName == "Darth Malak").Count() == 0)
@@ -512,7 +553,7 @@ th, td{
 
             sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Toon" }, prepaired.ToString()));
 
-            sb.AppendLine("<p/>");
+            sb.AppendLine("<p/></div>");
 
             m_journeyPrepared = sb.ToString();
 
@@ -524,7 +565,10 @@ th, td{
             StringBuilder sb = new StringBuilder();
             List<Unlock> unlocks = new List<Unlock>();
 
-            sb.AppendLine("This section highlights all players who have unlocked a Legendary or Journey toon/ship.");            
+            sb.AppendLine("<div id=\"toonunlock\">");
+            sb.AppendLine(HTMLConstructor.SectionHeader("Journey/Legendary Unlock"));
+            sb.AppendLine("This section highlights all players who have unlocked a Legendary or Journey toon/ship.");
+            sb.AppendLine("</p>");
 
             var filteredUnitList = m_dataBuilder.UnitData.Where(a => a.OldRarity == 0 && a.NewRarity != 0 && m_filteredPlayerNames.Contains(a.PlayerName) && (
                 a.UnitName == "Jedi Knight Revan" || 
@@ -558,7 +602,7 @@ th, td{
                 unlockedRows.AppendLine(HTMLConstructor.AddTableData(new string[] { unlock.PlayerName, unlock.UnitOrShipName }));
 
             sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Toon" }, unlockedRows.ToString()));
-            sb.AppendLine("<p/>");
+            sb.AppendLine("<p/></div>");
 
             m_journeyOrLegendaryUnlock = sb.ToString();
 
@@ -569,7 +613,10 @@ th, td{
         {
             StringBuilder sb = new StringBuilder();
 
+            sb.AppendLine("<div id=\"zetas\">");
+            sb.AppendLine(HTMLConstructor.SectionHeader("Zetas Applied"));
             sb.AppendLine("This section highlights all of the toons that have been given zetas since the last snapshot.");
+            sb.AppendLine("</p>");
             
             StringBuilder zetas = new StringBuilder();
             foreach (UnitData unit in m_filteredUnitData.OrderBy(a => a.PlayerName))
@@ -578,8 +625,8 @@ th, td{
                 
             sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Toon", "Zetas" }, zetas.ToString()));
 
-            sb.AppendLine("<p/>");
-
+            sb.AppendLine("<p/></div>");
+                        
             m_zetasApplied = sb.ToString();
 
             await Task.CompletedTask;
@@ -589,11 +636,14 @@ th, td{
         {
             StringBuilder sb = new StringBuilder();
 
+            sb.AppendLine("<div id=\"gearthirteen\">");
+            sb.AppendLine(HTMLConstructor.SectionHeader("Gear 13 Toons"));
             sb.AppendLine("This section highlights all of the toons that have been geared to 13 since the last snapshot.");
+            sb.AppendLine("</p>");
 
             sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Toon" }, GetAllToonsOfGearLevelDifference(12)));
 
-            sb.AppendLine("<p/>");
+            sb.AppendLine("<p/></div>");
                         
             m_gearThirteenToons = sb.ToString();
 
@@ -604,11 +654,14 @@ th, td{
         {
             StringBuilder sb = new StringBuilder();
 
-            sb.AppendLine("This section highlights all of the toons that have been geared to 12 since the last snapshot.");            
+            sb.AppendLine("<div id=\"geartwelve\">");
+            sb.AppendLine(HTMLConstructor.SectionHeader("Gear 12 Toons"));
+            sb.AppendLine("This section highlights all of the toons that have been geared to 12 since the last snapshot.");
+            sb.AppendLine("</p>");
 
             sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Toon" }, GetAllToonsOfGearLevelDifference(12)));
 
-            sb.AppendLine("<p/>");
+            sb.AppendLine("<p/></div>");
 
             m_gearTwelveToons = sb.ToString();
 
@@ -619,6 +672,8 @@ th, td{
         {
             StringBuilder sb = new StringBuilder();
 
+            sb.AppendLine("<div id=\"toptwenty\">");
+            sb.AppendLine(HTMLConstructor.SectionHeader("Top 20 Stats"));
             sb.AppendLine("This section highlights the top 20 toons of various stats.  Only the stats that are affected by mods with multiple primary or secondary capabilities are highlighted here (IE Crit Damage only has a single primary stat increase, so its a easly obtained ceiling).");
             sb.AppendLine("<p/>");
 
@@ -676,7 +731,7 @@ th, td{
             sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Toon", "Tenacity" }, TakeTopXOfStatAndReturnTableData(20, "CurrentTenacity", new string[] { "PlayerName", "UnitName", "CurrentTenacity" }), "Tenacity"));
 
             sb.AppendLine(HTMLConstructor.TableGroupEnd());
-            sb.AppendLine("<p/>");
+            sb.AppendLine("<p/></div>");
 
             m_topTwentySection = sb.ToString();
 
@@ -687,7 +742,10 @@ th, td{
         {
             StringBuilder sb = new StringBuilder();
 
+            sb.AppendLine("<div id=\"sevenstar\">");
+            sb.AppendLine(HTMLConstructor.SectionHeader("Seven Stars"));
             sb.AppendLine("This section highlights all of the toons that have been 7*'ed since the last snapshot.");
+            sb.AppendLine("</p>");
            
             StringBuilder units = new StringBuilder();
             foreach (UnitData unit in m_filteredUnitData.OrderBy(a => a.PlayerName))
@@ -696,7 +754,7 @@ th, td{
 
             sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Toon" }, units.ToString()));
                         
-            sb.AppendLine("<p/>");
+            sb.AppendLine("<p/></div><div>");
 
             sb.AppendLine("This section highlights all of the ships that have been 7*'ed since the last snapshot.");
 
@@ -706,7 +764,7 @@ th, td{
             
             sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Toon" }, ships.ToString()));
 
-            sb.AppendLine("<p/>");
+            sb.AppendLine("<p/></div>");
 
             m_sevenStarSection = sb.ToString();
 
@@ -717,7 +775,10 @@ th, td{
         {
             StringBuilder sb = new StringBuilder();
 
+            sb.AppendLine("<div id=\"playergpdiff\">");
+            sb.AppendLine(HTMLConstructor.SectionHeader("Gold Members"));
             sb.AppendLine("This section goes over the Galatic Power (GP) differences for players between snapshots.  Here is the top ten players who have gained the most Galatic Power by total and by percentage from the previous snapshot.");
+            sb.AppendLine("</p>");
             
             StringBuilder playerGPDiff = new StringBuilder();
             foreach (PlayerData player in m_dataBuilder.PlayerData.OrderByDescending(a => a.GalaticPowerDifference).Take(10))
@@ -732,7 +793,7 @@ th, td{
                 playerGPPercentDiff.AppendLine(HTMLConstructor.AddTableData(new string[] { player.PlayerName, player.OldGalaticPower.ToString(), player.NewGalaticPower.ToString(), player.GalaticPowerPercentageDifference.ToString() }));
 
             sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Previous Galatic Power", "New Galatic Power", "Galatic Power % Increase" }, playerGPPercentDiff.ToString()));
-            sb.AppendLine("<p/>");
+            sb.AppendLine("<p/></div>");
 
             m_playerGPDifferences = sb.ToString();
 
@@ -742,9 +803,11 @@ th, td{
         private async Task DetailedData()
         {
             StringBuilder sb = new StringBuilder();
+
+            sb.AppendLine("<div id=\"details\">");
+            sb.AppendLine(HTMLConstructor.SectionHeader("Data Details"));
             sb.AppendLine("For those who are interested, here is some full table data that the stats refer to.");
             sb.AppendLine("Here is the full list of players and their Galatic Power differences.");
-
             sb.AppendLine("<p/>");
             
             StringBuilder detailedData = new StringBuilder();
@@ -753,6 +816,7 @@ th, td{
 
             sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Previous Galatic Power", "New Galatic Power", "Galatic Power Increase", "Galatic Power % Increase" }, detailedData.ToString()));
 
+            sb.AppendLine("</div>");
             m_detailedData = sb.ToString();
 
             await Task.CompletedTask;
