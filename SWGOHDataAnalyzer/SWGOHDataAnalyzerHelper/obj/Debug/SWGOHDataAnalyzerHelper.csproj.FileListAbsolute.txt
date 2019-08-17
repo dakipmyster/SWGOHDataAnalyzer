@@ -1,0 +1,6 @@
+C:\Users\klarsen\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHDataAnalyzerHelper\bin\Debug\SWGOHDataAnalyzerHelper.dll
+C:\Users\klarsen\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHDataAnalyzerHelper\bin\Debug\SWGOHDataAnalyzerHelper.pdb
+C:\Users\klarsen\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHDataAnalyzerHelper\obj\Debug\SWGOHDataAnalyzerHelper.csprojAssemblyReference.cache
+C:\Users\klarsen\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHDataAnalyzerHelper\obj\Debug\SWGOHDataAnalyzerHelper.csproj.CoreCompileInputs.cache
+C:\Users\klarsen\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHDataAnalyzerHelper\obj\Debug\SWGOHDataAnalyzerHelper.dll
+C:\Users\klarsen\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHDataAnalyzerHelper\obj\Debug\SWGOHDataAnalyzerHelper.pdb

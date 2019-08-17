@@ -117,6 +117,10 @@
       <Project>{88661601-0e1b-44a7-9ad1-948c37ffcd92}</Project>
       <Name>SWGOHDBInterface</Name>
     </ProjectReference>
+    <ProjectReference Include="..\SWOGHHelper\SWOGHHelper.csproj">
+      <Project>{5079bf9e-9949-4647-8be6-7cd66ebb788c}</Project>
+      <Name>SWOGHHelper</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

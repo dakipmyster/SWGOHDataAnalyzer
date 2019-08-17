@@ -3,13 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using SWGOHMessage;
+using System.Reflection;
+using System.Diagnostics;
 using System.IO;
+using SWGOHMessage;
 using iText.Html2pdf;
+using SWOGHHelper;
 
 namespace SWGOHReportBuilder
 {
-    public class ReportBuilder
+    public class ReportBuilder : ISWGOHAsync
     {        
         DataBuilder m_dataBuilder;
         string m_playerGPDifferences;
@@ -25,6 +28,7 @@ namespace SWGOHReportBuilder
         string m_detailedData;
         string m_characterHighlight;
         string m_introduction;
+        string m_toonName;
 
         List<UnitData> m_filteredUnitData;
         List<ShipData> m_filteredShipData;
@@ -53,15 +57,22 @@ namespace SWGOHReportBuilder
 
             SWGOHMessageSystem.OutputMessage("Compiling Report Data....");
 
-            tasks.Add(m_dataBuilder.CollectPlayerGPDifferences());
+            /*tasks.Add(m_dataBuilder.CollectPlayerGPDifferences());
             tasks.Add(m_dataBuilder.CollectShipData());
-            tasks.Add(m_dataBuilder.CollectUnitData());
+            tasks.Add(m_dataBuilder.CollectUnitData());*/
+
+            tasks.Add(Task.Run(() => InvokeAsyncTask("CollectPlayerGPDifferences", "SWOGHReportBuilder.DataBuilder")));
+            tasks.Add(Task.Run(() => InvokeAsyncTask("CollectShipData", "SWOGHReportBuilder.DataBuilder")));
+            tasks.Add(Task.Run(() => InvokeAsyncTask("CollectUnitData", "SWOGHReportBuilder.DataBuilder")));
+
+            SWGOHMessageSystem.OutputMessage("Still Compiling Report Data....");
+
+            await Task.WhenAll(tasks.ToArray());
 
             m_filteredUnitData = m_dataBuilder.UnitData.Where(a => a.OldGalaticPower != 0 && a.NewGalaticPower != 0).ToList();
             m_filteredShipData = m_dataBuilder.ShipData.Where(a => a.OldGalaticPower != 0 && a.NewGalaticPower != 0).ToList();
             m_filteredPlayerNames = m_dataBuilder.PlayerData.Select(a => a.PlayerName).ToList();
 
-            await Task.WhenAll(tasks.ToArray());
 
             await BuildReport(fileName);
         }
@@ -70,7 +81,7 @@ namespace SWGOHReportBuilder
         {
             StringBuilder pdfString = new StringBuilder();
 
-            string toonName = SWGOHMessageSystem.InputMessage("Please enter in the name of the toon you wish to highlight in the report.");
+            m_toonName = SWGOHMessageSystem.InputMessage("Please enter in the name of the toon you wish to highlight in the report.");
 
             pdfString.Append(@"<html><head><style>
 table {
@@ -86,21 +97,41 @@ div {
 }
 </style></head><body>");
             List<Task> tasks = new List<Task>();
-                        
+            /*
             //This section can process in any order
-            tasks.Add(IntroductionPage(toonName));
-            tasks.Add(SevenStarSection());
-            tasks.Add(GearTwelveToons());
-            tasks.Add(GearThirteenToons());
-            tasks.Add(ZetasApplied());
-            tasks.Add(JourneyOrLegendaryUnlock());
-            tasks.Add(JourneyPrepared());
-            tasks.Add(GoldMembers());
-            tasks.Add(PlayerGPDifferences());
-            tasks.Add(UnitGPDifferences());
-            tasks.Add(TopTwentySection());
-            tasks.Add(DetailedData());
-            tasks.Add(CharacterHighlight(toonName));
+            tasks.Add(Task.Run(() => IntroductionPage()));
+            tasks.Add(Task.Run(() => SevenStarSection()));
+            tasks.Add(Task.Run(() => GearTwelveToons()));
+            tasks.Add(Task.Run(() => GearThirteenToons()));
+            tasks.Add(Task.Run(() => ZetasApplied()));
+            tasks.Add(Task.Run(() => JourneyOrLegendaryUnlock()));
+            tasks.Add(Task.Run(() => JourneyPrepared()));
+            tasks.Add(Task.Run(() => GoldMembers()));
+            tasks.Add(Task.Run(() => PlayerGPDifferences()));
+            tasks.Add(Task.Run(() => UnitGPDifferences()));
+            tasks.Add(Task.Run(() => TopTwentySection()));
+            tasks.Add(Task.Run(() => DetailedData()));
+            tasks.Add(Task.Run(() => CharacterHighlight()));
+            
+            SWGOHMessageSystem.OutputMessage("Still Doing shiot....");
+
+            await Task.WhenAll(tasks.ToArray());*/
+
+            tasks.Add(Task.Run(() => InvokeAsyncTask("IntroductionPage")));
+            tasks.Add(Task.Run(() => InvokeAsyncTask("SevenStarSection")));
+            tasks.Add(Task.Run(() => InvokeAsyncTask("GearTwelveToons")));
+            tasks.Add(Task.Run(() => InvokeAsyncTask("GearThirteenToons")));
+            tasks.Add(Task.Run(() => InvokeAsyncTask("ZetasApplied")));
+            tasks.Add(Task.Run(() => InvokeAsyncTask("JourneyOrLegendaryUnlock")));
+            tasks.Add(Task.Run(() => InvokeAsyncTask("JourneyPrepared")));
+            tasks.Add(Task.Run(() => InvokeAsyncTask("GoldMembers")));
+            tasks.Add(Task.Run(() => InvokeAsyncTask("PlayerGPDifferences")));
+            tasks.Add(Task.Run(() => InvokeAsyncTask("UnitGPDifferences")));
+            tasks.Add(Task.Run(() => InvokeAsyncTask("TopTwentySection")));
+            tasks.Add(Task.Run(() => InvokeAsyncTask("DetailedData")));
+            tasks.Add(Task.Run(() => InvokeAsyncTask("CharacterHighlight")));
+
+            SWGOHMessageSystem.OutputMessage("Spawned all tasks....");
 
             await Task.WhenAll(tasks.ToArray());
 
@@ -127,11 +158,11 @@ div {
 
             using (FileStream fs = File.Open(folderPath, FileMode.OpenOrCreate))
                 HtmlConverter.ConvertToPdf(pdfString.ToString(),fs, new ConverterProperties());
-
+                        
             SWGOHMessageSystem.OutputMessage($"Report saved at {folderPath}");
         }
 
-        private async Task IntroductionPage(string toonName)
+        private async Task IntroductionPage()
         {
             StringBuilder sb = new StringBuilder();
 
@@ -148,7 +179,7 @@ div {
             sb.AppendLine("<li><a href=\"#zetas\">Applied Zetas</a></li>");
             sb.AppendLine("<li><a href=\"#toonunlock\">Journey or Legendary Unlocks</a></li>");
             sb.AppendLine("<li><a href=\"#toonprep\">Players prepped for Journey Toons</a></li>");
-            sb.AppendLine($"<li><a href=\"#highlight\">Character Highlight: {toonName}</a></li>");
+            sb.AppendLine($"<li><a href=\"#highlight\">Character Highlight: {m_toonName}</a></li>");
             sb.AppendLine("<li><a href=\"#goldmembers\">Gold Teams</a></li>");
             sb.AppendLine("<li><a href=\"#details\">Data Details</a></li>");
             sb.AppendLine("</ol></div>");
@@ -158,70 +189,70 @@ div {
             await Task.CompletedTask;
         }
 
-        private async Task CharacterHighlight(string toonName)
+        private async Task CharacterHighlight()
         {
             StringBuilder sb = new StringBuilder();
 
             sb.AppendLine("<div id=\"highlight\">");
             sb.AppendLine(HTMLConstructor.SectionHeader("Character Highlight"));
-            sb.AppendLine($"This section goes over a specific character to highlight and will rotate every report.  This iteration is {toonName}.  The report takes the top 10 of {toonName}'s stats");
+            sb.AppendLine($"This section goes over a specific character to highlight and will rotate every report.  This iteration is {m_toonName}.  The report takes the top 10 of {m_toonName}'s stats");
             sb.AppendLine("<p/>");
 
             sb.AppendLine(HTMLConstructor.TableGroupStart());           
 
-            sb.Append(HTMLConstructor.AddTable(new string[] { "Player Name", "Health" }, TakeTopXOfStatAndReturnTableData(10, "CurrentHealth", new string[] {"PlayerName", "CurrentHealth" }, toonName), "Health"));
+            sb.Append(HTMLConstructor.AddTable(new string[] { "Player Name", "Health" }, TakeTopXOfStatAndReturnTableData(10, "CurrentHealth", new string[] {"PlayerName", "CurrentHealth" }, m_toonName), "Health"));
 
             sb.Append(HTMLConstructor.TableGroupNext());
 
-            sb.Append(HTMLConstructor.AddTable(new string[] { "Player Name", "Protection" }, TakeTopXOfStatAndReturnTableData(10, "CurrentProtection", new string[] { "PlayerName", "CurrentProtection" }, toonName), "Protection"));
+            sb.Append(HTMLConstructor.AddTable(new string[] { "Player Name", "Protection" }, TakeTopXOfStatAndReturnTableData(10, "CurrentProtection", new string[] { "PlayerName", "CurrentProtection" }, m_toonName), "Protection"));
             
             sb.Append(HTMLConstructor.TableGroupNext());
            
-            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Tankiest" }, TakeTopXOfStatAndReturnTableData(10, "CurrentTankiest", new string[] { "PlayerName", "CurrentTankiest" }, toonName), "Tankiest"));
+            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Tankiest" }, TakeTopXOfStatAndReturnTableData(10, "CurrentTankiest", new string[] { "PlayerName", "CurrentTankiest" }, m_toonName), "Tankiest"));
 
             sb.AppendLine(HTMLConstructor.TableGroupEnd());
             sb.AppendLine(HTMLConstructor.TableGroupStart());
 
-            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Speed" }, TakeTopXOfStatAndReturnTableData(10, "CurrentSpeed", new string[] { "PlayerName", "CurrentSpeed" }, toonName), "Speed"));
+            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Speed" }, TakeTopXOfStatAndReturnTableData(10, "CurrentSpeed", new string[] { "PlayerName", "CurrentSpeed" }, m_toonName), "Speed"));
 
             sb.Append(HTMLConstructor.TableGroupNext());
 
-            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "PO" }, TakeTopXOfStatAndReturnTableData(10, "CurrentPhysicalOffense", new string[] { "PlayerName", "CurrentPhysicalOffense" }, toonName), "Physical Offense"));
+            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "PO" }, TakeTopXOfStatAndReturnTableData(10, "CurrentPhysicalOffense", new string[] { "PlayerName", "CurrentPhysicalOffense" }, m_toonName), "Physical Offense"));
 
             sb.Append(HTMLConstructor.TableGroupNext());
              
-            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "SO" }, TakeTopXOfStatAndReturnTableData(10, "CurrentSpecialOffense", new string[] { "PlayerName", "CurrentSpecialOffense" }, toonName), "Special Offense"));
+            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "SO" }, TakeTopXOfStatAndReturnTableData(10, "CurrentSpecialOffense", new string[] { "PlayerName", "CurrentSpecialOffense" }, m_toonName), "Special Offense"));
 
             sb.AppendLine(HTMLConstructor.TableGroupEnd());
             sb.AppendLine(HTMLConstructor.TableGroupStart());
 
-            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "PD" }, TakeTopXOfStatAndReturnTableData(10, "CurrentPhysicalDefense", new string[] { "PlayerName", "CurrentPhysicalDefense" }, toonName), "Physical Defense"));
+            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "PD" }, TakeTopXOfStatAndReturnTableData(10, "CurrentPhysicalDefense", new string[] { "PlayerName", "CurrentPhysicalDefense" }, m_toonName), "Physical Defense"));
 
             sb.Append(HTMLConstructor.TableGroupNext());
 
-            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "SD" }, TakeTopXOfStatAndReturnTableData(10, "CurrentSpecialDefense", new string[] { "PlayerName", "CurrentSpecialDefense" }, toonName), "Special Defense"));
+            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "SD" }, TakeTopXOfStatAndReturnTableData(10, "CurrentSpecialDefense", new string[] { "PlayerName", "CurrentSpecialDefense" }, m_toonName), "Special Defense"));
 
             sb.Append(HTMLConstructor.TableGroupNext());
 
-            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "PCC" }, TakeTopXOfStatAndReturnTableData(10, "CurrentPhysicalCritChance", new string[] { "PlayerName", "CurrentPhysicalCritChance" }, toonName), "Physical CC"));
+            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "PCC" }, TakeTopXOfStatAndReturnTableData(10, "CurrentPhysicalCritChance", new string[] { "PlayerName", "CurrentPhysicalCritChance" }, m_toonName), "Physical CC"));
 
             sb.AppendLine(HTMLConstructor.TableGroupEnd());
             sb.AppendLine(HTMLConstructor.TableGroupStart());
 
-            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "SCC" }, TakeTopXOfStatAndReturnTableData(10, "CurrentSpecialCritChance", new string[] { "PlayerName", "CurrentSpecialCritChance" }, toonName), "Special CC"));
+            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "SCC" }, TakeTopXOfStatAndReturnTableData(10, "CurrentSpecialCritChance", new string[] { "PlayerName", "CurrentSpecialCritChance" }, m_toonName), "Special CC"));
 
             sb.Append(HTMLConstructor.TableGroupNext());
              
-            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Potency" }, TakeTopXOfStatAndReturnTableData(10, "CurrentPotency", new string[] { "PlayerName", "CurrentPotency" }, toonName), "Potency"));
+            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Potency" }, TakeTopXOfStatAndReturnTableData(10, "CurrentPotency", new string[] { "PlayerName", "CurrentPotency" }, m_toonName), "Potency"));
 
             sb.Append(HTMLConstructor.TableGroupNext());
 
-            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Tenacity" }, TakeTopXOfStatAndReturnTableData(10, "CurrentTenacity", new string[] { "PlayerName", "CurrentTenacity" }, toonName), "Tenacity"));
+            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Tenacity" }, TakeTopXOfStatAndReturnTableData(10, "CurrentTenacity", new string[] { "PlayerName", "CurrentTenacity" }, m_toonName), "Tenacity"));
 
             sb.AppendLine(HTMLConstructor.TableGroupEnd());
             sb.AppendLine(HTMLConstructor.TableGroupStart());
 
-            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Galatic Power", "Gear Level" }, TakeTopXOfStatAndReturnTableData(10, "NewPower", new string[] { "PlayerName", "NewPower", "NewGearLevel" }, toonName), "Highest Galatic Power"));
+            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Galatic Power", "Gear Level" }, TakeTopXOfStatAndReturnTableData(10, "NewPower", new string[] { "PlayerName", "NewPower", "NewGearLevel" }, m_toonName), "Highest Galatic Power"));
 
             sb.AppendLine(HTMLConstructor.TableGroupEnd());
 
@@ -895,6 +926,32 @@ div {
                     players.Add(player.Key);
 
             return players;
+        }
+
+        public async Task InvokeAsyncTask(string methodToInvoke, string classToInvoke = null)
+        {
+            try
+            {
+                //Invoke the method passed in
+                if(String.IsNullOrEmpty(classToInvoke))
+                    Type.GetType(this.ToString()).InvokeMember(methodToInvoke, BindingFlags.InvokeMethod | BindingFlags.NonPublic | BindingFlags.Instance, null, this, null);
+                else
+                    Type.GetType(classToInvoke).InvokeMember(methodToInvoke, BindingFlags.InvokeMethod | BindingFlags.NonPublic | BindingFlags.Instance, null, Type.GetType(classToInvoke), null);
+#if DEBUG
+                Stopwatch watch = new Stopwatch();
+                watch.Start();
+#endif
+
+#if DEBUG
+                watch.Stop();
+                SWGOHMessageSystem.OutputMessage($"Task {methodToInvoke} has completed in {watch.ElapsedMilliseconds} milliseconds and in {watch.ElapsedTicks} ticks");
+#endif
+            }
+            catch(Exception e)
+            {
+                SWGOHMessageSystem.OutputMessage($"An error has occurred trying to run the task {methodToInvoke} error: {e.Message}");
+            }
+            await Task.CompletedTask;
         }
     }
 }
