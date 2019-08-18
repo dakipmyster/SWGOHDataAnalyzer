@@ -964,7 +964,7 @@ div {
             sb.AppendLine("Here is the full list of toons within the guild, with their average stat in the guild and max.");
 
             StringBuilder detailedUnitData = new StringBuilder();            
-            foreach (var unit in m_dataBuilder.UnitData.GroupBy(a => a.UnitName).ToList())
+            foreach (var unit in m_dataBuilder.UnitData.OrderBy(b => b.UnitName).GroupBy(a => a.UnitName).ToList())
             {                
                 detailedUnitData.AppendLine(HTMLConstructor.AddTableData(new string[] {
                     unit.Key,
