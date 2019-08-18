@@ -9,6 +9,7 @@ using System.IO;
 using SWGOHMessage;
 using iText.Html2pdf;
 using SWOGHHelper;
+using SWGOHInterface;
 
 namespace SWGOHReportBuilder
 {
@@ -29,43 +30,81 @@ namespace SWGOHReportBuilder
         string m_characterHighlight;
         string m_introduction;
         string m_toonName;
+        string m_fileName;
+        bool m_isSimpleReport;
 
         List<UnitData> m_filteredUnitData;
         List<ShipData> m_filteredShipData;
         List<string> m_filteredPlayerNames;
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public ReportBuilder()
         {
             m_dataBuilder = new DataBuilder();
             m_filteredShipData = new List<ShipData>();
             m_filteredUnitData = new List<UnitData>();
             m_filteredPlayerNames = new List<string>();
+            m_isSimpleReport = false;
         }
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="fileName">Filename of the report</param>
+        /// <param name="characterName">Character to highlight</param>
+        public ReportBuilder(string fileName, string characterName)
+        {
+            m_dataBuilder = new DataBuilder();
+            m_filteredShipData = new List<ShipData>();
+            m_filteredUnitData = new List<UnitData>();
+            m_filteredPlayerNames = new List<string>();
+            m_fileName = fileName;
+            m_toonName = characterName;
+            m_isSimpleReport = true;
+        }
+
+        /// <summary>
+        /// Grabs the data needed to run the simple report
+        /// </summary>
+        /// <param name="guild">Guild data pulled from the interface</param>
+        /// <returns></returns>
+        public async Task CompileSimpleReport(Guild guild)
+        {
+            await m_dataBuilder.CollectUnitDataFromInterface(guild);
+
+            SWGOHMessageSystem.OutputMessage("Compiling Report Data....");
+
+            await BuildReport();
+        }
+
+        /// <summary>
+        /// Determines if the report can be ran
+        /// </summary>
         public bool CanRunReport()
         {
             return m_dataBuilder.CanRunReport();
         }
 
+        /// <summary>
+        /// Grabs the data needed to run the detailed report
+        /// </summary>
+        /// <returns></returns>
         public async Task CompileReport()
         {
             m_dataBuilder.GetSnapshotNames();
             
             List<Task> tasks = new List<Task>();
 
-            string fileName = SWGOHMessageSystem.InputMessage("Enter in the filename for the report");
+            tasks.Add(Task.Run(() => m_dataBuilder.CollectUnitDataFromDB()));
+            tasks.Add(Task.Run(() => m_dataBuilder.CollectShipDataFromDB()));
+            tasks.Add(Task.Run(() => m_dataBuilder.CollectPlayerGPDifferencesFromDB()));
+            tasks.Add(Task.Run(() => m_dataBuilder.CollectSnapshotMetadataFromDB()));
 
+            m_fileName = SWGOHMessageSystem.InputMessage("Enter in the filename for the report");
+            m_toonName = SWGOHMessageSystem.InputMessage("Please enter in the name of the toon you wish to highlight in the report.");
             SWGOHMessageSystem.OutputMessage("Compiling Report Data....");
-
-            /*tasks.Add(m_dataBuilder.CollectPlayerGPDifferences());
-            tasks.Add(m_dataBuilder.CollectShipData());
-            tasks.Add(m_dataBuilder.CollectUnitData());*/
-
-            tasks.Add(Task.Run(() => InvokeAsyncTask("CollectPlayerGPDifferences", "SWOGHReportBuilder.DataBuilder")));
-            tasks.Add(Task.Run(() => InvokeAsyncTask("CollectShipData", "SWOGHReportBuilder.DataBuilder")));
-            tasks.Add(Task.Run(() => InvokeAsyncTask("CollectUnitData", "SWOGHReportBuilder.DataBuilder")));
-
-            SWGOHMessageSystem.OutputMessage("Still Compiling Report Data....");
 
             await Task.WhenAll(tasks.ToArray());
 
@@ -73,15 +112,16 @@ namespace SWGOHReportBuilder
             m_filteredShipData = m_dataBuilder.ShipData.Where(a => a.OldGalaticPower != 0 && a.NewGalaticPower != 0).ToList();
             m_filteredPlayerNames = m_dataBuilder.PlayerData.Select(a => a.PlayerName).ToList();
 
-
-            await BuildReport(fileName);
+            await BuildReport();            
         }
 
-        private async Task BuildReport(string fileName)
+        /// <summary>
+        /// Builds the report and renders it into a PDF format
+        /// </summary>
+        /// <returns></returns>
+        private async Task BuildReport()
         {
             StringBuilder pdfString = new StringBuilder();
-
-            m_toonName = SWGOHMessageSystem.InputMessage("Please enter in the name of the toon you wish to highlight in the report.");
 
             pdfString.Append(@"<html><head><style>
 table {
@@ -97,64 +137,63 @@ div {
 }
 </style></head><body>");
             List<Task> tasks = new List<Task>();
-            /*
+
             //This section can process in any order
-            tasks.Add(Task.Run(() => IntroductionPage()));
-            tasks.Add(Task.Run(() => SevenStarSection()));
-            tasks.Add(Task.Run(() => GearTwelveToons()));
-            tasks.Add(Task.Run(() => GearThirteenToons()));
-            tasks.Add(Task.Run(() => ZetasApplied()));
-            tasks.Add(Task.Run(() => JourneyOrLegendaryUnlock()));
-            tasks.Add(Task.Run(() => JourneyPrepared()));
-            tasks.Add(Task.Run(() => GoldMembers()));
-            tasks.Add(Task.Run(() => PlayerGPDifferences()));
-            tasks.Add(Task.Run(() => UnitGPDifferences()));
-            tasks.Add(Task.Run(() => TopTwentySection()));
-            tasks.Add(Task.Run(() => DetailedData()));
+            if(!m_isSimpleReport)
+            {
+                tasks.Add(Task.Run(() => DetailedData()));
+                tasks.Add(Task.Run(() => JourneyOrLegendaryUnlock()));
+                tasks.Add(Task.Run(() => UnitGPDifferences()));
+                tasks.Add(Task.Run(() => SevenStarSection()));
+                tasks.Add(Task.Run(() => GearTwelveToons()));
+                tasks.Add(Task.Run(() => GearThirteenToons()));
+                tasks.Add(Task.Run(() => ZetasApplied()));
+                tasks.Add(Task.Run(() => PlayerGPDifferences()));
+            }
+            
+            tasks.Add(Task.Run(() => GoldMembers()));            
+            tasks.Add(Task.Run(() => JourneyPrepared()));            
+            tasks.Add(Task.Run(() => IntroductionPage()));            
+            tasks.Add(Task.Run(() => TopTwentySection()));            
             tasks.Add(Task.Run(() => CharacterHighlight()));
             
-            SWGOHMessageSystem.OutputMessage("Still Doing shiot....");
-
-            await Task.WhenAll(tasks.ToArray());*/
-
+            /* For testing processing times
             tasks.Add(Task.Run(() => InvokeAsyncTask("IntroductionPage")));
-            tasks.Add(Task.Run(() => InvokeAsyncTask("SevenStarSection")));
-            tasks.Add(Task.Run(() => InvokeAsyncTask("GearTwelveToons")));
-            tasks.Add(Task.Run(() => InvokeAsyncTask("GearThirteenToons")));
-            tasks.Add(Task.Run(() => InvokeAsyncTask("ZetasApplied")));
-            tasks.Add(Task.Run(() => InvokeAsyncTask("JourneyOrLegendaryUnlock")));
-            tasks.Add(Task.Run(() => InvokeAsyncTask("JourneyPrepared")));
-            tasks.Add(Task.Run(() => InvokeAsyncTask("GoldMembers")));
-            tasks.Add(Task.Run(() => InvokeAsyncTask("PlayerGPDifferences")));
-            tasks.Add(Task.Run(() => InvokeAsyncTask("UnitGPDifferences")));
-            tasks.Add(Task.Run(() => InvokeAsyncTask("TopTwentySection")));
-            tasks.Add(Task.Run(() => InvokeAsyncTask("DetailedData")));
-            tasks.Add(Task.Run(() => InvokeAsyncTask("CharacterHighlight")));
-
-            SWGOHMessageSystem.OutputMessage("Spawned all tasks....");
+            */
 
             await Task.WhenAll(tasks.ToArray());
 
-            SWGOHMessageSystem.OutputMessage("Rendering Report....");
-
             //This section needs to be in order
-            pdfString.AppendLine(m_introduction);
-            pdfString.AppendLine(m_playerGPDifferences);
-            pdfString.AppendLine(m_UnitGPDifferences);
-            pdfString.AppendLine(m_topTwentySection);
-            pdfString.AppendLine(m_sevenStarSection);
-            pdfString.AppendLine(m_gearTwelveToons);
-            pdfString.AppendLine(m_gearThirteenToons);
-            pdfString.AppendLine(m_zetasApplied);
-            pdfString.AppendLine(m_journeyOrLegendaryUnlock);
-            pdfString.AppendLine(m_journeyPrepared);
-            pdfString.AppendLine(m_characterHighlight);
-            pdfString.AppendLine(m_goldMembers);
-            pdfString.AppendLine(m_detailedData);
+            if(m_isSimpleReport)
+            {
+                pdfString.AppendLine(m_introduction);                                
+                pdfString.AppendLine(m_topTwentySection);                                
+                pdfString.AppendLine(m_journeyPrepared);
+                pdfString.AppendLine(m_characterHighlight);
+                pdfString.AppendLine(m_goldMembers);
+            }            
+            else
+            {
+                pdfString.AppendLine(m_introduction);
+                pdfString.AppendLine(m_playerGPDifferences);
+                pdfString.AppendLine(m_UnitGPDifferences);
+                pdfString.AppendLine(m_topTwentySection);
+                pdfString.AppendLine(m_sevenStarSection);
+                pdfString.AppendLine(m_gearTwelveToons);
+                pdfString.AppendLine(m_gearThirteenToons);
+                pdfString.AppendLine(m_zetasApplied);
+                pdfString.AppendLine(m_journeyOrLegendaryUnlock);
+                pdfString.AppendLine(m_journeyPrepared);
+                pdfString.AppendLine(m_characterHighlight);
+                pdfString.AppendLine(m_goldMembers);
+                pdfString.AppendLine(m_detailedData);
+            }
 
             pdfString.AppendLine(@"</body></html>");
 
-            string folderPath = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\\SWGOHDataAnalyzer\\{fileName}.pdf";
+            SWGOHMessageSystem.OutputMessage("Rendering Report....");
+
+            string folderPath = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\\SWGOHDataAnalyzer\\{m_fileName}.pdf";
 
             using (FileStream fs = File.Open(folderPath, FileMode.OpenOrCreate))
                 HtmlConverter.ConvertToPdf(pdfString.ToString(),fs, new ConverterProperties());
@@ -162,33 +201,62 @@ div {
             SWGOHMessageSystem.OutputMessage($"Report saved at {folderPath}");
         }
 
+        /// <summary>
+        /// Method to generate the Intro page on the report
+        /// </summary>
+        /// <returns></returns>
         private async Task IntroductionPage()
         {
             StringBuilder sb = new StringBuilder();
 
-            sb.AppendLine("<div>");
-            sb.AppendLine(HTMLConstructor.SectionHeader("Contents"));
-            sb.AppendLine("<ol type=\"1\"");
-            sb.AppendLine("<li></li>");
-            sb.AppendLine("<li><a href=\"#playergpdiff\">Player GP Differences</a></li>");
-            sb.AppendLine("<li><a href=\"#unitgpdiff\">Unit GP Differences</a></li>");
-            sb.AppendLine("<li><a href=\"#toptwenty\">Top 20 Stats</a></li>");
-            sb.AppendLine("<li><a href=\"#sevenstar\">Seven Stars</a></li>");
-            sb.AppendLine("<li><a href=\"#geartwelve\">Gear 12 Toons</a></li>");
-            sb.AppendLine("<li><a href=\"#gearthirteen\">Gear 13 Toons</a></li>");
-            sb.AppendLine("<li><a href=\"#zetas\">Applied Zetas</a></li>");
-            sb.AppendLine("<li><a href=\"#toonunlock\">Journey or Legendary Unlocks</a></li>");
-            sb.AppendLine("<li><a href=\"#toonprep\">Players prepped for Journey Toons</a></li>");
-            sb.AppendLine($"<li><a href=\"#highlight\">Character Highlight: {m_toonName}</a></li>");
-            sb.AppendLine("<li><a href=\"#goldmembers\">Gold Teams</a></li>");
-            sb.AppendLine("<li><a href=\"#details\">Data Details</a></li>");
-            sb.AppendLine("</ol></div>");
+            if (m_isSimpleReport)
+            {
+                sb.AppendLine("<div>");
+                sb.AppendLine(HTMLConstructor.ReportTitle(m_dataBuilder.GuildName, m_dataBuilder.DateRange));
+                sb.AppendLine("<p/>");
+                sb.AppendLine("<p/>");
+                sb.AppendLine(HTMLConstructor.SectionHeader("Contents"));
+                sb.AppendLine("<ol type=\"1\"");
+                sb.AppendLine("<li></li>");                
+                sb.AppendLine("<li><a href=\"#toptwenty\">Top 20 Stats</a></li>");                
+                sb.AppendLine("<li><a href=\"#toonprep\">Players prepped for Journey Toons</a></li>");
+                sb.AppendLine($"<li><a href=\"#highlight\">Character Highlight: {m_toonName}</a></li>");
+                sb.AppendLine("<li><a href=\"#goldmembers\">Gold Teams</a></li>");
+                sb.AppendLine("</ol></div>");
+            }
+            else
+            {
+                sb.AppendLine("<div>");
+                sb.AppendLine(HTMLConstructor.ReportTitle(m_dataBuilder.GuildName, m_dataBuilder.DateRange));
+                sb.AppendLine("<p/>");
+                sb.AppendLine("<p/>");
+                sb.AppendLine(HTMLConstructor.SectionHeader("Contents"));
+                sb.AppendLine("<ol type=\"1\"");
+                sb.AppendLine("<li></li>");
+                sb.AppendLine("<li><a href=\"#playergpdiff\">Player GP Differences</a></li>");
+                sb.AppendLine("<li><a href=\"#unitgpdiff\">Unit GP Differences</a></li>");
+                sb.AppendLine("<li><a href=\"#toptwenty\">Top 20 Stats</a></li>");
+                sb.AppendLine("<li><a href=\"#sevenstar\">Seven Stars</a></li>");
+                sb.AppendLine("<li><a href=\"#geartwelve\">Gear 12 Toons</a></li>");
+                sb.AppendLine("<li><a href=\"#gearthirteen\">Gear 13 Toons</a></li>");
+                sb.AppendLine("<li><a href=\"#zetas\">Applied Zetas</a></li>");
+                sb.AppendLine("<li><a href=\"#toonunlock\">Journey or Legendary Unlocks</a></li>");
+                sb.AppendLine("<li><a href=\"#toonprep\">Players prepped for Journey Toons</a></li>");
+                sb.AppendLine($"<li><a href=\"#highlight\">Character Highlight: {m_toonName}</a></li>");
+                sb.AppendLine("<li><a href=\"#goldmembers\">Gold Teams</a></li>");
+                sb.AppendLine("<li><a href=\"#details\">Data Details</a></li>");
+                sb.AppendLine("</ol></div>");
+            }
 
             m_introduction = sb.ToString();
 
             await Task.CompletedTask;
         }
 
+        /// <summary>
+        /// Method to generate the character highlight
+        /// </summary>
+        /// <returns></returns>
         private async Task CharacterHighlight()
         {
             StringBuilder sb = new StringBuilder();
@@ -263,6 +331,10 @@ div {
             await Task.CompletedTask;
         }
 
+        /// <summary>
+        /// Method to generate unit gp differences
+        /// </summary>
+        /// <returns></returns>
         private async Task UnitGPDifferences()
         {
             StringBuilder sb = new StringBuilder();
@@ -284,6 +356,10 @@ div {
             await Task.CompletedTask;            
         }
 
+        /// <summary>
+        /// Method to generate gold members
+        /// </summary>
+        /// <returns></returns>
         private async Task GoldMembers()
         {
             StringBuilder sb = new StringBuilder();
@@ -462,6 +538,10 @@ div {
             await Task.CompletedTask;
         }
 
+        /// <summary>
+        /// Method to generate list of players prepped
+        /// </summary>
+        /// <returns></returns>
         private async Task JourneyPrepared()
         {
             StringBuilder sb = new StringBuilder();
@@ -591,6 +671,10 @@ div {
             await Task.CompletedTask;
         }
 
+        /// <summary>
+        /// Method to generate list of players that unlocked
+        /// </summary>
+        /// <returns></returns>
         private async Task JourneyOrLegendaryUnlock()
         {
             StringBuilder sb = new StringBuilder();
@@ -640,6 +724,10 @@ div {
             await Task.CompletedTask;
         }
 
+        /// <summary>
+        /// Method to generate applied zetas
+        /// </summary>
+        /// <returns></returns>
         private async Task ZetasApplied()
         {
             StringBuilder sb = new StringBuilder();
@@ -663,6 +751,10 @@ div {
             await Task.CompletedTask;
         }
 
+        /// <summary>
+        /// Method to generate g13 toons
+        /// </summary>
+        /// <returns></returns>
         private async Task GearThirteenToons()
         {
             StringBuilder sb = new StringBuilder();
@@ -681,6 +773,10 @@ div {
             await Task.CompletedTask;
         }
 
+        /// <summary>
+        /// Method to generate g12 toons
+        /// </summary>
+        /// <returns></returns>
         private async Task GearTwelveToons()
         {
             StringBuilder sb = new StringBuilder();
@@ -699,6 +795,10 @@ div {
             await Task.CompletedTask;
         }
 
+        /// <summary>
+        /// Method to generate the top 20 toons of various stats
+        /// </summary>
+        /// <returns></returns>
         private async Task TopTwentySection()
         {
             StringBuilder sb = new StringBuilder();
@@ -769,6 +869,10 @@ div {
             await Task.CompletedTask;
         }
 
+        /// <summary>
+        /// Method to generate 7* characters
+        /// </summary>
+        /// <returns></returns>
         private async Task SevenStarSection()
         {
             StringBuilder sb = new StringBuilder();
@@ -803,6 +907,10 @@ div {
             await Task.CompletedTask;
         }
 
+        /// <summary>
+        /// Method to generate player gp differences
+        /// </summary>
+        /// <returns></returns>
         private async Task PlayerGPDifferences()
         {
             StringBuilder sb = new StringBuilder();
@@ -832,6 +940,10 @@ div {
             await Task.CompletedTask;
         }
 
+        /// <summary>
+        /// Method to generate detailed data
+        /// </summary>
+        /// <returns></returns>
         private async Task DetailedData()
         {
             StringBuilder sb = new StringBuilder();
@@ -882,6 +994,14 @@ div {
             await Task.CompletedTask;
         }
 
+        /// <summary>
+        /// Takes the top X toons of a stat and returns the result
+        /// </summary>
+        /// <param name="amount">Amount of results to return</param>
+        /// <param name="stat">Stat to compare against</param>
+        /// <param name="properties">Properties of the reflected object to pull data from</param>
+        /// <param name="toonName">Character name to find data against</param>
+        /// <returns>Table of data found for the passed in params</returns>
         private string TakeTopXOfStatAndReturnTableData(int amount, string stat, string[] properties, string toonName = null)
         {
             StringBuilder sb = new StringBuilder();
@@ -906,6 +1026,11 @@ div {
             return sb.ToString();
         }
 
+        /// <summary>
+        /// Gets all of the toons of a given gear level
+        /// </summary>
+        /// <param name="gearLevel">Gear level to search for</param>
+        /// <returns>Table of characters at a gear level</returns>
         private string GetAllToonsOfGearLevelDifference(int gearLevel)
         {
             StringBuilder sb = new StringBuilder();
@@ -917,6 +1042,12 @@ div {
             return sb.ToString();
         }
 
+        /// <summary>
+        /// Searches through a list of players for those who are part of a gold team
+        /// </summary>
+        /// <param name="potentialPlayers">List of players to go through</param>
+        /// <param name="count">Number of characters that meet the requirement</param>
+        /// <returns>List of players that meet the requirement of the gold member</returns>
         private List<string> FindGoldTeamPlayers(IEnumerable<IGrouping<string, string>> potentialPlayers, int count)
         {
             List<string> players = new List<string>();
@@ -928,6 +1059,12 @@ div {
             return players;
         }
 
+        /// <summary>
+        /// Uitilizing this method to help determine which of the method calls take the longest to process so I can call the longer ones sooner
+        /// </summary>
+        /// <param name="methodToInvoke"></param>
+        /// <param name="classToInvoke"></param>
+        /// <returns></returns>
         public async Task InvokeAsyncTask(string methodToInvoke, string classToInvoke = null)
         {
             try
@@ -936,7 +1073,7 @@ div {
                 if(String.IsNullOrEmpty(classToInvoke))
                     Type.GetType(this.ToString()).InvokeMember(methodToInvoke, BindingFlags.InvokeMethod | BindingFlags.NonPublic | BindingFlags.Instance, null, this, null);
                 else
-                    Type.GetType(classToInvoke).InvokeMember(methodToInvoke, BindingFlags.InvokeMethod | BindingFlags.NonPublic | BindingFlags.Instance, null, Type.GetType(classToInvoke), null);
+                    Type.GetType(classToInvoke).InvokeMember(methodToInvoke, BindingFlags.InvokeMethod | BindingFlags.Public | BindingFlags.Instance, null, Type.GetType(classToInvoke), null);
 #if DEBUG
                 Stopwatch watch = new Stopwatch();
                 watch.Start();

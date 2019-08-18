@@ -80,7 +80,12 @@ namespace SWGOHReportBuilder
 
         public static string SectionHeader(string headerText)
         {
-            return $"<h1><center>{headerText}</center></h1>";
+            return $"<h2><center>{headerText}</center></h2>";
+        }
+
+        public static string ReportTitle(string title, string dateRange)
+        {
+            return $"<h1><center>{title}</center></h1><p/><h1><center>{dateRange}</center></h1>";
         }
     }
 }

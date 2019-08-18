@@ -113,6 +113,10 @@
       <Project>{8f00307a-b80a-4450-b388-4395d602d656}</Project>
       <Name>SWGOHMessageSystem</Name>
     </ProjectReference>
+    <ProjectReference Include="..\SWGOHClient\SWGOHInterface.csproj">
+      <Project>{452aca04-2f5a-44a5-a7bb-1019f9c7ed7c}</Project>
+      <Name>SWGOHInterface</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SWGOHDBInterface\SWGOHDBInterface.csproj">
       <Project>{88661601-0e1b-44a7-9ad1-948c37ffcd92}</Project>
       <Name>SWGOHDBInterface</Name>

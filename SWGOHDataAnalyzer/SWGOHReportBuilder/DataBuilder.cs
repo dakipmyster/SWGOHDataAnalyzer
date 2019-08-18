@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using SWGOHDBInterface;
 using SWGOHMessage;
+using SWGOHInterface;
 
 namespace SWGOHReportBuilder
 {
@@ -17,6 +18,8 @@ namespace SWGOHReportBuilder
         internal List<PlayerData> PlayerData { get; set; }
         internal List<UnitData> UnitData { get; set; }
         internal List<ShipData> ShipData { get; set; }
+        internal string GuildName { get; set; }
+        internal string DateRange { get; set; }
 
         public DataBuilder()
         {
@@ -26,6 +29,10 @@ namespace SWGOHReportBuilder
             ShipData = new List<ShipData>();
         }
 
+        /// <summary>
+        /// Determines if there is enough snapshots in the database to run the detailed report
+        /// </summary>
+        /// <returns>True if two or more snapshots, otherwise false</returns>
         public bool CanRunReport()
         {
             if (!m_dbInterface.HasOldSnapshots)
@@ -37,6 +44,9 @@ namespace SWGOHReportBuilder
             return true;
         }
 
+        /// <summary>
+        /// Gets all of the names of the snapshots in the database
+        /// </summary>
         public void GetSnapshotNames()
         {
             SWGOHMessageSystem.OutputMessage($"Here is the list of all available snapshots \r\n{String.Join("\r\n", m_dbInterface.Tables.ToArray())} \r\n");
@@ -56,7 +66,37 @@ namespace SWGOHReportBuilder
             }
         }
 
-        internal async Task CollectPlayerGPDifferences()
+        /// <summary>
+        /// Gets the metadata info for the snapshot
+        /// </summary>
+        /// <returns></returns>
+        internal async Task CollectSnapshotMetadataFromDB()
+        {
+            string sqlQuery = $"SELECT DISTINCT guild_name, pull_date FROM {m_newSnapshot} LIMIT 1";
+
+            DataTable newResults = await m_dbInterface.ExecuteQueryAndReturnResults(sqlQuery, null);
+
+            foreach (DataRow row in newResults.Rows)
+            {
+                GuildName = row["guild_name"].ToString();
+                DateRange = Convert.ToDateTime(row["pull_date"].ToString()).ToString("d");
+            }
+
+            sqlQuery = $"SELECT DISTINCT pull_date FROM {m_oldSnapshot} LIMIT 1";
+
+            DataTable oldResults = await m_dbInterface.ExecuteQueryAndReturnResults(sqlQuery, null);
+
+            foreach (DataRow row in oldResults.Rows)
+            {
+                DateRange = $"{Convert.ToDateTime(row["pull_date"].ToString()).ToString("d")} - {DateRange}";
+            }
+        }
+
+        /// <summary>
+        /// Collects all player related data from the snapshots
+        /// </summary>
+        /// <returns></returns>
+        internal async Task CollectPlayerGPDifferencesFromDB()
         {
             string sqlQuery = $@"SELECT DISTINCT player_name, player_power, 'New' as 'State'
 FROM {m_newSnapshot}
@@ -98,7 +138,11 @@ FROM {m_oldSnapshot}";
             }
         }
         
-        internal async Task CollectShipData()
+        /// <summary>
+        /// Collects all of the ship data from the snapshots
+        /// </summary>
+        /// <returns></returns>
+        internal async Task CollectShipDataFromDB()
         {
             string sqlQuery = $@"SELECT player_name, toon, rarity, player_power, 'New' as 'State'
 FROM {m_newSnapshot} WHERE is_ship = 1
@@ -141,7 +185,11 @@ FROM {m_oldSnapshot} WHERE is_ship = 1";
             }
         }
 
-        internal async Task CollectUnitData()
+        /// <summary>
+        /// Collects all the unit data from the snapshots
+        /// </summary>
+        /// <returns></returns>
+        internal async Task CollectUnitDataFromDB()
         {
             string sqlQuery = $@"SELECT player_name, toon, rarity, player_power, gear_level, toon_power, toon_level, health, protection, speed, p_offense,
 s_offense, p_defense, s_defense, p_crit_chance, s_crit_chance, potency, tenacity, zeta_one, zeta_two, zeta_three, 'New' as 'State'
@@ -221,5 +269,65 @@ FROM {m_oldSnapshot} WHERE is_ship = 0";
             foreach (UnitData unit in UnitData)
                 unit.PowerDifference = unit.NewPower - unit.OldPower;
         }
+
+        /// <summary>
+        /// Collects all the data from a recent interface pull
+        /// </summary>
+        /// <param name="guild">Guild data from the interface</param>
+        /// <returns></returns>
+        internal async Task CollectUnitDataFromInterface(Guild guild)
+        {
+            GuildName = guild.GuildData.GuildName;
+            DateRange = DateTime.Now.ToString("d");
+
+            foreach(Player player in guild.Players)
+            {
+                PlayerData.Add(new PlayerData() { PlayerName = player.PlayerData.Name });
+
+                foreach (PlayerUnit unit in player.PlayerUnits)
+                {
+                    if (unit.UnitData.Gear.Count > 0)
+                    {
+                        List<string> zetas = new List<string>();
+
+                        foreach (string zeta in unit.UnitData.AppliedZetas)
+                        {
+                            if (unit.UnitData.UnitAbilities.FirstOrDefault(a => a.AbilityId == zeta) != null)
+                            {
+                                zetas.Add(unit.UnitData.UnitAbilities.FirstOrDefault(a => a.AbilityId == zeta).AbilityName);
+                            }
+                        }
+
+                        UnitData unitData = new UnitData()
+                        {
+                            PlayerName = player.PlayerData.Name,
+                            CurrentHealth = (decimal)Math.Round(unit.UnitData.UnitStats.Health, 2),
+                            CurrentPhysicalCritChance = (decimal)Math.Round(unit.UnitData.UnitStats.PhysicalCriticalChance, 2),
+                            CurrentPhysicalDefense = (decimal)Math.Round(unit.UnitData.UnitStats.PhysicalDefense, 2),
+                            CurrentPhysicalOffense = (decimal)Math.Round(unit.UnitData.UnitStats.PhysicalOffense, 2),
+                            CurrentPotency = (decimal)Math.Round(unit.UnitData.UnitStats.Potency, 2),
+                            CurrentProtection = (decimal)Math.Round(unit.UnitData.UnitStats.Protection, 2),
+                            CurrentSpecialCritChance = (decimal)Math.Round(unit.UnitData.UnitStats.SpecialCriticalChance, 2),
+                            CurrentSpecialDefense = (decimal)Math.Round(unit.UnitData.UnitStats.SpeicalDefense, 2),
+                            CurrentSpecialOffense = (decimal)Math.Round(unit.UnitData.UnitStats.SpecialOffense, 2),
+                            CurrentSpeed = (decimal)Math.Round(unit.UnitData.UnitStats.Speed, 2),
+                            CurrentTankiest = (decimal)Math.Round(unit.UnitData.UnitStats.Health, 2) + (decimal)Math.Round(unit.UnitData.UnitStats.Protection, 2),
+                            CurrentTenacity = (decimal)Math.Round(unit.UnitData.UnitStats.Tenacity, 2),
+                            UnitName = unit.UnitData.Name,
+                            NewPower = unit.UnitData.Power,
+                            NewGearLevel = unit.UnitData.GearLevel,
+                            NewZetas = zetas,
+                            NewRarity = unit.UnitData.Rarity
+                        };
+
+                        UnitData.Add(unitData);
+                        
+                    }
+                }
+            }
+
+            await Task.CompletedTask;
+        }
+
     }
 }

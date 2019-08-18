@@ -50,6 +50,9 @@ namespace SWGOHDBInterface
             CollectTables();
         }
 
+        /// <summary>
+        /// Method to collect the name of all the tables in the system as snapshot names
+        /// </summary>
         private void CollectTables()
         {
             string sql = "SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%'";
@@ -70,6 +73,10 @@ namespace SWGOHDBInterface
             }
         }
 
+        /// <summary>
+        /// Collects all of the data from the interface data pull and inserts it into the snapshot database
+        /// </summary>
+        /// <param name="guild"></param>
         public void WriteDataToDB(Guild guild)
         {
             CreateTable();
@@ -86,12 +93,12 @@ namespace SWGOHDBInterface
                         {
                             using (var cmd = new SQLiteCommand(conn))
                             {
-                                cmd.Parameters.AddRange(CollectSQLParams(player.PlayerData.Name, player.PlayerData.PlayerPower, unit));
+                                cmd.Parameters.AddRange(CollectSQLParams(player.PlayerData.Name, player.PlayerData.PlayerPower, guild.GuildData.GuildName, unit));
 
                                 //Yes, the SQL Injection again
                                 cmd.CommandText = $@"INSERT INTO {m_dbTableName}
-(player_name, player_power, toon, toon_power, toon_level, is_ship, gear_level, rarity, health, protection, speed, p_offense, s_offense, p_defense, s_defense, p_crit_chance, s_crit_chance, potency, tenacity, total_zetas, zeta_one, zeta_two, zeta_three, pull_date) 
-VALUES (@player_name, @player_power, @toon, @toon_power, @toon_level, @is_ship, @gear_level, @rarity, @health, @protection, @speed, @p_offense, @s_offense, @p_defense, @s_defense, @p_crit_chance, @s_cirt_chance, @potency, @tenacity, @total_zetas, @zeta_one, @zeta_two, @zeta_three, @pull_date) ;";
+(guild_name, player_name, player_power, toon, toon_power, toon_level, is_ship, gear_level, rarity, health, protection, speed, p_offense, s_offense, p_defense, s_defense, p_crit_chance, s_crit_chance, potency, tenacity, total_zetas, zeta_one, zeta_two, zeta_three, pull_date) 
+VALUES (@guild_name, @player_name, @player_power, @toon, @toon_power, @toon_level, @is_ship, @gear_level, @rarity, @health, @protection, @speed, @p_offense, @s_offense, @p_defense, @s_defense, @p_crit_chance, @s_cirt_chance, @potency, @tenacity, @total_zetas, @zeta_one, @zeta_two, @zeta_three, @pull_date) ;";
 
 
                                 cmd.ExecuteNonQuery();
@@ -105,7 +112,15 @@ VALUES (@player_name, @player_power, @toon, @toon_power, @toon_level, @is_ship, 
             SWGOHMessageSystem.OutputMessage("Snapshot Complete!");
         }
 
-        private SQLiteParameter[] CollectSQLParams(string playerName, int playerPower, PlayerUnit unit)
+        /// <summary>
+        /// Puts together the parameters for the sql insert
+        /// </summary>
+        /// <param name="playerName">Name of the player</param>
+        /// <param name="playerPower">Power of the player</param>
+        /// <param name="guildName">Guild name</param>
+        /// <param name="unit">Unit object of all the data</param>
+        /// <returns>An array of all the sql params needed to insert the data</returns>
+        private SQLiteParameter[] CollectSQLParams(string playerName, int playerPower, string guildName, PlayerUnit unit)
         {
             List<SQLiteParameter> sqlParams = new List<SQLiteParameter>();
 
@@ -120,6 +135,7 @@ VALUES (@player_name, @player_power, @toon, @toon_power, @toon_level, @is_ship, 
                 }
             }
 
+            sqlParams.Add(new SQLiteParameter("@guild_name", guildName));
             sqlParams.Add(new SQLiteParameter("@player_name", playerName));
             sqlParams.Add(new SQLiteParameter("@player_power", playerPower));
             sqlParams.Add(new SQLiteParameter("@toon", unit.UnitData.Name));
@@ -157,6 +173,7 @@ VALUES (@player_name, @player_power, @toon, @toon_power, @toon_level, @is_ship, 
             string sql = $@"CREATE TABLE {m_dbTableName}
 (
     ID INTEGER PRIMARY KEY AUTOINCREMENT,
+    guild_name varchar(40),
     player_name varchar(30),
     player_power int,
     toon varchar(50),
@@ -196,6 +213,12 @@ VALUES (@player_name, @player_power, @toon, @toon_power, @toon_level, @is_ship, 
             }
         }
 
+        /// <summary>
+        /// Executes  the sql and parameters passsed in
+        /// </summary>
+        /// <param name="sql">Sql query to run</param>
+        /// <param name="parameters">Parameters for the query</param>
+        /// <returns>Results of the query</returns>
         public async Task<DataTable> ExecuteQueryAndReturnResults(string sql, SQLiteParameter[] parameters)
         {
             DataTable table = new DataTable();
