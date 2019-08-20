@@ -103,7 +103,7 @@ namespace SWGOHReportBuilder
             tasks.Add(Task.Run(() => m_dataBuilder.CollectSnapshotMetadataFromDB()));
 
             m_fileName = SWGOHMessageSystem.InputMessage("Enter in the filename for the report");
-            m_toonName = SWGOHMessageSystem.InputMessage("Please enter in the name of the toon you wish to highlight in the report.");
+            m_toonName = SWGOHMessageSystem.InputMessage("Please enter in the name of the toon you wish to highlight in the report.  If there is not a toon you wish to highlight, press enter to continue.");
             SWGOHMessageSystem.OutputMessage("Compiling Report Data....");
 
             await Task.WhenAll(tasks.ToArray());
@@ -220,7 +220,7 @@ div {
                 sb.AppendLine("<li></li>");                
                 sb.AppendLine("<li><a href=\"#toptwenty\">Top 20 Stats</a></li>");                
                 sb.AppendLine("<li><a href=\"#toonprep\">Players prepped for Journey Toons</a></li>");
-                sb.AppendLine($"<li><a href=\"#highlight\">Character Highlight: {m_toonName}</a></li>");
+                if (!String.IsNullOrEmpty(m_toonName)) sb.AppendLine($"<li><a href=\"#highlight\">Character Highlight: {m_toonName}</a></li>");
                 sb.AppendLine("<li><a href=\"#goldmembers\">Gold Teams</a></li>");
                 sb.AppendLine("</ol></div>");
             }
@@ -242,7 +242,7 @@ div {
                 sb.AppendLine("<li><a href=\"#zetas\">Applied Zetas</a></li>");
                 sb.AppendLine("<li><a href=\"#toonunlock\">Journey or Legendary Unlocks</a></li>");
                 sb.AppendLine("<li><a href=\"#toonprep\">Players prepped for Journey Toons</a></li>");
-                sb.AppendLine($"<li><a href=\"#highlight\">Character Highlight: {m_toonName}</a></li>");
+                if(!String.IsNullOrEmpty(m_toonName)) sb.AppendLine($"<li><a href=\"#highlight\">Character Highlight: {m_toonName}</a></li>");
                 sb.AppendLine("<li><a href=\"#goldmembers\">Gold Teams</a></li>");
                 sb.AppendLine("<li><a href=\"#details\">Data Details</a></li>");
                 sb.AppendLine("</ol></div>");
@@ -259,74 +259,77 @@ div {
         /// <returns></returns>
         private async Task CharacterHighlight()
         {
-            StringBuilder sb = new StringBuilder();
+            if (!String.IsNullOrEmpty(m_toonName))
+            {
+                StringBuilder sb = new StringBuilder();
 
-            sb.AppendLine("<div id=\"highlight\">");
-            sb.AppendLine(HTMLConstructor.SectionHeader("Character Highlight"));
-            sb.AppendLine($"This section goes over a specific character to highlight and will rotate every report.  This iteration is {m_toonName}.  The report takes the top 10 of {m_toonName}'s stats");
-            sb.AppendLine("<p/>");
+                sb.AppendLine("<div id=\"highlight\">");
+                sb.AppendLine(HTMLConstructor.SectionHeader("Character Highlight"));
+                sb.AppendLine($"This section goes over a specific character to highlight and will rotate every report.  This iteration is {m_toonName}.  The report takes the top 10 of {m_toonName}'s stats");
+                sb.AppendLine("<p/>");
 
-            sb.AppendLine(HTMLConstructor.TableGroupStart());           
+                sb.AppendLine(HTMLConstructor.TableGroupStart());
 
-            sb.Append(HTMLConstructor.AddTable(new string[] { "Player Name", "Health" }, TakeTopXOfStatAndReturnTableData(10, "CurrentHealth", new string[] {"PlayerName", "CurrentHealth" }, m_toonName), "Health"));
+                sb.Append(HTMLConstructor.AddTable(new string[] { "Player Name", "Health" }, TakeTopXOfStatAndReturnTableData(10, "CurrentHealth", new string[] { "PlayerName", "CurrentHealth" }, m_toonName), "Health"));
 
-            sb.Append(HTMLConstructor.TableGroupNext());
+                sb.Append(HTMLConstructor.TableGroupNext());
 
-            sb.Append(HTMLConstructor.AddTable(new string[] { "Player Name", "Protection" }, TakeTopXOfStatAndReturnTableData(10, "CurrentProtection", new string[] { "PlayerName", "CurrentProtection" }, m_toonName), "Protection"));
-            
-            sb.Append(HTMLConstructor.TableGroupNext());
-           
-            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Tankiest" }, TakeTopXOfStatAndReturnTableData(10, "CurrentTankiest", new string[] { "PlayerName", "CurrentTankiest" }, m_toonName), "Tankiest"));
+                sb.Append(HTMLConstructor.AddTable(new string[] { "Player Name", "Protection" }, TakeTopXOfStatAndReturnTableData(10, "CurrentProtection", new string[] { "PlayerName", "CurrentProtection" }, m_toonName), "Protection"));
 
-            sb.AppendLine(HTMLConstructor.TableGroupEnd());
-            sb.AppendLine(HTMLConstructor.TableGroupStart());
+                sb.Append(HTMLConstructor.TableGroupNext());
 
-            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Speed" }, TakeTopXOfStatAndReturnTableData(10, "CurrentSpeed", new string[] { "PlayerName", "CurrentSpeed" }, m_toonName), "Speed"));
+                sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Tankiest" }, TakeTopXOfStatAndReturnTableData(10, "CurrentTankiest", new string[] { "PlayerName", "CurrentTankiest" }, m_toonName), "Tankiest"));
 
-            sb.Append(HTMLConstructor.TableGroupNext());
+                sb.AppendLine(HTMLConstructor.TableGroupEnd());
+                sb.AppendLine(HTMLConstructor.TableGroupStart());
 
-            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "PO" }, TakeTopXOfStatAndReturnTableData(10, "CurrentPhysicalOffense", new string[] { "PlayerName", "CurrentPhysicalOffense" }, m_toonName), "Physical Offense"));
+                sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Speed" }, TakeTopXOfStatAndReturnTableData(10, "CurrentSpeed", new string[] { "PlayerName", "CurrentSpeed" }, m_toonName), "Speed"));
 
-            sb.Append(HTMLConstructor.TableGroupNext());
-             
-            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "SO" }, TakeTopXOfStatAndReturnTableData(10, "CurrentSpecialOffense", new string[] { "PlayerName", "CurrentSpecialOffense" }, m_toonName), "Special Offense"));
+                sb.Append(HTMLConstructor.TableGroupNext());
 
-            sb.AppendLine(HTMLConstructor.TableGroupEnd());
-            sb.AppendLine(HTMLConstructor.TableGroupStart());
+                sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "PO" }, TakeTopXOfStatAndReturnTableData(10, "CurrentPhysicalOffense", new string[] { "PlayerName", "CurrentPhysicalOffense" }, m_toonName), "Physical Offense"));
 
-            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "PD" }, TakeTopXOfStatAndReturnTableData(10, "CurrentPhysicalDefense", new string[] { "PlayerName", "CurrentPhysicalDefense" }, m_toonName), "Physical Defense"));
+                sb.Append(HTMLConstructor.TableGroupNext());
 
-            sb.Append(HTMLConstructor.TableGroupNext());
+                sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "SO" }, TakeTopXOfStatAndReturnTableData(10, "CurrentSpecialOffense", new string[] { "PlayerName", "CurrentSpecialOffense" }, m_toonName), "Special Offense"));
 
-            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "SD" }, TakeTopXOfStatAndReturnTableData(10, "CurrentSpecialDefense", new string[] { "PlayerName", "CurrentSpecialDefense" }, m_toonName), "Special Defense"));
+                sb.AppendLine(HTMLConstructor.TableGroupEnd());
+                sb.AppendLine(HTMLConstructor.TableGroupStart());
 
-            sb.Append(HTMLConstructor.TableGroupNext());
+                sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "PD" }, TakeTopXOfStatAndReturnTableData(10, "CurrentPhysicalDefense", new string[] { "PlayerName", "CurrentPhysicalDefense" }, m_toonName), "Physical Defense"));
 
-            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "PCC" }, TakeTopXOfStatAndReturnTableData(10, "CurrentPhysicalCritChance", new string[] { "PlayerName", "CurrentPhysicalCritChance" }, m_toonName), "Physical CC"));
+                sb.Append(HTMLConstructor.TableGroupNext());
 
-            sb.AppendLine(HTMLConstructor.TableGroupEnd());
-            sb.AppendLine(HTMLConstructor.TableGroupStart());
+                sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "SD" }, TakeTopXOfStatAndReturnTableData(10, "CurrentSpecialDefense", new string[] { "PlayerName", "CurrentSpecialDefense" }, m_toonName), "Special Defense"));
 
-            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "SCC" }, TakeTopXOfStatAndReturnTableData(10, "CurrentSpecialCritChance", new string[] { "PlayerName", "CurrentSpecialCritChance" }, m_toonName), "Special CC"));
+                sb.Append(HTMLConstructor.TableGroupNext());
 
-            sb.Append(HTMLConstructor.TableGroupNext());
-             
-            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Potency" }, TakeTopXOfStatAndReturnTableData(10, "CurrentPotency", new string[] { "PlayerName", "CurrentPotency" }, m_toonName), "Potency"));
+                sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "PCC" }, TakeTopXOfStatAndReturnTableData(10, "CurrentPhysicalCritChance", new string[] { "PlayerName", "CurrentPhysicalCritChance" }, m_toonName), "Physical CC"));
 
-            sb.Append(HTMLConstructor.TableGroupNext());
+                sb.AppendLine(HTMLConstructor.TableGroupEnd());
+                sb.AppendLine(HTMLConstructor.TableGroupStart());
 
-            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Tenacity" }, TakeTopXOfStatAndReturnTableData(10, "CurrentTenacity", new string[] { "PlayerName", "CurrentTenacity" }, m_toonName), "Tenacity"));
+                sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "SCC" }, TakeTopXOfStatAndReturnTableData(10, "CurrentSpecialCritChance", new string[] { "PlayerName", "CurrentSpecialCritChance" }, m_toonName), "Special CC"));
 
-            sb.AppendLine(HTMLConstructor.TableGroupEnd());
-            sb.AppendLine(HTMLConstructor.TableGroupStart());
+                sb.Append(HTMLConstructor.TableGroupNext());
 
-            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Galatic Power", "Gear Level" }, TakeTopXOfStatAndReturnTableData(10, "NewPower", new string[] { "PlayerName", "NewPower", "NewGearLevel" }, m_toonName), "Highest Galatic Power"));
+                sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Potency" }, TakeTopXOfStatAndReturnTableData(10, "CurrentPotency", new string[] { "PlayerName", "CurrentPotency" }, m_toonName), "Potency"));
 
-            sb.AppendLine(HTMLConstructor.TableGroupEnd());
+                sb.Append(HTMLConstructor.TableGroupNext());
 
-            sb.AppendLine("<p/></div>");
+                sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Tenacity" }, TakeTopXOfStatAndReturnTableData(10, "CurrentTenacity", new string[] { "PlayerName", "CurrentTenacity" }, m_toonName), "Tenacity"));
 
-            m_characterHighlight = sb.ToString();
+                sb.AppendLine(HTMLConstructor.TableGroupEnd());
+                sb.AppendLine(HTMLConstructor.TableGroupStart());
+
+                sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Galatic Power", "Gear Level" }, TakeTopXOfStatAndReturnTableData(10, "NewPower", new string[] { "PlayerName", "NewPower", "NewGearLevel" }, m_toonName), "Highest Galatic Power"));
+
+                sb.AppendLine(HTMLConstructor.TableGroupEnd());
+
+                sb.AppendLine("<p/></div>");
+
+                m_characterHighlight = sb.ToString();
+            }
 
             await Task.CompletedTask;
         }

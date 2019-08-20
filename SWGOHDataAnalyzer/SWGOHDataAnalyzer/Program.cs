@@ -98,7 +98,7 @@ namespace SWGOHDataAnalyzer
             Task dataPullTask = client.GetGuildData();
 
             string fileName = SWGOHMessageSystem.InputMessage("Enter in the filename for the report");
-            string characterName = SWGOHMessageSystem.InputMessage("Enter in the character to highlight for the report");
+            string characterName = SWGOHMessageSystem.InputMessage("Enter in the toon to highlight for the report.  If there is not a toon you wish to highlight, press enter to continue");
 
             SWGOHMessageSystem.OutputMessage("Pulling down guild data...");
 
