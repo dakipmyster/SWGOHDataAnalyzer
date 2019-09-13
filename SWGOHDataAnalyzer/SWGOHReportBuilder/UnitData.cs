@@ -14,6 +14,10 @@ namespace SWGOHReportBuilder
 
         public int NewGearLevel { get; set; }
 
+        public int OldRelicTier { get; set; }
+
+        public int NewRelicTier { get; set; }
+
         public List<string> OldZetas { get; set; }
 
         public List<string> NewZetas { get; set; }

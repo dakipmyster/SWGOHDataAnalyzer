@@ -1,14 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using Newtonsoft.Json;
 
 namespace SWGOHInterface
 {
     public class UnitData
     {
+        [JsonProperty("relic_tier")]
+        public int RelicTier { get; set; }
+
         [JsonProperty("gear")]
         public List<Gear> Gear { get; set; }
 

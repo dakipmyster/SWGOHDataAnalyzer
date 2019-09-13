@@ -97,8 +97,8 @@ namespace SWGOHDBInterface
 
                                 //Yes, the SQL Injection again
                                 cmd.CommandText = $@"INSERT INTO {m_dbTableName}
-(guild_name, player_name, player_power, toon, toon_power, toon_level, is_ship, gear_level, rarity, health, protection, speed, p_offense, s_offense, p_defense, s_defense, p_crit_chance, s_crit_chance, potency, tenacity, total_zetas, zeta_one, zeta_two, zeta_three, pull_date) 
-VALUES (@guild_name, @player_name, @player_power, @toon, @toon_power, @toon_level, @is_ship, @gear_level, @rarity, @health, @protection, @speed, @p_offense, @s_offense, @p_defense, @s_defense, @p_crit_chance, @s_cirt_chance, @potency, @tenacity, @total_zetas, @zeta_one, @zeta_two, @zeta_three, @pull_date) ;";
+(guild_name, player_name, player_power, toon, toon_power, toon_level, is_ship, gear_level, rarity, health, protection, speed, p_offense, s_offense, p_defense, s_defense, p_crit_chance, s_crit_chance, potency, tenacity, total_zetas, zeta_one, zeta_two, zeta_three, pull_date, relic_tier) 
+VALUES (@guild_name, @player_name, @player_power, @toon, @toon_power, @toon_level, @is_ship, @gear_level, @rarity, @health, @protection, @speed, @p_offense, @s_offense, @p_defense, @s_defense, @p_crit_chance, @s_crit_chance, @potency, @tenacity, @total_zetas, @zeta_one, @zeta_two, @zeta_three, @pull_date, @relic_tier) ;";
 
 
                                 cmd.ExecuteNonQuery();
@@ -152,7 +152,7 @@ VALUES (@guild_name, @player_name, @player_power, @toon, @toon_power, @toon_leve
             sqlParams.Add(new SQLiteParameter("@p_defense", Math.Round(unit.UnitData.UnitStats.PhysicalDefense, 2)));
             sqlParams.Add(new SQLiteParameter("@s_defense", Math.Round(unit.UnitData.UnitStats.SpeicalDefense, 2)));
             sqlParams.Add(new SQLiteParameter("@p_crit_chance", Math.Round(unit.UnitData.UnitStats.PhysicalCriticalChance, 2)));
-            sqlParams.Add(new SQLiteParameter("@s_cirt_chance", Math.Round(unit.UnitData.UnitStats.SpecialCriticalChance, 2)));
+            sqlParams.Add(new SQLiteParameter("@s_crit_chance", Math.Round(unit.UnitData.UnitStats.SpecialCriticalChance, 2)));
             sqlParams.Add(new SQLiteParameter("@potency", Math.Round(unit.UnitData.UnitStats.Potency*100, 2)));
             sqlParams.Add(new SQLiteParameter("@tenacity", Math.Round(unit.UnitData.UnitStats.Tenacity*100, 2)));
             sqlParams.Add(new SQLiteParameter("@total_zetas", unit.UnitData.AppliedZetas.Count));
@@ -160,6 +160,7 @@ VALUES (@guild_name, @player_name, @player_power, @toon, @toon_power, @toon_leve
             sqlParams.Add(new SQLiteParameter("@zeta_two", zetas.ElementAtOrDefault(1)));
             sqlParams.Add(new SQLiteParameter("@zeta_three", zetas.ElementAtOrDefault(2)));
             sqlParams.Add(new SQLiteParameter("@pull_date", DateTime.Now));
+            sqlParams.Add(new SQLiteParameter("@relic_tier", unit.UnitData.RelicTier >= 3 ? unit.UnitData.RelicTier - 2 : 0));
 
             return sqlParams.ToArray();
         }
@@ -197,7 +198,8 @@ VALUES (@guild_name, @player_name, @player_power, @toon, @toon_power, @toon_leve
     zeta_one varchar(50),
     zeta_two varchar(50),
     zeta_three varchar(50),
-    pull_date, date
+    pull_date date,
+    relic_tier int
 
 )";
 

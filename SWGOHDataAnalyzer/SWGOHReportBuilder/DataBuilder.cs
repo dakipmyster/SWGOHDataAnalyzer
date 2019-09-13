@@ -192,11 +192,11 @@ FROM {m_oldSnapshot} WHERE is_ship = 1";
         internal async Task CollectUnitDataFromDB()
         {
             string sqlQuery = $@"SELECT player_name, toon, rarity, player_power, gear_level, toon_power, toon_level, health, protection, speed, p_offense,
-s_offense, p_defense, s_defense, p_crit_chance, s_crit_chance, potency, tenacity, zeta_one, zeta_two, zeta_three, 'New' as 'State'
+s_offense, p_defense, s_defense, p_crit_chance, s_crit_chance, potency, tenacity, zeta_one, zeta_two, zeta_three, relic_tier, 'New' as 'State'
 FROM {m_newSnapshot} WHERE is_ship = 0
 UNION
 SELECT player_name, toon, rarity, player_power, gear_level, toon_power, toon_level, health, protection, speed, p_offense,
-s_offense, p_defense, s_defense, p_crit_chance, s_crit_chance, potency, tenacity, zeta_one, zeta_two, zeta_three, 'Old' as 'State'
+s_offense, p_defense, s_defense, p_crit_chance, s_crit_chance, potency, tenacity, zeta_one, zeta_two, zeta_three, relic_tier, 'Old' as 'State'
 FROM {m_oldSnapshot} WHERE is_ship = 0";
 
             DataTable results = await m_dbInterface.ExecuteQueryAndReturnResults(sqlQuery, null);
@@ -211,6 +211,7 @@ FROM {m_oldSnapshot} WHERE is_ship = 0";
                 int unitPower = Convert.ToInt32(row["toon_power"].ToString());
                 int unitLevel = Convert.ToInt32(row["toon_level"].ToString());
                 int gearLevel = Convert.ToInt32(row["gear_level"].ToString());
+                int relicTier = Convert.ToInt32(row["relic_tier"].ToString());
 
                 List<string> zetas = new List<string>();
                 if (!String.IsNullOrEmpty(row["zeta_one"].ToString()))
@@ -242,6 +243,7 @@ FROM {m_oldSnapshot} WHERE is_ship = 0";
                     unit.NewGearLevel = gearLevel;
                     unit.NewPower = unitPower;
                     unit.NewLevel = unitLevel;
+                    unit.NewRelicTier = relicTier;
                     unit.CurrentHealth = Convert.ToDecimal(row["health"].ToString());
                     unit.CurrentProtection = Convert.ToDecimal(row["protection"].ToString());
                     unit.CurrentTankiest = unit.CurrentHealth + unit.CurrentProtection;
@@ -263,6 +265,7 @@ FROM {m_oldSnapshot} WHERE is_ship = 0";
                     unit.OldGearLevel = gearLevel;
                     unit.OldPower = unitPower;
                     unit.OldLevel = unitLevel;
+                    unit.OldRelicTier = relicTier;
                 }
             }
             
@@ -305,19 +308,20 @@ FROM {m_oldSnapshot} WHERE is_ship = 0";
                             CurrentPhysicalCritChance = (decimal)Math.Round(unit.UnitData.UnitStats.PhysicalCriticalChance, 2),
                             CurrentPhysicalDefense = (decimal)Math.Round(unit.UnitData.UnitStats.PhysicalDefense, 2),
                             CurrentPhysicalOffense = (decimal)Math.Round(unit.UnitData.UnitStats.PhysicalOffense, 2),
-                            CurrentPotency = (decimal)Math.Round(unit.UnitData.UnitStats.Potency, 2),
+                            CurrentPotency = (decimal)Math.Round(unit.UnitData.UnitStats.Potency*100, 2),
                             CurrentProtection = (decimal)Math.Round(unit.UnitData.UnitStats.Protection, 2),
                             CurrentSpecialCritChance = (decimal)Math.Round(unit.UnitData.UnitStats.SpecialCriticalChance, 2),
                             CurrentSpecialDefense = (decimal)Math.Round(unit.UnitData.UnitStats.SpeicalDefense, 2),
                             CurrentSpecialOffense = (decimal)Math.Round(unit.UnitData.UnitStats.SpecialOffense, 2),
                             CurrentSpeed = (decimal)Math.Round(unit.UnitData.UnitStats.Speed, 2),
                             CurrentTankiest = (decimal)Math.Round(unit.UnitData.UnitStats.Health, 2) + (decimal)Math.Round(unit.UnitData.UnitStats.Protection, 2),
-                            CurrentTenacity = (decimal)Math.Round(unit.UnitData.UnitStats.Tenacity, 2),
+                            CurrentTenacity = (decimal)Math.Round(unit.UnitData.UnitStats.Tenacity*100, 2),
                             UnitName = unit.UnitData.Name,
                             NewPower = unit.UnitData.Power,
                             NewGearLevel = unit.UnitData.GearLevel,
                             NewZetas = zetas,
-                            NewRarity = unit.UnitData.Rarity
+                            NewRarity = unit.UnitData.Rarity,
+                            NewRelicTier = unit.UnitData.RelicTier
                         };
 
                         UnitData.Add(unitData);

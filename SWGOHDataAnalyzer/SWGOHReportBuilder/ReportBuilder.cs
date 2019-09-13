@@ -22,6 +22,7 @@ namespace SWGOHReportBuilder
         string m_sevenStarSection;
         string m_gearTwelveToons;
         string m_gearThirteenToons;
+        string m_relicTiers;
         string m_zetasApplied;
         string m_journeyOrLegendaryUnlock;
         string m_journeyPrepared;
@@ -149,6 +150,7 @@ div {
                 tasks.Add(Task.Run(() => GearThirteenToons()));
                 tasks.Add(Task.Run(() => ZetasApplied()));
                 tasks.Add(Task.Run(() => PlayerGPDifferences()));
+                tasks.Add(Task.Run(() => RelicTierDifferences()));
             }
             
             tasks.Add(Task.Run(() => GoldMembers()));            
@@ -181,6 +183,7 @@ div {
                 pdfString.AppendLine(m_sevenStarSection);
                 pdfString.AppendLine(m_gearTwelveToons);
                 pdfString.AppendLine(m_gearThirteenToons);
+                pdfString.AppendLine(m_relicTiers);
                 pdfString.AppendLine(m_zetasApplied);
                 pdfString.AppendLine(m_journeyOrLegendaryUnlock);
                 pdfString.AppendLine(m_journeyPrepared);
@@ -194,10 +197,15 @@ div {
             SWGOHMessageSystem.OutputMessage("Rendering Report....");
 
             string folderPath = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\\SWGOHDataAnalyzer\\{m_fileName}.pdf";
+            string folderPathHTML = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\\SWGOHDataAnalyzer\\{m_fileName}.html";
 
             using (FileStream fs = File.Open(folderPath, FileMode.OpenOrCreate))
                 HtmlConverter.ConvertToPdf(pdfString.ToString(),fs, new ConverterProperties());
-                        
+
+#if DEBUG
+            using (StreamWriter sw = new StreamWriter(folderPathHTML))
+                sw.Write(pdfString.ToString());
+#endif
             SWGOHMessageSystem.OutputMessage($"Report saved at {folderPath}");
         }
 
@@ -239,6 +247,7 @@ div {
                 sb.AppendLine("<li><a href=\"#sevenstar\">Seven Stars</a></li>");
                 sb.AppendLine("<li><a href=\"#geartwelve\">Gear 12 Toons</a></li>");
                 sb.AppendLine("<li><a href=\"#gearthirteen\">Gear 13 Toons</a></li>");
+                sb.AppendLine("<li><a href=\"#relictiers\">Relic Tier Upgrades</a></li>");
                 sb.AppendLine("<li><a href=\"#zetas\">Applied Zetas</a></li>");
                 sb.AppendLine("<li><a href=\"#toonunlock\">Journey or Legendary Unlocks</a></li>");
                 sb.AppendLine("<li><a href=\"#toonprep\">Players prepped for Journey Toons</a></li>");
@@ -322,7 +331,7 @@ div {
                 sb.AppendLine(HTMLConstructor.TableGroupEnd());
                 sb.AppendLine(HTMLConstructor.TableGroupStart());
 
-                sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Galatic Power", "Gear Level" }, TakeTopXOfStatAndReturnTableData(10, "NewPower", new string[] { "PlayerName", "NewPower", "NewGearLevel" }, m_toonName), "Highest Galatic Power"));
+                sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Galatic Power", "Gear Level", "Relic Tier" }, TakeTopXOfStatAndReturnTableData(10, "NewPower", new string[] { "PlayerName", "NewPower", "NewGearLevel", "NewRelicTier" }, m_toonName), "Highest Galatic Power"));
 
                 sb.AppendLine(HTMLConstructor.TableGroupEnd());
 
@@ -344,11 +353,13 @@ div {
 
             sb.AppendLine("<div id=\"unitgpdiff\">");
             sb.AppendLine(HTMLConstructor.SectionHeader("Toon GP Differences"));
-            sb.AppendLine("This section highlights the top 20 toons who have had the greatest GP increase.");
+            sb.AppendLine("This section highlights the top 50 toons who have had the greatest GP increase.");
             sb.AppendLine("<p/>");
 
             StringBuilder unitGPDiff = new StringBuilder();
-            foreach (UnitData unit in m_filteredUnitData.OrderByDescending(a => a.PowerDifference).Take(20))
+            
+            //foreach (UnitData unit in m_filteredUnitData.OrderByDescending(a => a.PowerDifference).Take(50))
+            foreach (UnitData unit in m_dataBuilder.UnitData.OrderByDescending(a => a.PowerDifference).Take(50))
                 unitGPDiff.AppendLine(HTMLConstructor.AddTableData(new string[] { unit.PlayerName, unit.UnitName, unit.OldPower.ToString(), unit.NewPower.ToString(), unit.PowerDifference.ToString() }));
 
             sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Toon", "Old Power", "New Power", "Power Increase" }, unitGPDiff.ToString()));
@@ -741,8 +752,10 @@ div {
             sb.AppendLine("</p>");
             
             StringBuilder zetas = new StringBuilder();
-            foreach (UnitData unit in m_filteredUnitData.OrderBy(a => a.PlayerName))
-                if (unit.OldZetas.Count < unit.NewZetas.Count)
+            
+            //foreach (UnitData unit in m_filteredUnitData.OrderBy(a => a.PlayerName))
+            foreach (UnitData unit in m_dataBuilder.UnitData.OrderBy(a => a.PlayerName))
+                if (unit.OldZetas?.Count < unit.NewZetas?.Count)
                     zetas.AppendLine(HTMLConstructor.AddTableData(new string[] { unit.PlayerName, unit.UnitName, string.Join(",", unit.NewZetas.Except(unit.OldZetas).ToArray()) }));
                 
             sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Toon", "Zetas" }, zetas.ToString()));
@@ -750,6 +763,35 @@ div {
             sb.AppendLine("<p/></div>");
                         
             m_zetasApplied = sb.ToString();
+
+            await Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// Method to generate relic upgrdes
+        /// </summary>
+        /// <returns></returns>
+        private async Task RelicTierDifferences()
+        {
+            StringBuilder sb = new StringBuilder();
+
+            sb.AppendLine("<div id=\"relictiers\">");
+            sb.AppendLine(HTMLConstructor.SectionHeader("Relic Tier Upgrades"));
+            sb.AppendLine("This section highlights all of the toons that have been given upgrades to their relics.");
+            sb.AppendLine("</p>");
+
+            StringBuilder relicTiers = new StringBuilder();
+            
+            //foreach (UnitData unit in m_filteredUnitData.OrderBy(a => a.PlayerName))
+            foreach (UnitData unit in m_dataBuilder.UnitData.OrderBy(a => a.PlayerName))
+                if (unit.OldRelicTier < unit.NewRelicTier)
+                    relicTiers.AppendLine(HTMLConstructor.AddTableData(new string[] { unit.PlayerName, unit.UnitName, $"{unit.OldRelicTier} > {unit.NewRelicTier}" }));
+
+            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Toon", "Relic Tier Increase" }, relicTiers.ToString()));
+
+            sb.AppendLine("<p/></div>");
+
+            m_relicTiers = sb.ToString();
 
             await Task.CompletedTask;
         }
@@ -886,7 +928,9 @@ div {
             sb.AppendLine("</p>");
            
             StringBuilder units = new StringBuilder();
-            foreach (UnitData unit in m_filteredUnitData.OrderBy(a => a.PlayerName))
+            
+            //foreach (UnitData unit in m_filteredUnitData.OrderBy(a => a.PlayerName))
+            foreach (UnitData unit in m_dataBuilder.UnitData.OrderBy(a => a.PlayerName))
                 if (unit.OldRarity < 7 && unit.NewRarity == 7)
                     units.AppendLine(HTMLConstructor.AddTableData(new string[] { unit.PlayerName, unit.UnitName }));
 
@@ -966,7 +1010,9 @@ div {
             sb.AppendLine("</div><div>");
             sb.AppendLine("Here is the full list of toons within the guild, with their average stat in the guild and max.");
 
-            StringBuilder detailedUnitData = new StringBuilder();            
+            StringBuilder detailedUnitData = new StringBuilder();
+            StringBuilder detailedUnitDataStats = new StringBuilder();
+
             foreach (var unit in m_dataBuilder.UnitData.OrderBy(b => b.UnitName).GroupBy(a => a.UnitName).ToList())
             {                
                 detailedUnitData.AppendLine(HTMLConstructor.AddTableData(new string[] {
@@ -974,7 +1020,14 @@ div {
                     m_dataBuilder.UnitData.Where(b => b.UnitName == unit.Key).Average(a => a.NewPower).ToString("#."),
                     m_dataBuilder.UnitData.Where(b => b.UnitName == unit.Key).Max(a => a.NewPower).ToString(),
                     m_dataBuilder.UnitData.Where(b => b.UnitName == unit.Key).Average(a => a.NewGearLevel).ToString("#."),
-                    m_dataBuilder.UnitData.Where(b => b.UnitName == unit.Key).Max(a => a.NewGearLevel).ToString(),
+                    m_dataBuilder.UnitData.Where(b => b.UnitName == unit.Key).Max(a => a.NewGearLevel).ToString(),                    
+                    String.IsNullOrEmpty(m_dataBuilder.UnitData.Where(b => b.UnitName == unit.Key).Average(a => a.NewRelicTier).ToString("#.")) ? "0" : m_dataBuilder.UnitData.Where(b => b.UnitName == unit.Key).Average(a => a.NewRelicTier).ToString("#."),
+                    m_dataBuilder.UnitData.Where(b => b.UnitName == unit.Key).Max(a => a.NewRelicTier).ToString(),
+                }));
+
+                detailedUnitDataStats.AppendLine(HTMLConstructor.AddTableData(new string[]
+                {
+                    unit.Key,                    
                     m_dataBuilder.UnitData.Where(b => b.UnitName == unit.Key).Average(a => a.CurrentHealth).ToString("#."),
                     m_dataBuilder.UnitData.Where(b => b.UnitName == unit.Key).Max(a => a.CurrentHealth).ToString(),
                     m_dataBuilder.UnitData.Where(b => b.UnitName == unit.Key).Average(a => a.CurrentProtection).ToString("#."),
@@ -988,7 +1041,9 @@ div {
                 }));
             }
 
-            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Toon", "Avg GP", "Max GP", "Avg Gear Lvl", "Max Gear Lvl", "Avg Health", "Max Health", "Avg Prot.", "Max Prot.", "Avg Speed", "Max Speed", "Avg PO", "Max PO", "Avg SO", "Max SO" }, detailedUnitData.ToString()));
+            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Toon", "Avg GP", "Max GP", "Avg Gear Lvl", "Max Gear Lvl", "Avg Relic Tier", "Max Relic Tier" }, detailedUnitData.ToString()));
+            sb.AppendLine("</div>");
+            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Toon", "Avg Health", "Max Health", "Avg Prot.", "Max Prot.", "Avg Speed", "Max Speed", "Avg PO", "Max PO", "Avg SO", "Max SO" }, detailedUnitDataStats.ToString()));
 
             sb.AppendLine("</div>");
 
@@ -1037,8 +1092,9 @@ div {
         private string GetAllToonsOfGearLevelDifference(int gearLevel)
         {
             StringBuilder sb = new StringBuilder();
-
-            foreach (UnitData unit in m_filteredUnitData.OrderBy(a => a.PlayerName))
+            
+            //foreach (UnitData unit in m_filteredUnitData.OrderBy(a => a.PlayerName))
+            foreach (UnitData unit in m_dataBuilder.UnitData.OrderBy(a => a.PlayerName))
                 if (unit.OldGearLevel < gearLevel && unit.NewGearLevel == gearLevel)
                     sb.AppendLine(HTMLConstructor.AddTableData(new string[] { unit.PlayerName, unit.UnitName }));
 
