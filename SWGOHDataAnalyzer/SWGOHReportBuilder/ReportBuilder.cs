@@ -109,10 +109,10 @@ namespace SWGOHReportBuilder
 
             await Task.WhenAll(tasks.ToArray());
 
-            m_filteredUnitData = m_dataBuilder.UnitData.Where(a => a.OldGalaticPower != 0 && a.NewGalaticPower != 0).ToList();
-            m_filteredShipData = m_dataBuilder.ShipData.Where(a => a.OldGalaticPower != 0 && a.NewGalaticPower != 0).ToList();
             m_filteredPlayerNames = m_dataBuilder.PlayerData.Select(a => a.PlayerName).ToList();
-
+            m_filteredUnitData = m_dataBuilder.UnitData.Where(a => m_filteredPlayerNames.Contains(a.PlayerName)).ToList();            
+            m_filteredShipData = m_dataBuilder.ShipData.Where(a => m_filteredPlayerNames.Contains(a.PlayerName)).ToList();
+            var fart = m_filteredUnitData.Where(a => a.PlayerName == "Fathoneybadger" && a.UnitName == "Darth Revan");
             await BuildReport();            
         }
 
@@ -358,8 +358,7 @@ div {
 
             StringBuilder unitGPDiff = new StringBuilder();
             
-            //foreach (UnitData unit in m_filteredUnitData.OrderByDescending(a => a.PowerDifference).Take(50))
-            foreach (UnitData unit in m_dataBuilder.UnitData.OrderByDescending(a => a.PowerDifference).Take(50))
+            foreach (UnitData unit in m_filteredUnitData.OrderByDescending(a => a.PowerDifference).Take(50))            
                 unitGPDiff.AppendLine(HTMLConstructor.AddTableData(new string[] { unit.PlayerName, unit.UnitName, unit.OldPower.ToString(), unit.NewPower.ToString(), unit.PowerDifference.ToString() }));
 
             sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Toon", "Old Power", "New Power", "Power Increase" }, unitGPDiff.ToString()));
@@ -753,9 +752,8 @@ div {
             
             StringBuilder zetas = new StringBuilder();
             
-            //foreach (UnitData unit in m_filteredUnitData.OrderBy(a => a.PlayerName))
-            foreach (UnitData unit in m_dataBuilder.UnitData.OrderBy(a => a.PlayerName))
-                if (unit.OldZetas?.Count < unit.NewZetas?.Count)
+            foreach (UnitData unit in m_filteredUnitData.OrderBy(a => a.PlayerName))            
+                if (unit.OldZetas.Count < unit.NewZetas.Count)
                     zetas.AppendLine(HTMLConstructor.AddTableData(new string[] { unit.PlayerName, unit.UnitName, string.Join(",", unit.NewZetas.Except(unit.OldZetas).ToArray()) }));
                 
             sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Toon", "Zetas" }, zetas.ToString()));
@@ -782,8 +780,7 @@ div {
 
             StringBuilder relicTiers = new StringBuilder();
             
-            //foreach (UnitData unit in m_filteredUnitData.OrderBy(a => a.PlayerName))
-            foreach (UnitData unit in m_dataBuilder.UnitData.OrderBy(a => a.PlayerName))
+            foreach (UnitData unit in m_filteredUnitData.OrderBy(a => a.PlayerName))            
                 if (unit.OldRelicTier < unit.NewRelicTier)
                     relicTiers.AppendLine(HTMLConstructor.AddTableData(new string[] { unit.PlayerName, unit.UnitName, $"{unit.OldRelicTier} > {unit.NewRelicTier}" }));
 
@@ -929,8 +926,7 @@ div {
            
             StringBuilder units = new StringBuilder();
             
-            //foreach (UnitData unit in m_filteredUnitData.OrderBy(a => a.PlayerName))
-            foreach (UnitData unit in m_dataBuilder.UnitData.OrderBy(a => a.PlayerName))
+            foreach (UnitData unit in m_filteredUnitData.OrderBy(a => a.PlayerName))            
                 if (unit.OldRarity < 7 && unit.NewRarity == 7)
                     units.AppendLine(HTMLConstructor.AddTableData(new string[] { unit.PlayerName, unit.UnitName }));
 
@@ -1093,8 +1089,7 @@ div {
         {
             StringBuilder sb = new StringBuilder();
             
-            //foreach (UnitData unit in m_filteredUnitData.OrderBy(a => a.PlayerName))
-            foreach (UnitData unit in m_dataBuilder.UnitData.OrderBy(a => a.PlayerName))
+            foreach (UnitData unit in m_filteredUnitData.OrderBy(a => a.PlayerName))            
                 if (unit.OldGearLevel < gearLevel && unit.NewGearLevel == gearLevel)
                     sb.AppendLine(HTMLConstructor.AddTableData(new string[] { unit.PlayerName, unit.UnitName }));
 

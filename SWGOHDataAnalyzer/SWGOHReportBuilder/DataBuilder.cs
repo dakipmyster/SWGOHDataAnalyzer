@@ -232,6 +232,8 @@ FROM {m_oldSnapshot} WHERE is_ship = 0";
                     unit = new UnitData();
                     unit.PlayerName = playerName;
                     unit.UnitName = unitName;
+                    unit.OldZetas = new List<string>();
+                    unit.NewZetas = new List<string>();
                     UnitData.Add(unit);
                 }
 
