@@ -112,7 +112,6 @@ namespace SWGOHReportBuilder
             m_filteredPlayerNames = m_dataBuilder.PlayerData.Select(a => a.PlayerName).ToList();
             m_filteredUnitData = m_dataBuilder.UnitData.Where(a => m_filteredPlayerNames.Contains(a.PlayerName)).ToList();            
             m_filteredShipData = m_dataBuilder.ShipData.Where(a => m_filteredPlayerNames.Contains(a.PlayerName)).ToList();
-            var fart = m_filteredUnitData.Where(a => a.PlayerName == "Fathoneybadger" && a.UnitName == "Darth Revan");
             await BuildReport();            
         }
 
