@@ -56,6 +56,10 @@ namespace SWGOHReportBuilder
 
         public decimal CurrentTenacity { get; set; }
 
-        public UnitData() { }
+        public UnitData()
+        {
+            OldZetas = new List<string>();
+            NewZetas = new List<string>();
+        }
     }
 }

@@ -229,11 +229,12 @@ FROM {m_oldSnapshot} WHERE is_ship = 0";
                     unit = UnitData.First(a => a.PlayerName == playerName && a.UnitName == unitName);
                 else
                 {
-                    unit = new UnitData();
-                    unit.PlayerName = playerName;
-                    unit.UnitName = unitName;
-                    unit.OldZetas = new List<string>();
-                    unit.NewZetas = new List<string>();
+                    unit = new UnitData()
+                    {
+                        PlayerName = playerName,
+                        UnitName = unitName
+                    };
+                    
                     UnitData.Add(unit);
                 }
 
