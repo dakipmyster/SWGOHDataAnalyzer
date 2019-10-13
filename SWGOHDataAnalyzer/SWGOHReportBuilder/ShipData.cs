@@ -8,6 +8,10 @@
 
         public int NewRarity { get; set; }
 
+        public int OldPower { get; set; }
+
+        public int NewPower { get; set; }
+
         public ShipData() { }
     }
 }

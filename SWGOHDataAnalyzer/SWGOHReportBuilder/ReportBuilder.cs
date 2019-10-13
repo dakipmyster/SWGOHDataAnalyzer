@@ -558,6 +558,7 @@ div {
         {
             StringBuilder sb = new StringBuilder();
             List<Unlock> unlocks = new List<Unlock>();
+            List<string> generalSkywalkerLocked = new List<string>();
             List<string> malakLocked = new List<string>();
             List<string> jediKnightRevanLocked = new List<string>();
             List<string> darthRevanLocked = new List<string>();
@@ -584,6 +585,9 @@ div {
 
                 if (m_dataBuilder.UnitData.Where(a => a.PlayerName == player.PlayerName && a.UnitName == "Commander Luke Skywalker").Count() == 0)
                     commanderLukeSkywalkerLocked.Add(player.PlayerName);
+
+                if (m_dataBuilder.UnitData.Where(a => a.PlayerName == player.PlayerName && a.UnitName == "General Skywalker").Count() == 0)
+                    generalSkywalkerLocked.Add(player.PlayerName);
             }
             
             foreach(string player in commanderLukeSkywalkerLocked)
@@ -670,6 +674,31 @@ div {
                 }
             }
 
+            foreach (string player in generalSkywalkerLocked)
+            {
+                if (m_dataBuilder.UnitData.Where(a => a.NewRarity == 7 && a.NewPower > 16999 && a.PlayerName == player &&
+                    (a.UnitName == "C-3PO" ||
+                     a.UnitName == "General Kenobi" ||
+                     a.UnitName == "Shaak Ti" ||
+                     a.UnitName == "Ahsoka Tano" ||
+                     a.UnitName == "Padmé Amidala" ||
+                     a.UnitName == "Asajj Ventress" ||
+                     a.UnitName == "B1 Battle Droid" ||
+                     a.UnitName == "B2 Super Battle Droid" ||
+                     a.UnitName == "IG-100 MagnaGuard" ||
+                     a.UnitName == "Droideka")
+                    ).Count() == 10)
+                {
+                    if (m_dataBuilder.ShipData.Where(a => a.NewRarity == 7 && a.NewPower > 39999 && a.PlayerName == player &&
+                        (a.ShipName == "Anakin's Eta-2 Starfighter" ||
+                         a.ShipName == "Endurance")
+                        ).Count() == 2)
+                    {   
+                        unlocks.Add(new Unlock(player, "General Skywalker"));
+                    }
+                }
+            }
+
             StringBuilder prepaired = new StringBuilder();
             foreach (Unlock unlock in unlocks.OrderBy(a => a.PlayerName))
                 prepaired.AppendLine(HTMLConstructor.AddTableData(new string[] { unlock.PlayerName, unlock.UnitOrShipName }));
@@ -710,7 +739,8 @@ div {
                 a.UnitName == "BB-8" ||
                 a.UnitName == "R2-D2" ||
                 a.UnitName == "Padmé Amidala" ||
-                a.UnitName == "Darth Malak"
+                a.UnitName == "Darth Malak" ||
+                a.UnitName == "General Skywalker"
             )).ToList();
 
             foreach (UnitData unit in filteredUnitList.OrderBy(a => a.PlayerName))

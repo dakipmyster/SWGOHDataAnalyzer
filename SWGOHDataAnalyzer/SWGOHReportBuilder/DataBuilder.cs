@@ -144,7 +144,7 @@ FROM {m_oldSnapshot}";
         /// <returns></returns>
         internal async Task CollectShipDataFromDB()
         {
-            string sqlQuery = $@"SELECT player_name, toon, rarity, player_power, 'New' as 'State'
+            string sqlQuery = $@"SELECT player_name, toon, toon_power, rarity, player_power, 'New' as 'State'
 FROM {m_newSnapshot} WHERE is_ship = 1
 UNION
 SELECT player_name, toon, rarity, player_power, 'Old' as 'State'
@@ -159,6 +159,7 @@ FROM {m_oldSnapshot} WHERE is_ship = 1";
                 string shipName = row["toon"].ToString();
                 int rarity = Convert.ToInt32(row["rarity"].ToString());
                 int power = Convert.ToInt32(row["player_power"].ToString());
+                int shipPower = Convert.ToInt32(row["toon_power"].ToString());
 
                 ShipData ship;
 
@@ -176,11 +177,13 @@ FROM {m_oldSnapshot} WHERE is_ship = 1";
                 {
                     ship.NewRarity = rarity;
                     ship.NewGalaticPower = power;
+                    ship.NewPower = shipPower;
                 }
                 else
                 {
                     ship.OldRarity = rarity;
                     ship.OldGalaticPower = power;
+                    ship.OldPower = power;
                 }
             }
         }
