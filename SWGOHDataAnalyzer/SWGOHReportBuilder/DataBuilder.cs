@@ -147,7 +147,7 @@ FROM {m_oldSnapshot}";
             string sqlQuery = $@"SELECT player_name, toon, toon_power, rarity, player_power, 'New' as 'State'
 FROM {m_newSnapshot} WHERE is_ship = 1
 UNION
-SELECT player_name, toon, rarity, player_power, 'Old' as 'State'
+SELECT player_name, toon, toon_power, rarity, player_power, 'Old' as 'State'
 FROM {m_oldSnapshot} WHERE is_ship = 1";
 
             DataTable results = await m_dbInterface.ExecuteQueryAndReturnResults(sqlQuery, null);

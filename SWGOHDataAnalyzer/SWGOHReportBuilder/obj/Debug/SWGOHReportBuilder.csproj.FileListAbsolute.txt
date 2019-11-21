@@ -1,5 +1,4 @@
 C:\Users\klarsen\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHReportBuilder\obj\Debug\SWGOHReportBuilder.csprojAssemblyReference.cache
-C:\Users\klarsen\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHReportBuilder\obj\Debug\SWGOHReportBuilder.csproj.CoreCompileInputs.cache
 C:\Users\klarsen\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHReportBuilder\bin\Debug\SWGOHReportBuilder.dll
 C:\Users\klarsen\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHReportBuilder\bin\Debug\SWGOHReportBuilder.pdb
 C:\Users\klarsen\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHReportBuilder\bin\Debug\SWGOHDBInterface.dll

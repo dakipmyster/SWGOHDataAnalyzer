@@ -6,6 +6,5 @@ C:\Users\klarsen\source\repos\SWGOHDataAnalyzer\MessageSystem\obj\Debug\SWGOHMes
 C:\Users\klarsen\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\MessageSystem\bin\Debug\SWGOHMessageSystem.dll
 C:\Users\klarsen\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\MessageSystem\bin\Debug\SWGOHMessageSystem.pdb
 C:\Users\klarsen\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\MessageSystem\obj\Debug\SWGOHMessageSystem.csprojAssemblyReference.cache
-C:\Users\klarsen\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\MessageSystem\obj\Debug\SWGOHMessageSystem.csproj.CoreCompileInputs.cache
 C:\Users\klarsen\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\MessageSystem\obj\Debug\SWGOHMessageSystem.dll
 C:\Users\klarsen\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\MessageSystem\obj\Debug\SWGOHMessageSystem.pdb

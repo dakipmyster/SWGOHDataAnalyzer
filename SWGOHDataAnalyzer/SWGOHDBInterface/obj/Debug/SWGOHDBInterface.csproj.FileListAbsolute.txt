@@ -11,7 +11,6 @@ C:\Users\klarsen\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHDBInt
 C:\Users\klarsen\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHDBInterface\bin\Debug\System.Data.SQLite.xml
 C:\Users\klarsen\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHDBInterface\bin\Debug\System.Data.SQLite.dll.config
 C:\Users\klarsen\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHDBInterface\obj\Debug\SWGOHDBInterface.csprojAssemblyReference.cache
-C:\Users\klarsen\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHDBInterface\obj\Debug\SWGOHDBInterface.csproj.CoreCompileInputs.cache
 C:\Users\klarsen\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHDBInterface\obj\Debug\SWGOHDBInterface.csproj.CopyComplete
 C:\Users\klarsen\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHDBInterface\obj\Debug\SWGOHDBInterface.dll
 C:\Users\klarsen\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHDBInterface\obj\Debug\SWGOHDBInterface.pdb
