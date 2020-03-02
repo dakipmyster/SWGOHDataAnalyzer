@@ -333,6 +333,11 @@ FROM {m_oldSnapshot} WHERE is_ship = 0";
                         UnitData.Add(unitData);
                         
                     }
+                    else
+                    {
+                        ShipData.Add(new ShipData() { PlayerName = player.PlayerData.Name, NewPower = unit.UnitData.Power, NewRarity = unit.UnitData.Rarity, ShipName = unit.UnitData.Name });
+                    }
+
                 }
             }
 
