@@ -14,6 +14,7 @@ using System.Windows.Forms.VisualStyles;
 
 namespace SWGOHReportBuilder
 {
+    //TODO: make comments for new methods made, make a summary page on the first page that says stuff to the effect of like 'the guild increased by x gp, we got y toons to G13, we got z zetas applied
     public class ReportBuilder : ISWGOHAsync
     {        
         DataBuilder m_dataBuilder;
@@ -253,7 +254,7 @@ div {
                 sb.AppendLine("<li><a href=\"#gearthirteen\">Gear 13 Toons</a></li>");
                 sb.AppendLine("<li><a href=\"#relictiers\">Relic Tier Upgrades</a></li>");
                 sb.AppendLine("<li><a href=\"#zetas\">Applied Zetas</a></li>");
-                sb.AppendLine("<li><a href=\"#toonunlock\">Journey or Legendary Unlocks</a></li>");
+                sb.AppendLine("<li><a href=\"#toonunlock\">Journey/Legendary/Galactic Legend Unlocks</a></li>");
                 sb.AppendLine("<li><a href=\"#toonprep\">Players prepping for Galatic Legends</a></li>");
                 sb.AppendLine("<li><a href=\"#glprep\">Players prepped for Journey Toons</a></li>");
                 if (!String.IsNullOrEmpty(m_toonName)) sb.AppendLine($"<li><a href=\"#highlight\">Character Highlight: {m_toonName}</a></li>");
@@ -735,7 +736,7 @@ div {
             sb.AppendLine("<div id=\"toonprep\">");
             sb.AppendLine(HTMLConstructor.SectionHeader("Galatic Legend Prep"));
             sb.AppendLine("This section goes over all guild members and their progress towards a GL toon.  100% for each toon indicates the player is currently in progress or has unlocked the toon.");
-            sb.AppendLine("Go over progress calculation.");
+            sb.AppendLine("<p>Calculations of progress is based on current gear level, gear pieces applied at current gear level, relic level and star level relative to the requirement for the toon.");
 
             foreach (string playerName in m_dataBuilder.PlayerData.Select(a => a.PlayerName))
             {
@@ -831,7 +832,7 @@ div {
             //-1 because we want to count the number of gear pieces equipped not the current gear level ie Gear 1 if not the -1 would award 6 points
             points = ((unitData.NewGearLevel-1) * 6) + unitData.NewRelicTier + unitData.HasGearSlotOne + unitData.HasGearSlotTwo + unitData.HasGearSlotThree + unitData.HasGearSlotFour + unitData.HasGearSlotFive + unitData.HasGearSlotSix + unitData.NewRarity;
 
-            progressList.Add(Math.Round(Decimal.Divide(points, maxPoints) * 100, 2));
+            progressList.Add(Math.Round(Decimal.Divide(points, maxPoints) * 100, 2) > 100 ? 100 : Math.Round(Decimal.Divide(points, maxPoints) * 100, 2));
             return Math.Round(Decimal.Divide(points, maxPoints) * 100, 2) > 100 ? "100" : Math.Round(Decimal.Divide(points, maxPoints) * 100, 2).ToString();
         }
 
@@ -842,10 +843,10 @@ div {
             if (shipData == null)
             {
                 progressList.Add(Convert.ToDecimal(0.0));
-                return "0.00";
+                return "0";
             }
             
-            progressList.Add(Math.Round(Decimal.Divide(shipData.NewRarity, maxPoints) * 100, 2));
+            progressList.Add(Math.Round(Decimal.Divide(shipData.NewRarity, maxPoints) * 100, 2) > 100 ? 100 : Math.Round(Decimal.Divide(shipData.NewRarity, maxPoints) * 100, 2));
             return Math.Round(Decimal.Divide(shipData.NewRarity, maxPoints) * 100, 2) > 100 ? "100" : Math.Round(Decimal.Divide(shipData.NewRarity, maxPoints) * 100, 2).ToString();
         }
 
@@ -859,8 +860,8 @@ div {
             List<Unlock> unlocks = new List<Unlock>();
 
             sb.AppendLine("<div id=\"toonunlock\">");
-            sb.AppendLine(HTMLConstructor.SectionHeader("Journey/Legendary Unlock"));
-            sb.AppendLine("This section highlights all players who have unlocked a Legendary or Journey toon/ship.");
+            sb.AppendLine(HTMLConstructor.SectionHeader("Journey/Legendary/Galactic Legend Unlock"));
+            sb.AppendLine("This section highlights all players who have unlocked a Legendary, Journey or Galactic Legend toon/ship.");
             sb.AppendLine("</p>");
 
             var filteredUnitList = m_dataBuilder.UnitData.Where(a => a.OldRarity == 0 && a.NewRarity != 0 && m_filteredPlayerNames.Contains(a.PlayerName) && (
@@ -877,7 +878,9 @@ div {
                 a.UnitName == "R2-D2" ||
                 a.UnitName == "Padmé Amidala" ||
                 a.UnitName == "Darth Malak" ||
-                a.UnitName == "General Skywalker"
+                a.UnitName == "General Skywalker" ||
+                a.UnitName == "Supreme Leader Kylo Ren" ||
+                a.UnitName == "Rey" 
             )).ToList();
 
             foreach (UnitData unit in filteredUnitList.OrderBy(a => a.PlayerName))

@@ -100,6 +100,7 @@
   <ItemGroup>
     <Compile Include="DataBuilder.cs" />
     <Compile Include="GeneralData.cs" />
+    <Compile Include="GLCharacterProgress.cs" />
     <Compile Include="HTMLConstructor.cs" />
     <Compile Include="PlayerData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
