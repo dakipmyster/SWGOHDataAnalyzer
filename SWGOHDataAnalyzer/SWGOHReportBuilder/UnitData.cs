@@ -56,6 +56,20 @@ namespace SWGOHReportBuilder
 
         public decimal CurrentTenacity { get; set; }
 
+        public int HasGearSlotOne { get; set; }
+
+        public int HasGearSlotTwo { get; set; }
+
+        public int HasGearSlotThree { get; set; }
+
+        public int HasGearSlotFour { get; set; }
+
+        public int HasGearSlotFive { get; set; }
+
+        public int HasGearSlotSix { get; set; }
+
+
+
         public UnitData()
         {
             OldZetas = new List<string>();

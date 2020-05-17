@@ -97,8 +97,8 @@ namespace SWGOHDBInterface
 
                                 //Yes, the SQL Injection again
                                 cmd.CommandText = $@"INSERT INTO {m_dbTableName}
-(guild_name, player_name, player_power, toon, toon_power, toon_level, is_ship, gear_level, rarity, health, protection, speed, p_offense, s_offense, p_defense, s_defense, p_crit_chance, s_crit_chance, potency, tenacity, total_zetas, zeta_one, zeta_two, zeta_three, pull_date, relic_tier) 
-VALUES (@guild_name, @player_name, @player_power, @toon, @toon_power, @toon_level, @is_ship, @gear_level, @rarity, @health, @protection, @speed, @p_offense, @s_offense, @p_defense, @s_defense, @p_crit_chance, @s_crit_chance, @potency, @tenacity, @total_zetas, @zeta_one, @zeta_two, @zeta_three, @pull_date, @relic_tier) ;";
+(guild_name, player_name, player_power, toon, toon_power, toon_level, is_ship, gear_level, rarity, health, protection, speed, p_offense, s_offense, p_defense, s_defense, p_crit_chance, s_crit_chance, potency, tenacity, total_zetas, zeta_one, zeta_two, zeta_three, pull_date, relic_tier, gear_one_equipped, gear_two_equipped, gear_three_equipped, gear_four_equipped, gear_five_equipped, gear_six_equipped) 
+VALUES (@guild_name, @player_name, @player_power, @toon, @toon_power, @toon_level, @is_ship, @gear_level, @rarity, @health, @protection, @speed, @p_offense, @s_offense, @p_defense, @s_defense, @p_crit_chance, @s_crit_chance, @potency, @tenacity, @total_zetas, @zeta_one, @zeta_two, @zeta_three, @pull_date, @relic_tier, @gear_one_equipped, @gear_two_equipped, @gear_three_equipped, @gear_four_equipped, @gear_five_equipped, @gear_six_equipped) ;";
 
 
                                 cmd.ExecuteNonQuery();
@@ -161,6 +161,12 @@ VALUES (@guild_name, @player_name, @player_power, @toon, @toon_power, @toon_leve
             sqlParams.Add(new SQLiteParameter("@zeta_three", zetas.ElementAtOrDefault(2)));
             sqlParams.Add(new SQLiteParameter("@pull_date", DateTime.Now));
             sqlParams.Add(new SQLiteParameter("@relic_tier", unit.UnitData.RelicTier >= 3 ? unit.UnitData.RelicTier - 2 : 0));
+            sqlParams.Add(new SQLiteParameter("@gear_one_equipped", unit.UnitData.Gear.Count > 0 && unit.UnitData.Gear.FirstOrDefault(a => a.SlotPosition == 0).IsObtained ? 1 : 0));
+            sqlParams.Add(new SQLiteParameter("@gear_two_equipped", unit.UnitData.Gear.Count > 0 && unit.UnitData.Gear.FirstOrDefault(a => a.SlotPosition == 1).IsObtained ? 1 : 0));
+            sqlParams.Add(new SQLiteParameter("@gear_three_equipped", unit.UnitData.Gear.Count > 0 && unit.UnitData.Gear.FirstOrDefault(a => a.SlotPosition == 2).IsObtained ? 1 : 0));
+            sqlParams.Add(new SQLiteParameter("@gear_four_equipped", unit.UnitData.Gear.Count > 0 && unit.UnitData.Gear.FirstOrDefault(a => a.SlotPosition == 3).IsObtained ? 1 : 0));
+            sqlParams.Add(new SQLiteParameter("@gear_five_equipped", unit.UnitData.Gear.Count > 0 && unit.UnitData.Gear.FirstOrDefault(a => a.SlotPosition == 4).IsObtained ? 1 : 0));
+            sqlParams.Add(new SQLiteParameter("@gear_six_equipped", unit.UnitData.Gear.Count > 0 && unit.UnitData.Gear.FirstOrDefault(a => a.SlotPosition == 5).IsObtained ? 1 : 0));
 
             return sqlParams.ToArray();
         }
@@ -199,8 +205,13 @@ VALUES (@guild_name, @player_name, @player_power, @toon, @toon_power, @toon_leve
     zeta_two varchar(50),
     zeta_three varchar(50),
     pull_date date,
-    relic_tier int
-
+    relic_tier int,
+    gear_one_equipped int,
+    gear_two_equipped int,
+    gear_three_equipped int,
+    gear_four_equipped int,
+    gear_five_equipped int,
+    gear_six_equipped int
 )";
 
             using (SQLiteConnection conn = new SQLiteConnection($"Data Source={m_folderPath}\\{m_dbName}"))

@@ -195,11 +195,11 @@ FROM {m_oldSnapshot} WHERE is_ship = 1";
         internal async Task CollectUnitDataFromDB()
         {
             string sqlQuery = $@"SELECT player_name, toon, rarity, player_power, gear_level, toon_power, toon_level, health, protection, speed, p_offense,
-s_offense, p_defense, s_defense, p_crit_chance, s_crit_chance, potency, tenacity, zeta_one, zeta_two, zeta_three, relic_tier, 'New' as 'State'
+s_offense, p_defense, s_defense, p_crit_chance, s_crit_chance, potency, tenacity, zeta_one, zeta_two, zeta_three, relic_tier, gear_one_equipped, gear_two_equipped, gear_three_equipped, gear_four_equipped, gear_five_equipped, gear_six_equipped, 'New' as 'State'
 FROM {m_newSnapshot} WHERE is_ship = 0
 UNION
 SELECT player_name, toon, rarity, player_power, gear_level, toon_power, toon_level, health, protection, speed, p_offense,
-s_offense, p_defense, s_defense, p_crit_chance, s_crit_chance, potency, tenacity, zeta_one, zeta_two, zeta_three, relic_tier, 'Old' as 'State'
+s_offense, p_defense, s_defense, p_crit_chance, s_crit_chance, potency, tenacity, zeta_one, zeta_two, zeta_three, relic_tier, gear_one_equipped, gear_two_equipped, gear_three_equipped, gear_four_equipped, gear_five_equipped, gear_six_equipped, 'Old' as 'State'
 FROM {m_oldSnapshot} WHERE is_ship = 0";
 
             DataTable results = await m_dbInterface.ExecuteQueryAndReturnResults(sqlQuery, null);
@@ -262,6 +262,12 @@ FROM {m_oldSnapshot} WHERE is_ship = 0";
                     unit.CurrentSpecialCritChance = Convert.ToDecimal(row["s_crit_chance"].ToString());
                     unit.CurrentPotency = Convert.ToDecimal(row["potency"].ToString());
                     unit.CurrentTenacity = Convert.ToDecimal(row["tenacity"].ToString());
+                    unit.HasGearSlotOne = Convert.ToInt32(row["gear_one_equipped"].ToString());
+                    unit.HasGearSlotTwo = Convert.ToInt32(row["gear_two_equipped"].ToString());
+                    unit.HasGearSlotThree = Convert.ToInt32(row["gear_three_equipped"].ToString());
+                    unit.HasGearSlotFour = Convert.ToInt32(row["gear_four_equipped"].ToString());
+                    unit.HasGearSlotFive = Convert.ToInt32(row["gear_five_equipped"].ToString());
+                    unit.HasGearSlotSix = Convert.ToInt32(row["gear_six_equipped"].ToString());
                 }
                 else
                 {
