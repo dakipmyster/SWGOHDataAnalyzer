@@ -366,7 +366,7 @@ div {
                     sb.AppendLine(HTMLConstructor.TableGroupEnd());
                     sb.AppendLine(HTMLConstructor.TableGroupStart());
 
-                    sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Galatic Power", "Gear Level", "Relic Tier" }, TakeTopXOfStatAndReturnTableData(10, "NewPower", new string[] { "PlayerName", "NewPower", "NewGearLevel", "NewRelicTier" }, toonName.Trim()), "Highest Galatic Power"));
+                    sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Galactic Power", "Gear Level", "Relic Tier" }, TakeTopXOfStatAndReturnTableData(10, "NewPower", new string[] { "PlayerName", "NewPower", "NewGearLevel", "NewRelicTier" }, toonName.Trim()), "Highest Galatic Power"));
 
                     sb.AppendLine(HTMLConstructor.TableGroupEnd());
 
@@ -765,8 +765,8 @@ div {
             sb.AppendLine(HTMLConstructor.SectionHeader("Galatic Legend Prep"));
             sb.AppendLine("This section goes over all guild members and their progress towards a GL toon.  100% for each toon indicates the player is currently in progress or has unlocked the toon.");
             sb.AppendLine("<p>Calculations of progress is based on current gear level, gear pieces applied at current gear level, relic level and star level relative to the requirement for the toon.");
-
-            foreach (string playerName in m_dataBuilder.PlayerData.Select(a => a.PlayerName))
+                        
+            foreach (string playerName in m_dataBuilder.UnitData.Where(b => b.NewGalaticPower != 0).Select(a => a.PlayerName).Distinct().OrderBy(a => a))
             {
                 m_glCharacterProgressList.Add(new GLCharacterProgress() { PlayerName = playerName });
                 rey.AppendLine(GetGLReyProgressForPlayer(playerName));
