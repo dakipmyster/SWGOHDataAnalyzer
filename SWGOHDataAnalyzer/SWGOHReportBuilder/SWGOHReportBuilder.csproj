@@ -105,6 +105,7 @@
     <Compile Include="PlayerData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReportBuilder.cs" />
+    <Compile Include="ReportSummary.cs" />
     <Compile Include="ShipData.cs" />
     <Compile Include="UnitData.cs" />
     <Compile Include="Unlock.cs" />

@@ -41,6 +41,7 @@ namespace SWGOHReportBuilder
         List<UnitData> m_filteredUnitData;
         List<ShipData> m_filteredShipData;
         List<string> m_filteredPlayerNames;
+        ReportSummary m_reportSummary;
 
         /// <summary>
         /// Constructor
@@ -52,6 +53,7 @@ namespace SWGOHReportBuilder
             m_filteredUnitData = new List<UnitData>();
             m_filteredPlayerNames = new List<string>();
             m_isSimpleReport = false;
+            m_reportSummary = new ReportSummary();
         }
 
         /// <summary>
@@ -158,8 +160,7 @@ div {
             }
             
             //tasks.Add(Task.Run(() => GoldMembers()));            
-            tasks.Add(Task.Run(() => JourneyPrepared()));            
-            tasks.Add(Task.Run(() => IntroductionPage()));            
+            tasks.Add(Task.Run(() => JourneyPrepared()));                          
             tasks.Add(Task.Run(() => TopTwentySection()));            
             tasks.Add(Task.Run(() => CharacterHighlight()));
             
@@ -169,10 +170,12 @@ div {
 
             await Task.WhenAll(tasks.ToArray());
 
+            await IntroductionPage();
+
             //This section needs to be in order
-            if(m_isSimpleReport)
+            if (m_isSimpleReport)
             {
-                pdfString.AppendLine(m_introduction);                                
+                pdfString.AppendLine(m_introduction);
                 pdfString.AppendLine(m_topTwentySection);                                
                 pdfString.AppendLine(m_journeyPrepared);
                 pdfString.AppendLine(m_characterHighlight);
@@ -230,8 +233,9 @@ div {
                 sb.AppendLine("<p/>");
                 sb.AppendLine(HTMLConstructor.SectionHeader("Contents"));
                 sb.AppendLine("<ol type=\"1\"");
-                sb.AppendLine("<li></li>");                
-                sb.AppendLine("<li><a href=\"#toptwenty\">Top 20 Stats</a></li>");                
+                sb.AppendLine("<li></li>");
+                sb.AppendLine("<li><a href=\"#guildsummary\">Guild Summary</a></li>");
+                sb.AppendLine("<li><a href=\"#toptwenty\">Top 20 Stats</a></li>");
                 sb.AppendLine("<li><a href=\"#toonprep\">Players prepped for Journey Toons</a></li>");
                 if (!String.IsNullOrEmpty(m_toonName)) sb.AppendLine($"<li><a href=\"#highlight\">Character Highlight: {m_toonName}</a></li>");
                 //sb.AppendLine("<li><a href=\"#goldmembers\">Gold Teams</a></li>");
@@ -260,7 +264,27 @@ div {
                 if (!String.IsNullOrEmpty(m_toonName)) sb.AppendLine($"<li><a href=\"#highlight\">Character Highlight: {m_toonName}</a></li>");
                 //sb.AppendLine("<li><a href=\"#goldmembers\">Gold Teams</a></li>");
                 sb.AppendLine("<li><a href=\"#details\">Data Details</a></li>");
-                sb.AppendLine("</ol></div>");
+                sb.AppendLine("</ol>");
+                sb.AppendLine("<p/>");
+                sb.AppendLine("<p/>");
+                sb.AppendLine(HTMLConstructor.SectionHeader("Summary"));
+                sb.AppendLine("Summary of guild progress:");
+                sb.AppendLine("<p/>");
+                sb.AppendLine($"Guild Power Increase: {m_reportSummary.TotalGuildPowerIncrease}");
+                sb.AppendLine("<p/>");
+                sb.AppendLine($"Total 7* Toons: {m_reportSummary.TotalSevenStarToons}");
+                sb.AppendLine("<p/>");
+                sb.AppendLine($"Total 7* Ships: {m_reportSummary.TotalSevenStarShips}");
+                sb.AppendLine("<p/>");
+                sb.AppendLine($"Total New G12 Toons: {m_reportSummary.TotalGearTwelveToons}");
+                sb.AppendLine("<p/>");
+                sb.AppendLine($"Total New G13 Toons: {m_reportSummary.TotalGearThirteenToons}");
+                sb.AppendLine("<p/>");
+                sb.AppendLine($"Sum of Relic Levels Applied: {m_reportSummary.TotalRelicLevelsIncreased}");
+                sb.AppendLine("<p/>");
+                sb.AppendLine($"Sum of Zeta Abilites Unlocked: {m_reportSummary.TotalZetasApplied}");
+                sb.AppendLine("</div>");
+
             }
 
             m_introduction = sb.ToString();
@@ -725,6 +749,10 @@ div {
             await Task.CompletedTask;
         }
 
+        /// <summary>
+        /// Method to collect data towards unlocking GLs
+        /// </summary>
+        /// <returns></returns>
         private async Task GalaticLegenedProgress()
         {
             StringBuilder sb = new StringBuilder();
@@ -768,12 +796,22 @@ div {
             await Task.CompletedTask;
         }
 
+        /// <summary>
+        /// Method to display a summary of a players GL progress
+        /// </summary>
+        /// <param name="playerName">The playername</param>
+        /// <returns></returns>
         private string GetOverallGLProgressForPlayer(string playerName)
         {
             GLCharacterProgress playerProgress = m_glCharacterProgressList.FirstOrDefault(a => a.PlayerName == playerName);
             return HTMLConstructor.AddTableData(new string[] { playerName, playerProgress.ReyOverallProgress, playerProgress.SLKROverallProgress });
         }
 
+        /// <summary>
+        /// Method to determine GL Kylo progress
+        /// </summary>
+        /// <param name="playerName"></param>
+        /// <returns></returns>
         private string GetGLKyloProgressForPlayer(string playerName)
         {
             List<decimal> progressList = new List<decimal>();
@@ -796,6 +834,11 @@ div {
             return HTMLConstructor.AddTableData(new string[] { playerName, kru, fos, foo, kyloRen, phasma, fox, vetHan, sithTroop, fosftp, hux, fotp, palp, finalizer });
         }
 
+        /// <summary>
+        /// Method to determine GL Rey progress
+        /// </summary>
+        /// <param name="playerName"></param>
+        /// <returns></returns>
         private string GetGLReyProgressForPlayer(string playerName)
         {
             List<decimal> progressList = new List<decimal>();
@@ -818,6 +861,14 @@ div {
             return HTMLConstructor.AddTableData(new string[] { playerName, jtr, finn, resTrooper, scavRey, resPilot, poe, rhFinn, holdo, rose, rhPoe, bbEight, vetChewie, raddus });
         }
 
+        /// <summary>
+        /// Method to calculate the percent of progress towards a toon
+        /// </summary>
+        /// <param name="unitData">The toon to calculate against</param>
+        /// <param name="maxPoints">Max points of progress for the toon</param>
+        /// <param name="progressList">The overall progresss</param>
+        /// <param name="currentList">The current snapsho of the overall progress</param>
+        /// <returns></returns>
         private string CalculatePercentProgressForGL(UnitData unitData, int maxPoints, out List<decimal> progressList, List<decimal> currentList)
         {
             progressList = currentList;
@@ -836,6 +887,14 @@ div {
             return Math.Round(Decimal.Divide(points, maxPoints) * 100, 2) > 100 ? "100" : Math.Round(Decimal.Divide(points, maxPoints) * 100, 2).ToString();
         }
 
+        /// <summary>
+        /// Method to calculate the percent of progress towards a ship
+        /// </summary>
+        /// <param name="unitData">The ship to calculate against</param>
+        /// <param name="maxPoints">Max points of progress for the toon</param>
+        /// <param name="progressList">The overall progresss</param>
+        /// <param name="currentList">The current snapsho of the overall progress</param>
+        /// <returns></returns>
         private string CalculatePercentProgressForGL(ShipData shipData, int maxPoints, out List<decimal> progressList, List<decimal> currentList)
         {
             progressList = currentList;
@@ -920,10 +979,15 @@ div {
             sb.AppendLine("</p>");
             
             StringBuilder zetas = new StringBuilder();
-            
-            foreach (UnitData unit in m_filteredUnitData.OrderBy(a => a.PlayerName))            
+
+            foreach (UnitData unit in m_filteredUnitData.OrderBy(a => a.PlayerName))
+            {
                 if (unit.OldZetas.Count < unit.NewZetas.Count)
+                {
                     zetas.AppendLine(HTMLConstructor.AddTableData(new string[] { unit.PlayerName, unit.UnitName, string.Join(",", unit.NewZetas.Except(unit.OldZetas).ToArray()) }));
+                    m_reportSummary.TotalZetasApplied++;
+                }
+            }
                 
             sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Toon", "Zetas" }, zetas.ToString()));
 
@@ -948,10 +1012,15 @@ div {
             sb.AppendLine("</p>");
 
             StringBuilder relicTiers = new StringBuilder();
-            
-            foreach (UnitData unit in m_filteredUnitData.OrderBy(a => a.PlayerName))            
+
+            foreach (UnitData unit in m_filteredUnitData.OrderBy(a => a.PlayerName))
+            {
                 if (unit.OldRelicTier < unit.NewRelicTier)
+                {
                     relicTiers.AppendLine(HTMLConstructor.AddTableData(new string[] { unit.PlayerName, unit.UnitName, $"{unit.OldRelicTier} > {unit.NewRelicTier}" }));
+                    m_reportSummary.TotalRelicLevelsIncreased = m_reportSummary.TotalRelicLevelsIncreased + (unit.NewRelicTier - unit.OldRelicTier);
+                }
+            }
 
             sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Toon", "Relic Tier Increase" }, relicTiers.ToString()));
 
@@ -1094,10 +1163,15 @@ div {
             sb.AppendLine("</p>");
            
             StringBuilder units = new StringBuilder();
-            
-            foreach (UnitData unit in m_filteredUnitData.OrderBy(a => a.PlayerName))            
+
+            foreach (UnitData unit in m_filteredUnitData.OrderBy(a => a.PlayerName))
+            {
                 if (unit.OldRarity < 7 && unit.NewRarity == 7)
+                {
                     units.AppendLine(HTMLConstructor.AddTableData(new string[] { unit.PlayerName, unit.UnitName }));
+                    m_reportSummary.TotalSevenStarToons++;
+                }
+            }
 
             sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Toon" }, units.ToString()));
                         
@@ -1107,10 +1181,15 @@ div {
 
             StringBuilder ships = new StringBuilder();
             foreach (ShipData ship in m_filteredShipData.OrderBy(a => a.PlayerName))
+            {
                 if (ship.OldRarity < 7 && ship.NewRarity == 7)
+                {
                     ships.AppendLine(HTMLConstructor.AddTableData(new string[] { ship.PlayerName, ship.ShipName }));
+                    m_reportSummary.TotalSevenStarShips++;
+                }
+            }
             
-            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Toon" }, ships.ToString()));
+            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Ship" }, ships.ToString()));
 
             sb.AppendLine("<p/></div>");
 
@@ -1131,7 +1210,9 @@ div {
             sb.AppendLine(HTMLConstructor.SectionHeader("Player GP Differences"));
             sb.AppendLine("This section goes over the Galatic Power (GP) differences for players between snapshots.  Here is the top ten players who have gained the most Galatic Power by total and by percentage from the previous snapshot.");
             sb.AppendLine("</p>");
-            
+
+            m_reportSummary.TotalGuildPowerIncrease = m_dataBuilder.PlayerData.Sum(a => a.GalaticPowerDifference);            
+
             StringBuilder playerGPDiff = new StringBuilder();
             foreach (PlayerData player in m_dataBuilder.PlayerData.OrderByDescending(a => a.GalaticPowerDifference).Take(10))
                 playerGPDiff.AppendLine(HTMLConstructor.AddTableData(new string[] { player.PlayerName, player.OldGalaticPower.ToString(), player.NewGalaticPower.ToString(), player.GalaticPowerDifference.ToString() }));
@@ -1257,10 +1338,18 @@ div {
         private string GetAllToonsOfGearLevelDifference(int gearLevel)
         {
             StringBuilder sb = new StringBuilder();
-            
-            foreach (UnitData unit in m_filteredUnitData.OrderBy(a => a.PlayerName))            
+
+            foreach (UnitData unit in m_filteredUnitData.OrderBy(a => a.PlayerName))
+            {
                 if (unit.OldGearLevel < gearLevel && unit.NewGearLevel == gearLevel)
+                {
                     sb.AppendLine(HTMLConstructor.AddTableData(new string[] { unit.PlayerName, unit.UnitName }));
+                    if (gearLevel == 13)
+                        m_reportSummary.TotalGearThirteenToons++;
+                    else if (gearLevel == 12)
+                        m_reportSummary.TotalGearTwelveToons++;
+                }
+            }
 
             return sb.ToString();
         }
