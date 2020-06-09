@@ -727,11 +727,16 @@ div {
                     ).Count() == 10)
                 {
                     if (m_dataBuilder.ShipData.Where(a => a.NewRarity == 7 && a.NewPower > 39999 && a.PlayerName == player &&
-                        (a.ShipName == "Anakin's Eta-2 Starfighter" ||
-                         a.ShipName == "Endurance")
-                        ).Count() == 2)
-                    {   
-                        unlocks.Add(new Unlock(player, "General Skywalker"));
+                        (a.ShipName == "Anakin's Eta-2 Starfighter")
+                        ).Count() == 1)
+                    {
+                        if (m_dataBuilder.ShipData.Where(a => a.NewRarity == 7 && a.NewPower > 39999 && a.PlayerName == player &&
+                            (a.ShipName == "Endurance" ||
+                             a.ShipName == "Negotiator")
+                            ).Count() > 0)
+                        {
+                            unlocks.Add(new Unlock(player, "General Skywalker"));
+                        }
                     }
                 }
             }

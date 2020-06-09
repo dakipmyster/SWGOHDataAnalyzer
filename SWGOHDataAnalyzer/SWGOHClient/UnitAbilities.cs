@@ -12,10 +12,19 @@ namespace SWGOHInterface
         [JsonProperty("is_zeta")]
         public bool IsZeta { get; set; }
 
+        [JsonProperty("is_omega")]
+        public bool IsOmega { get; set; }        
+
         [JsonProperty("name")]
         public string AbilityName { get; set; }
 
         [JsonProperty("id")]
         public string AbilityId { get; set; }
+
+        [JsonProperty("ability_tier")]
+        public int AbilityTier { get; set; }
+
+        [JsonProperty("tier_max")]
+        public int TierMax { get; set; }
     }
 }

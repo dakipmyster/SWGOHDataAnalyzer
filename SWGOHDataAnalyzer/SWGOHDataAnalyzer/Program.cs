@@ -5,6 +5,7 @@ using SWGOHDBInterface;
 using SWGOHReportBuilder;
 using System.Net;
 using System;
+using System.Linq;
 
 namespace SWGOHDataAnalyzer
 {
@@ -21,7 +22,8 @@ namespace SWGOHDataAnalyzer
 1. Create Snapshot
 2. Compare Snapshots
 3. Generate simple report from latest data
-4. Quit app"))
+4. Omegas Left
+5. Quit app"))
                     {
                         case "1":
                             await GetGuildData();
@@ -33,6 +35,9 @@ namespace SWGOHDataAnalyzer
                             await RunSimpleReport();
                             break;
                         case "4":
+                            await OmegasLeft();
+                            break;
+                        case "5":
                             Environment.Exit(0);
                             break;
                         default:
@@ -107,6 +112,15 @@ namespace SWGOHDataAnalyzer
             ReportBuilder builder = new ReportBuilder(fileName, characterName);
                         
             await builder.CompileSimpleReport(client.Guild);
+        }
+
+        private static async Task OmegasLeft()
+        {
+            SWGOHClient client = new SWGOHClient("20799");
+            var playerData = await client.GetPlayerDataAsync();
+
+            var filteredToonList = playerData.PlayerUnits.Where(c => c.UnitData.Gear.Count > 0).SelectMany(a => a.UnitData.UnitAbilities.Where(b => b.IsZeta == false && b.IsOmega == true && b.AbilityTier != b.TierMax));
+            Console.WriteLine($"Approximately {filteredToonList.Count()} omegas to apply, for a total of {filteredToonList.Count() * 5}");
         }
 
     }

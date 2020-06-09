@@ -30,12 +30,11 @@ namespace SWGOHInterface
         /// Pulls player data per ally code
         /// </summary>
         /// <returns></returns>
-        public async Task<string> GetPlayerNameByAllyCodeAsync()
+        public async Task<Player> GetPlayerDataAsync()
         {
             //var response = await m_httpClient.GetAsync($"https://swgoh.gg/api/player/714669639/?");
             var response = await m_httpClient.GetAsync($"https://swgoh.gg/api/player/714669639");
-            var converted = JsonConvert.DeserializeObject<Player>(await response.Content.ReadAsStringAsync());
-            return converted.PlayerData.Name;
+            return JsonConvert.DeserializeObject<Player>(await response.Content.ReadAsStringAsync());
         }
 
         /// <summary>
