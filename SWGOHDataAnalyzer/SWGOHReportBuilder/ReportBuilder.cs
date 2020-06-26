@@ -601,6 +601,7 @@ div {
             List<string> darthRevanLocked = new List<string>();
             List<string> commanderLukeSkywalkerLocked = new List<string>();
             List<string> jediTrainingReyLocked = new List<string>();
+            List<string> jediKnightLukeLocked = new List<string>();
 
             sb.AppendLine("<div id=\"toonprep\">");
             sb.AppendLine(HTMLConstructor.SectionHeader("Prepped Journey Players"));
@@ -625,6 +626,9 @@ div {
 
                 if (m_dataBuilder.UnitData.Where(a => a.PlayerName == player.PlayerName && a.UnitName == "General Skywalker").Count() == 0)
                     generalSkywalkerLocked.Add(player.PlayerName);
+
+                if (m_dataBuilder.UnitData.Where(a => a.PlayerName == player.PlayerName && a.UnitName == "Jedi Knight Luke Skywalker").Count() == 0)
+                    jediKnightLukeLocked.Add(player.PlayerName);
             }
             
             foreach(string player in commanderLukeSkywalkerLocked)
@@ -737,6 +741,30 @@ div {
                         {
                             unlocks.Add(new Unlock(player, "General Skywalker"));
                         }
+                    }
+                }
+            }
+
+            foreach (string player in jediKnightLukeLocked)
+            {
+                if (m_dataBuilder.UnitData.Where(a => a.NewRarity == 7 && a.NewRelicTier >= 3 && a.PlayerName == player &&
+                     (a.UnitName == "Commander Luke Skywalker" ||
+                     a.UnitName == "Rebel Officedr Leia Organa" ||
+                     a.UnitName == "Captain Han Solo" ||
+                     a.UnitName == "Chewbacca" ||
+                     a.UnitName == "Lando Calrissian" ||
+                     a.UnitName == "Hermit Yoda" ||
+                     a.UnitName == "Darth Vader" ||
+                     a.UnitName == "Wampa" ||
+                     a.UnitName == "C-3PO")
+                    ).Count() == 9)
+                {
+                    if (m_dataBuilder.ShipData.Where(a => a.NewRarity == 7 && a.NewPower > 39999 && a.PlayerName == player &&
+                           (a.ShipName == "Han's Millennium Falcon" ||
+                            a.ShipName == "Wedge Antilles's X-wing")
+                           ).Count() > 0)
+                    {
+                        unlocks.Add(new Unlock(player, "Jedi Knight Luke Skywalker"));
                     }
                 }
             }
@@ -944,7 +972,8 @@ div {
                 a.UnitName == "Darth Malak" ||
                 a.UnitName == "General Skywalker" ||
                 a.UnitName == "Supreme Leader Kylo Ren" ||
-                a.UnitName == "Rey" 
+                a.UnitName == "Rey" ||
+                a.UnitName == "Jedi Knight Luke Skywalker"
             )).ToList();
 
             foreach (UnitData unit in filteredUnitList.OrderBy(a => a.PlayerName))
