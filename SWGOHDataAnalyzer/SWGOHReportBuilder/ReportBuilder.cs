@@ -791,6 +791,8 @@ div {
             StringBuilder sb = new StringBuilder();
             StringBuilder rey = new StringBuilder();
             StringBuilder slkr = new StringBuilder();
+            StringBuilder luke = new StringBuilder();
+            StringBuilder palp = new StringBuilder();
             StringBuilder overall = new StringBuilder();
             m_glCharacterProgressList = new List<GLCharacterProgress>();
 
@@ -804,6 +806,8 @@ div {
                 m_glCharacterProgressList.Add(new GLCharacterProgress() { PlayerName = playerName });
                 rey.AppendLine(GetGLReyProgressForPlayer(playerName));
                 slkr.AppendLine(GetGLKyloProgressForPlayer(playerName));
+                luke.AppendLine(GetGLLukeProgressForPlayer(playerName));
+                palp.AppendLine(GetGLPalpProgressForPlayer(playerName));
                 overall.AppendLine(GetOverallGLProgressForPlayer(playerName));
             }
 
@@ -818,9 +822,19 @@ div {
             sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "KRU", "FOS", "FOO", "Kylo Ren", "Phasma", "FOX", "Vet Han", "Sith Troop", "FOS FTP", "Hux", "FOTP", "Palp", "Finalizer" }, slkr.ToString()));
 
             sb.AppendLine("</p>");
+            sb.AppendLine("<b>Grand Master Luke:</b>");
+
+            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Big", "C3P0", "Chew", "Han", "Yoda", "JKL", "Land", "Mon", "Obi", "Leia", "R2D2", "JTR", "CHWP", "Wed", "YWin" }, luke.ToString()));
+
+            sb.AppendLine("</p>");
+            sb.AppendLine("<b>Sith Eternal Palpatine:</b>");
+
+            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Pie", "Star", "Dook", "Maul", "Sidi", "Vad", "Kren", "Palp", "Veer", "Thra", "Tark", "JKA", "RGua", "Mara", "Bomb" }, palp.ToString()));
+
+            sb.AppendLine("</p>");
             sb.AppendLine("<b>Overall Progress:</b>");
 
-            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Rey", "Supreme Leader Kylo Ren" }, overall.ToString()));
+            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Rey", "Supreme Leader Kylo Ren", "Grand Master Luke", "Sith Eternal Palpatine" }, overall.ToString()));
 
             sb.AppendLine("<p/></div>");
 
@@ -837,7 +851,66 @@ div {
         private string GetOverallGLProgressForPlayer(string playerName)
         {
             GLCharacterProgress playerProgress = m_glCharacterProgressList.FirstOrDefault(a => a.PlayerName == playerName);
-            return HTMLConstructor.AddTableData(new string[] { playerName, playerProgress.ReyOverallProgress, playerProgress.SLKROverallProgress });
+            return HTMLConstructor.AddTableData(new string[] { playerName, playerProgress.ReyOverallProgress, playerProgress.SLKROverallProgress, playerProgress.GLLukeOverallProgress, playerProgress.GLPalpOverallProgress });
+        }
+
+
+        /// <summary>
+        /// Method to determine GL Kylo progress
+        /// </summary>
+        /// <param name="playerName"></param>
+        /// <returns></returns>
+        private string GetGLLukeProgressForPlayer(string playerName)
+        {
+            List<decimal> progressList = new List<decimal>();
+            string big = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Biggs Darklighter"), 82, out progressList, progressList);
+            string c3p0 = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "C-3PO"), 84, out progressList, progressList);
+            string chew = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Chewbacca"), 85, out progressList, progressList);
+            string han = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Han Solo"), 85, out progressList, progressList);
+            string yoda = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Hermit Yoda"), 84, out progressList, progressList);
+            string jkl = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Jedi Knight Luke Skywalker"), 86, out progressList, progressList);
+            string land = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Lando Calrissian"), 84, out progressList, progressList);
+            string mon = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Mon Mothma"), 84, out progressList, progressList);
+            string obi = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Obi-Wan Kenobi (Old Ben)"), 84, out progressList, progressList);
+            string leia = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Princess Leia"), 82, out progressList, progressList);
+            string r2d2 = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "R2-D2"), 86, out progressList, progressList);
+            string jtr = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Rey (Jedi Training)"), 86, out progressList, progressList);
+            string chwp = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Threepio & Chewie"), 84, out progressList, progressList);
+            string wed = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Wedge Antilles"), 82, out progressList, progressList);
+            string ywin = CalculatePercentProgressForGL(m_dataBuilder.ShipData.FirstOrDefault(a => a.PlayerName == playerName && a.ShipName == "Rebel Y-wing"), 6, out progressList, progressList);
+
+            m_glCharacterProgressList.FirstOrDefault(a => a.PlayerName == playerName).GLLukeOverallProgress = Math.Round(progressList.Average(), 2).ToString();
+
+            return HTMLConstructor.AddTableData(new string[] { playerName, big, c3p0, chew, han, yoda, jkl, land, mon, obi, leia, r2d2, jtr, chwp, wed, ywin });
+        }
+
+        /// <summary>
+        /// Method to determine GL Kylo progress
+        /// </summary>
+        /// <param name="playerName"></param>
+        /// <returns></returns>
+        private string GetGLPalpProgressForPlayer(string playerName)
+        {
+            List<decimal> progressList = new List<decimal>();
+            string pie = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Admiral Piett"), 84, out progressList, progressList);
+            string star = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Colonel Starck"), 82, out progressList, progressList);
+            string dook = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Count Dooku"), 85, out progressList, progressList);
+            string maul = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Darth Maul"), 83, out progressList, progressList);
+            string sidi = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Darth Sidious"), 86, out progressList, progressList);
+            string vad = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Darth Vader"), 86, out progressList, progressList);
+            string kren = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Director Krennic"), 83, out progressList, progressList);
+            string palp = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Emperor Palpatine"), 86, out progressList, progressList);
+            string veer = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "General Veers"), 82, out progressList, progressList);
+            string thra = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Grand Admiral Thrawn"), 85, out progressList, progressList);
+            string tark = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Grand Moff Tarkin"), 82, out progressList, progressList);
+            string jka = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Jedi Knight Anakin"), 86, out progressList, progressList);
+            string rgua = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Royal Guard"), 82, out progressList, progressList);
+            string mara = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Sith Marauder"), 86, out progressList, progressList);
+            string bomb = CalculatePercentProgressForGL(m_dataBuilder.ShipData.FirstOrDefault(a => a.PlayerName == playerName && a.ShipName == "Imperial TIE Bomber"), 6, out progressList, progressList);
+
+            m_glCharacterProgressList.FirstOrDefault(a => a.PlayerName == playerName).GLPalpOverallProgress = Math.Round(progressList.Average(), 2).ToString();
+
+            return HTMLConstructor.AddTableData(new string[] { playerName, pie, star, dook, maul, sidi, vad, kren, palp, veer, thra, tark, jka, rgua, mara, bomb});
         }
 
         /// <summary>
@@ -917,7 +990,7 @@ div {
             points = ((unitData.NewGearLevel-1) * 6) + unitData.NewRelicTier + unitData.HasGearSlotOne + unitData.HasGearSlotTwo + unitData.HasGearSlotThree + unitData.HasGearSlotFour + unitData.HasGearSlotFive + unitData.HasGearSlotSix + unitData.NewRarity;
 
             progressList.Add(Math.Round(Decimal.Divide(points, maxPoints) * 100, 2) > 100 ? 100 : Math.Round(Decimal.Divide(points, maxPoints) * 100, 2));
-            return Math.Round(Decimal.Divide(points, maxPoints) * 100, 2) > 100 ? "100" : Math.Round(Decimal.Divide(points, maxPoints) * 100, 2).ToString();
+            return Math.Round(Decimal.Divide(points, maxPoints) * 100, 2) > 100 ? "100" : Math.Round(Decimal.Divide(points, maxPoints) * 100, 0).ToString();
         }
 
         /// <summary>
@@ -939,7 +1012,7 @@ div {
             }
             
             progressList.Add(Math.Round(Decimal.Divide(shipData.NewRarity, maxPoints) * 100, 2) > 100 ? 100 : Math.Round(Decimal.Divide(shipData.NewRarity, maxPoints) * 100, 2));
-            return Math.Round(Decimal.Divide(shipData.NewRarity, maxPoints) * 100, 2) > 100 ? "100" : Math.Round(Decimal.Divide(shipData.NewRarity, maxPoints) * 100, 2).ToString();
+            return Math.Round(Decimal.Divide(shipData.NewRarity, maxPoints) * 100, 2) > 100 ? "100" : Math.Round(Decimal.Divide(shipData.NewRarity, maxPoints) * 100, 0).ToString();
         }
 
         /// <summary>

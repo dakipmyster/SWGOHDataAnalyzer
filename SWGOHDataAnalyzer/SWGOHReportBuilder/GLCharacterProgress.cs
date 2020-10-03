@@ -10,6 +10,8 @@ namespace SWGOHReportBuilder
     {
         public string ReyOverallProgress { get; set; }
         public string SLKROverallProgress { get; set; }
+        public string GLLukeOverallProgress { get; set; }
+        public string GLPalpOverallProgress { get; set; }
         public string PlayerName { get; set; }
     }
 }
