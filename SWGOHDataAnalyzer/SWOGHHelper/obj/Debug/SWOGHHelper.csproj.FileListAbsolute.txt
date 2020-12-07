@@ -5,7 +5,7 @@ C:\Users\klarsen\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWOGHHelpe
 C:\Users\klarsen\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWOGHHelper\obj\Debug\SWOGHHelper.pdb
 C:\Users\Kyle\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWOGHHelper\bin\Debug\SWOGHHelper.dll
 C:\Users\Kyle\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWOGHHelper\bin\Debug\SWOGHHelper.pdb
+C:\Users\Kyle\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWOGHHelper\obj\Debug\SWOGHHelper.csprojAssemblyReference.cache
 C:\Users\Kyle\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWOGHHelper\obj\Debug\SWOGHHelper.csproj.CoreCompileInputs.cache
 C:\Users\Kyle\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWOGHHelper\obj\Debug\SWOGHHelper.dll
 C:\Users\Kyle\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWOGHHelper\obj\Debug\SWOGHHelper.pdb
-C:\Users\Kyle\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWOGHHelper\obj\Debug\SWOGHHelper.csprojAssemblyReference.cache
