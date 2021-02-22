@@ -1130,7 +1130,8 @@ div {
                 a.UnitName == "Rey" ||
                 a.UnitName == "Jedi Master Luke Skywalker" ||
                 a.UnitName == "Sith Eternal Emperor" ||
-                a.UnitName == "Jedi Knight Luke Skywalker"
+                a.UnitName == "Jedi Knight Luke Skywalker" ||
+                a.UnitName == "The Mandalorian (Beskar Armor)"
             )).ToList();
 
             foreach (UnitData unit in filteredUnitList.OrderBy(a => a.PlayerName))
