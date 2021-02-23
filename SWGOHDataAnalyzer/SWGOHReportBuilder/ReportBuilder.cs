@@ -1066,6 +1066,9 @@ div {
                 case 7:
                     relicPoints = 28;
                     break;
+                case 8:
+                    relicPoints = 34;
+                    break;
             }
 
             //-1 because we want to count the number of gear pieces equipped not the current gear level ie Gear 1 if not the -1 would award 6 points
