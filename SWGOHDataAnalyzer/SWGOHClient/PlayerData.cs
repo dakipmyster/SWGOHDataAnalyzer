@@ -14,5 +14,8 @@ namespace SWGOHInterface
 
         [JsonProperty("galactic_power")]
         public int PlayerPower { get; set; }
+
+        [JsonProperty("ally_code")]
+        public int AllyCode { get; set; }
     }
 }

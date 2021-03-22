@@ -195,11 +195,11 @@ FROM {m_oldSnapshot} WHERE is_ship = 1";
         internal async Task CollectUnitDataFromDB()
         {
             string sqlQuery = $@"SELECT player_name, toon, rarity, player_power, gear_level, toon_power, toon_level, health, protection, speed, p_offense,
-s_offense, p_defense, s_defense, p_crit_chance, s_crit_chance, potency, tenacity, zeta_one, zeta_two, zeta_three, relic_tier, gear_one_equipped, gear_two_equipped, gear_three_equipped, gear_four_equipped, gear_five_equipped, gear_six_equipped, 'New' as 'State'
+s_offense, p_defense, s_defense, p_crit_chance, s_crit_chance, potency, tenacity, zeta_one, zeta_two, zeta_three, zeta_four, zeta_five, zeta_six, relic_tier, gear_one_equipped, gear_two_equipped, gear_three_equipped, gear_four_equipped, gear_five_equipped, gear_six_equipped, 'New' as 'State'
 FROM {m_newSnapshot} WHERE is_ship = 0
 UNION
 SELECT player_name, toon, rarity, player_power, gear_level, toon_power, toon_level, health, protection, speed, p_offense,
-s_offense, p_defense, s_defense, p_crit_chance, s_crit_chance, potency, tenacity, zeta_one, zeta_two, zeta_three, relic_tier, gear_one_equipped, gear_two_equipped, gear_three_equipped, gear_four_equipped, gear_five_equipped, gear_six_equipped, 'Old' as 'State'
+s_offense, p_defense, s_defense, p_crit_chance, s_crit_chance, potency, tenacity, zeta_one, zeta_two, zeta_three, zeta_four, zeta_five, zeta_six, relic_tier, gear_one_equipped, gear_two_equipped, gear_three_equipped, gear_four_equipped, gear_five_equipped, gear_six_equipped, 'Old' as 'State'
 FROM {m_oldSnapshot} WHERE is_ship = 0";
 
             DataTable results = await m_dbInterface.ExecuteQueryAndReturnResults(sqlQuery, null);
@@ -225,6 +225,15 @@ FROM {m_oldSnapshot} WHERE is_ship = 0";
 
                 if (!String.IsNullOrEmpty(row["zeta_three"].ToString()))
                     zetas.Add(row["zeta_three"].ToString());
+
+                if (!String.IsNullOrEmpty(row["zeta_four"].ToString()))
+                    zetas.Add(row["zeta_four"].ToString());
+
+                if (!String.IsNullOrEmpty(row["zeta_five"].ToString()))
+                    zetas.Add(row["zeta_five"].ToString());
+
+                if (!String.IsNullOrEmpty(row["zeta_six"].ToString()))
+                    zetas.Add(row["zeta_six"].ToString());
 
                 UnitData unit;
 
@@ -297,7 +306,7 @@ FROM {m_oldSnapshot} WHERE is_ship = 0";
 
             foreach(Player player in guild.Players)
             {
-                PlayerData.Add(new PlayerData() { PlayerName = player.PlayerData.Name });
+                PlayerData.Add(new PlayerData() { PlayerName = player.PlayerData.Name, AllyCode = player.PlayerData.AllyCode });
 
                 foreach (PlayerUnit unit in player.PlayerUnits)
                 {
@@ -329,6 +338,7 @@ FROM {m_oldSnapshot} WHERE is_ship = 0";
                             CurrentTankiest = (decimal)Math.Round(unit.UnitData.UnitStats.Health, 2) + (decimal)Math.Round(unit.UnitData.UnitStats.Protection, 2),
                             CurrentTenacity = (decimal)Math.Round(unit.UnitData.UnitStats.Tenacity*100, 2),
                             UnitName = unit.UnitData.Name,
+                            UnitId = unit.UnitData.UnitId,
                             NewPower = unit.UnitData.Power,
                             NewGearLevel = unit.UnitData.GearLevel,
                             NewZetas = zetas,

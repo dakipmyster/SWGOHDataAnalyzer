@@ -68,6 +68,8 @@ namespace SWGOHReportBuilder
 
         public int HasGearSlotSix { get; set; }
 
+        public string UnitId { get; set; }
+
 
 
         public UnitData()

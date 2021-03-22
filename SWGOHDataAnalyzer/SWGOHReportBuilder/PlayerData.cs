@@ -6,6 +6,8 @@
 
         public decimal GalaticPowerPercentageDifference { get; set; }
 
+        public int AllyCode { get; set; }
+
         public PlayerData() { }
     }
 }

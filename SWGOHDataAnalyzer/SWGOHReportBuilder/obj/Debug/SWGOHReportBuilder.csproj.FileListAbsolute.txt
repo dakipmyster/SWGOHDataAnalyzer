@@ -105,3 +105,11 @@ C:\Users\Kyle\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHReportBu
 C:\Users\Kyle\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHReportBuilder\obj\Debug\SWGOHReportBuilder.csproj.CopyComplete
 C:\Users\Kyle\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHReportBuilder\obj\Debug\SWGOHReportBuilder.dll
 C:\Users\Kyle\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHReportBuilder\obj\Debug\SWGOHReportBuilder.pdb
+C:\Users\Kyle\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHReportBuilder\bin\Debug\AsyncEnumerable.dll
+C:\Users\Kyle\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHReportBuilder\bin\Debug\Microsoft.Bcl.AsyncInterfaces.dll
+C:\Users\Kyle\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHReportBuilder\bin\Debug\System.Threading.Tasks.Extensions.dll
+C:\Users\Kyle\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHReportBuilder\bin\Debug\System.Runtime.CompilerServices.Unsafe.dll
+C:\Users\Kyle\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHReportBuilder\bin\Debug\AsyncEnumerable.xml
+C:\Users\Kyle\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHReportBuilder\bin\Debug\Microsoft.Bcl.AsyncInterfaces.xml
+C:\Users\Kyle\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHReportBuilder\bin\Debug\System.Threading.Tasks.Extensions.xml
+C:\Users\Kyle\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHReportBuilder\bin\Debug\System.Runtime.CompilerServices.Unsafe.xml

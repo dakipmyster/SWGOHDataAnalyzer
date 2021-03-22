@@ -20,6 +20,9 @@ namespace SWGOHInterface
         [JsonProperty("name")]
         public string Name { get; set; }
 
+        [JsonProperty("base_id")]
+        public string UnitId { get; set; }
+
         [JsonProperty("level")]
         public int Level { get; set; }
 
@@ -34,5 +37,7 @@ namespace SWGOHInterface
 
         [JsonProperty("zeta_abilities")]
         public List<string> AppliedZetas { get; set; }
+
+        public List<Mod> UnitMods { get; set; }
     }
 }

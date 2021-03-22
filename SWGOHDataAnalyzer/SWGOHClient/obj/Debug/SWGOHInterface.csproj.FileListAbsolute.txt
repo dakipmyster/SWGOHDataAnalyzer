@@ -24,3 +24,11 @@ C:\Users\Kyle\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHClient\o
 C:\Users\Kyle\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHClient\obj\Debug\SWGOHInterface.csproj.CopyComplete
 C:\Users\Kyle\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHClient\obj\Debug\SWGOHInterface.dll
 C:\Users\Kyle\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHClient\obj\Debug\SWGOHInterface.pdb
+C:\Users\Kyle\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHClient\bin\Debug\AsyncEnumerable.dll
+C:\Users\Kyle\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHClient\bin\Debug\Microsoft.Bcl.AsyncInterfaces.dll
+C:\Users\Kyle\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHClient\bin\Debug\System.Runtime.CompilerServices.Unsafe.dll
+C:\Users\Kyle\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHClient\bin\Debug\System.Threading.Tasks.Extensions.dll
+C:\Users\Kyle\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHClient\bin\Debug\AsyncEnumerable.xml
+C:\Users\Kyle\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHClient\bin\Debug\Microsoft.Bcl.AsyncInterfaces.xml
+C:\Users\Kyle\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHClient\bin\Debug\System.Runtime.CompilerServices.Unsafe.xml
+C:\Users\Kyle\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHClient\bin\Debug\System.Threading.Tasks.Extensions.xml
