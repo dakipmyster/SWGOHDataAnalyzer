@@ -70,12 +70,13 @@ namespace SWGOHReportBuilder
 
         public string UnitId { get; set; }
 
-
+        public List<Mod> Mods { get; set; }
 
         public UnitData()
         {
             OldZetas = new List<string>();
             NewZetas = new List<string>();
+            Mods = new List<Mod>();
         }
     }
 }

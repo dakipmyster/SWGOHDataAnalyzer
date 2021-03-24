@@ -207,18 +207,32 @@ VALUES (@player_id, @toon_id, @mod_set, @mod_primary_name, @mod_secondary_one_na
             sqlParams.Add(new SQLiteParameter("@toon_id", modData.ToonId));
             sqlParams.Add(new SQLiteParameter("@mod_set", modData.Set));
             sqlParams.Add(new SQLiteParameter("@mod_primary_name", modData.PrimaryModData.Name));
-            sqlParams.Add(new SQLiteParameter("@mod_secondary_one_name", modData.SecondaryStats.ElementAtOrDefault(0)?.Name));
+            sqlParams.Add(new SQLiteParameter("@mod_secondary_one_name", DetermineModName(modData.SecondaryStats.ElementAtOrDefault(0)?.Value, modData.SecondaryStats.ElementAtOrDefault(0)?.Name)));
             sqlParams.Add(new SQLiteParameter("@mod_secondary_one", modData.SecondaryStats.ElementAtOrDefault(0)?.Value));
-            sqlParams.Add(new SQLiteParameter("@mod_secondary_two_name", modData.SecondaryStats.ElementAtOrDefault(1)?.Name));
+            sqlParams.Add(new SQLiteParameter("@mod_secondary_two_name", DetermineModName(modData.SecondaryStats.ElementAtOrDefault(1)?.Value, modData.SecondaryStats.ElementAtOrDefault(1)?.Name)));
             sqlParams.Add(new SQLiteParameter("@mod_secondary_two", modData.SecondaryStats.ElementAtOrDefault(1)?.Value));
-            sqlParams.Add(new SQLiteParameter("@mod_secondary_three_name", modData.SecondaryStats.ElementAtOrDefault(2)?.Name));
+            sqlParams.Add(new SQLiteParameter("@mod_secondary_three_name", DetermineModName(modData.SecondaryStats.ElementAtOrDefault(2)?.Value, modData.SecondaryStats.ElementAtOrDefault(2)?.Name)));
             sqlParams.Add(new SQLiteParameter("@mod_secondary_three", modData.SecondaryStats.ElementAtOrDefault(2)?.Value));
-            sqlParams.Add(new SQLiteParameter("@mod_secondary_four_name", modData.SecondaryStats.ElementAtOrDefault(3)?.Name));
+            sqlParams.Add(new SQLiteParameter("@mod_secondary_four_name", DetermineModName(modData.SecondaryStats.ElementAtOrDefault(3)?.Value, modData.SecondaryStats.ElementAtOrDefault(3)?.Name)));
             sqlParams.Add(new SQLiteParameter("@mod_secondary_four", modData.SecondaryStats.ElementAtOrDefault(3)?.Value));
             sqlParams.Add(new SQLiteParameter("@mod_tier", modData.Tier));
             sqlParams.Add(new SQLiteParameter("@mod_rarity", modData.Rarity));
 
             return sqlParams.ToArray();
+        }
+
+        /// <summary>
+        /// Gets the proper name for 
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="name"></param>
+        /// <returns>Modfied name</returns>
+        private string DetermineModName(string value, string name)
+        {
+            if (!String.IsNullOrEmpty(value) && !String.IsNullOrEmpty(name) && value.Contains("%") && !name.Contains("Potency") && !name.Contains("Critical Chance") && !name.Contains("Tenacity"))
+                return $"{name} %";
+            else
+                return name;
         }
 
         /// <summary>

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using SWGOHDBInterface;
 using SWGOHMessage;
 using SWGOHInterface;
+using System.Data.SQLite;
 
 namespace SWGOHReportBuilder
 {
@@ -194,11 +195,11 @@ FROM {m_oldSnapshot} WHERE is_ship = 1";
         /// <returns></returns>
         internal async Task CollectUnitDataFromDB()
         {
-            string sqlQuery = $@"SELECT player_name, toon, rarity, player_power, gear_level, toon_power, toon_level, health, protection, speed, p_offense,
+            string sqlQuery = $@"SELECT player_name, toon, rarity, player_power, gear_level, toon_power, toon_level, health, protection, speed, p_offense, toon_id, ally_code,
 s_offense, p_defense, s_defense, p_crit_chance, s_crit_chance, potency, tenacity, zeta_one, zeta_two, zeta_three, zeta_four, zeta_five, zeta_six, relic_tier, gear_one_equipped, gear_two_equipped, gear_three_equipped, gear_four_equipped, gear_five_equipped, gear_six_equipped, 'New' as 'State'
 FROM {m_newSnapshot} WHERE is_ship = 0
 UNION
-SELECT player_name, toon, rarity, player_power, gear_level, toon_power, toon_level, health, protection, speed, p_offense,
+SELECT player_name, toon, rarity, player_power, gear_level, toon_power, toon_level, health, protection, speed, p_offense, toon_id, ally_code,
 s_offense, p_defense, s_defense, p_crit_chance, s_crit_chance, potency, tenacity, zeta_one, zeta_two, zeta_three, zeta_four, zeta_five, zeta_six, relic_tier, gear_one_equipped, gear_two_equipped, gear_three_equipped, gear_four_equipped, gear_five_equipped, gear_six_equipped, 'Old' as 'State'
 FROM {m_oldSnapshot} WHERE is_ship = 0";
 
@@ -277,6 +278,34 @@ FROM {m_oldSnapshot} WHERE is_ship = 0";
                     unit.HasGearSlotFour = Convert.ToInt32(row["gear_four_equipped"].ToString());
                     unit.HasGearSlotFive = Convert.ToInt32(row["gear_five_equipped"].ToString());
                     unit.HasGearSlotSix = Convert.ToInt32(row["gear_six_equipped"].ToString());
+
+                    var modSqlQuery = $@"SELECT mod_set, mod_primary_name, mod_secondary_one, mod_secondary_one_name, mod_secondary_two, mod_secondary_two_name, mod_secondary_three, mod_secondary_three_name, mod_secondary_four, mod_secondary_four_name, mod_tier, mod_rarity
+FROM MOD_{m_newSnapshot} WHERE toon_id = @toonid AND player_id = @allycode";
+                    var modSqlParams = new List<SQLiteParameter>(){ 
+                        new SQLiteParameter() { ParameterName = "@allycode", Value = row["ally_code"].ToString() },
+                        new SQLiteParameter() { ParameterName = "@toonid", Value = row["toon_id"].ToString() }
+                    };
+
+                    DataTable modResults = await m_dbInterface.ExecuteQueryAndReturnResults(modSqlQuery, modSqlParams.ToArray());
+
+                    foreach(DataRow modRow in modResults.Rows)
+                    {
+                        unit.Mods.Add(new Mod()
+                        { 
+                            ModSet = modRow["mod_set"].ToString(),
+                            ModPrimaryName = modRow["mod_primary_name"].ToString(),                            
+                            ModRarity = $"{modRow["mod_tier"]}{modRow["mod_rarity"]}",
+                            ModSecondaryOneName = modRow["mod_secondary_one_name"].ToString(),
+                            ModSecondaryTwoName = modRow["mod_secondary_two_name"].ToString(),
+                            ModSecondaryThreeName = modRow["mod_secondary_three_name"].ToString(),
+                            ModSecondaryFourName = modRow["mod_secondary_four_name"].ToString(),
+                            ModSecondaryOne = String.IsNullOrEmpty(modRow["mod_secondary_one"].ToString()) ? 0 : Convert.ToDecimal(modRow["mod_secondary_one"].ToString()),
+                            ModSecondaryTwo = String.IsNullOrEmpty(modRow["mod_secondary_two"].ToString()) ? 0 : Convert.ToDecimal(modRow["mod_secondary_two"].ToString()),
+                            ModSecondaryThree = String.IsNullOrEmpty(modRow["mod_secondary_three"].ToString()) ? 0 : Convert.ToDecimal(modRow["mod_secondary_three"].ToString()),
+                            ModSecondaryFour = String.IsNullOrEmpty(modRow["mod_secondary_four"].ToString()) ? 0 : Convert.ToDecimal(modRow["mod_secondary_four"].ToString())
+
+                        });
+                    }
                 }
                 else
                 {

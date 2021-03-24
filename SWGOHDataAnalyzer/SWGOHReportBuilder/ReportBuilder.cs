@@ -859,7 +859,7 @@ div {
             m_glCharacterProgressList = new List<GLCharacterProgress>();
 
             sb.AppendLine("<div id=\"guildfocus\">");
-            sb.AppendLine(HTMLConstructor.SectionHeader("Galatic Legend Prep"));
+            sb.AppendLine(HTMLConstructor.SectionHeader("Team Prep"));
             sb.AppendLine("This section goes over all guild members and their progress towards a guild focused team.  100% for each toon indicates the player is at the goal level.");
             sb.AppendLine("<p>Calculations of progress is based on current gear level, gear pieces applied at current gear level, relic level and star level relative to the requirement for the toon.");
 
