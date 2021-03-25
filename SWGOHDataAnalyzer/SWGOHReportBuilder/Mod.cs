@@ -8,6 +8,7 @@ namespace SWGOHReportBuilder
 {
     public class Mod
     {
+        public int Id { get; set; }
         public string ModSet { get; set; }
 
         public string ModPrimaryName { get; set; }
@@ -23,5 +24,8 @@ namespace SWGOHReportBuilder
         public decimal ModSecondaryTwo { get; set; }
         public decimal ModSecondaryThree { get; set; }
         public decimal ModSecondaryFour { get; set; }
+
+        public string PlayerName { get; set; }
+        public string UnitName { get; set; }
     }
 }

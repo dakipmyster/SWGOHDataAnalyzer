@@ -36,6 +36,7 @@ namespace SWGOHReportBuilder
         string m_fileName;
         string m_glProgress;
         string m_guildFocusProgress;
+        string m_modStats;
         bool m_isSimpleReport;
 
         List<GLCharacterProgress> m_glCharacterProgressList;
@@ -148,6 +149,7 @@ div {
             //This section can process in any order
             if(!m_isSimpleReport)
             {
+                tasks.Add(Task.Run(() => CompileModStats()));
                 tasks.Add(Task.Run(() => DetailedData()));
                 tasks.Add(Task.Run(() => JourneyOrLegendaryUnlock()));
                 tasks.Add(Task.Run(() => GalaticLegenedProgress()));
@@ -158,7 +160,7 @@ div {
                 tasks.Add(Task.Run(() => GearThirteenToons()));
                 tasks.Add(Task.Run(() => ZetasApplied()));
                 tasks.Add(Task.Run(() => PlayerGPDifferences()));
-                tasks.Add(Task.Run(() => RelicTierDifferences()));
+                tasks.Add(Task.Run(() => RelicTierDifferences()));                
             }
             
             //tasks.Add(Task.Run(() => GoldMembers()));            
@@ -195,12 +197,13 @@ div {
                 pdfString.AppendLine(m_relicTiers);
                 pdfString.AppendLine(m_zetasApplied);
                 pdfString.AppendLine(m_journeyOrLegendaryUnlock);
+                pdfString.AppendLine(m_modStats);
                 pdfString.AppendLine(m_guildFocusProgress);
                 pdfString.AppendLine(m_journeyPrepared);
                 pdfString.AppendLine(m_glProgress);
                 pdfString.AppendLine(m_characterHighlight);
                 //pdfString.AppendLine(m_goldMembers);
-                //pdfString.AppendLine(m_detailedData);
+                pdfString.AppendLine(m_detailedData);
             }
 
             pdfString.AppendLine(@"</body></html>");
@@ -254,17 +257,18 @@ div {
                 sb.AppendLine("<ol type=\"1\"");
                 sb.AppendLine("<li></li>");
                 sb.AppendLine("<li><a href=\"#playergpdiff\">Player GP Differences</a></li>");
-                sb.AppendLine("<li><a href=\"#unitgpdiff\">Unit GP Differences</a></li>");
+                sb.AppendLine("<li><a href=\"#unitgpdiff\">Toon GP Differences</a></li>");
                 sb.AppendLine("<li><a href=\"#toptwenty\">Top 20 Stats</a></li>");
                 sb.AppendLine("<li><a href=\"#sevenstar\">Seven Stars</a></li>");
                 sb.AppendLine("<li><a href=\"#geartwelve\">Gear 12 Toons</a></li>");
                 sb.AppendLine("<li><a href=\"#gearthirteen\">Gear 13 Toons</a></li>");
                 sb.AppendLine("<li><a href=\"#relictiers\">Relic Tier Upgrades</a></li>");
-                sb.AppendLine("<li><a href=\"#zetas\">Applied Zetas</a></li>");
+                sb.AppendLine("<li><a href=\"#zetas\">Zetas Applied</a></li>");
                 sb.AppendLine("<li><a href=\"#toonunlock\">Journey/Legendary/Galactic Legend Unlocks</a></li>");
+                sb.AppendLine("<li><a href=\"#modstats\">Top mods per secondary stat</a></li>");
                 sb.AppendLine("<li><a href=\"#guildfocus\">Guild Focus Teams</a></li>");
-                sb.AppendLine("<li><a href=\"#toonprep\">Players prepping for Galatic Legends</a></li>");
-                sb.AppendLine("<li><a href=\"#glprep\">Players prepped for Journey Toons</a></li>");
+                sb.AppendLine("<li><a href=\"#glprep\">Players prepping for Galatic Legends</a></li>");
+                sb.AppendLine("<li><a href=\"#toonprep\">Players prepped for Journey Toons</a></li>");
                 if (!String.IsNullOrEmpty(m_toonName)) sb.AppendLine($"<li><a href=\"#highlight\">Character Highlight: {m_toonName}</a></li>");
                 //sb.AppendLine("<li><a href=\"#goldmembers\">Gold Teams</a></li>");
                 sb.AppendLine("<li><a href=\"#details\">Data Details</a></li>");
@@ -800,7 +804,7 @@ div {
             StringBuilder overall = new StringBuilder();
             m_glCharacterProgressList = new List<GLCharacterProgress>();
 
-            sb.AppendLine("<div id=\"toonprep\">");
+            sb.AppendLine("<div id=\"glprep\">");
             sb.AppendLine(HTMLConstructor.SectionHeader("Galatic Legend Prep"));
             sb.AppendLine("This section goes over all guild members and their progress towards a GL toon.  100% for each toon indicates the player is currently in progress or has unlocked the toon.");
             sb.AppendLine("<p>Calculations of progress is based on current gear level, gear pieces applied at current gear level, relic level and star level relative to the requirement for the toon.");
@@ -1429,6 +1433,87 @@ div {
         }
 
         /// <summary>
+        /// Method to generate mod stats
+        /// </summary>
+        /// <returns></returns>
+        private async Task CompileModStats()
+        {
+            StringBuilder sb = new StringBuilder();
+
+            sb.AppendLine("<div id=\"modstats\">");
+            sb.AppendLine(HTMLConstructor.SectionHeader("Top mods per secondary"));
+            sb.AppendLine("Mods is where the geeks hang out. Here is the top X mods per secondary stat in the guild.");
+            sb.AppendLine("<p/>");
+                        
+            var headers = new string[] { "Player Name", "Toon Name", "Tier", "Set", "Primary Stat", "Slot 1", "Slot 2", "Slot 3", "Slot 4" };
+
+            sb.AppendLine("<b>Speed:</b>");
+
+            sb.AppendLine(HTMLConstructor.AddTable(headers, GetModListForStat("Speed", 20)));
+
+            sb.AppendLine("</p style=\"page-break-after: always\">");
+            sb.AppendLine("<b>Health:</b>");
+
+            sb.AppendLine(HTMLConstructor.AddTable(headers, GetModListForStat("Health", 20)));
+
+            sb.AppendLine("</p style=\"page-break-after: always\">");
+            sb.AppendLine("<b>Health %:</b>");
+
+            sb.AppendLine(HTMLConstructor.AddTable(headers, GetModListForStat("Health %", 20)));
+
+            sb.AppendLine("</p style=\"page-break-after: always\">");
+            sb.AppendLine("<b>Protection:</b>");
+
+            sb.AppendLine(HTMLConstructor.AddTable(headers, GetModListForStat("Protection", 20)));
+
+            sb.AppendLine("</p style=\"page-break-after: always\">");
+            sb.AppendLine("<b>Protection %:</b>");
+
+            sb.AppendLine(HTMLConstructor.AddTable(headers, GetModListForStat("Protection %", 20)));
+
+            sb.AppendLine("</p style=\"page-break-after: always\">");
+            sb.AppendLine("<b>Defense:</b>");
+
+            sb.AppendLine(HTMLConstructor.AddTable(headers, GetModListForStat("Defense", 20)));
+
+            sb.AppendLine("</p style=\"page-break-after: always\">");
+            sb.AppendLine("<b>Defense %:</b>");
+
+            sb.AppendLine(HTMLConstructor.AddTable(headers, GetModListForStat("Defense %", 20)));
+
+            sb.AppendLine("</p style=\"page-break-after: always\">");
+            sb.AppendLine("<b>Offense:</b>");
+
+            sb.AppendLine(HTMLConstructor.AddTable(headers, GetModListForStat("Offense", 20)));
+
+            sb.AppendLine("</p style=\"page-break-after: always\">");
+            sb.AppendLine("<b>Offense %:</b>");
+
+            sb.AppendLine(HTMLConstructor.AddTable(headers, GetModListForStat("Offense %", 20)));
+
+            sb.AppendLine("</p style=\"page-break-after: always\">");
+            sb.AppendLine("<b>Critical Chance:</b>");
+
+            sb.AppendLine(HTMLConstructor.AddTable(headers, GetModListForStat("Critical Chance", 20)));
+
+            sb.AppendLine("</p style=\"page-break-after: always\">");
+            sb.AppendLine("<b>Tenacity:</b>");
+
+            sb.AppendLine(HTMLConstructor.AddTable(headers, GetModListForStat("Tenacity", 20)));
+
+            sb.AppendLine("</p style=\"page-break-after: always\">");
+            sb.AppendLine("<b>Potency:</b>");
+
+            sb.AppendLine(HTMLConstructor.AddTable(headers, GetModListForStat("Potency", 20)));
+
+            sb.AppendLine("<p/></div>");
+
+            m_modStats = sb.ToString();
+
+            await Task.CompletedTask;
+        }
+
+        /// <summary>
         /// Method to generate detailed data
         /// </summary>
         /// <returns></returns>
@@ -1564,6 +1649,49 @@ div {
                     players.Add(player.Key);
 
             return players;
+        }
+
+        /// <summary>
+        /// Compiles a full list of mod data for a specific secondary stat by the top x
+        /// </summary>
+        /// <param name="stat">Secondary stat to pull</param>
+        /// <param name="modList">Full List of mods</param>
+        /// <param name="returnCount">The number of results to return</param>
+        /// <returns></returns>
+        private string GetModListForStat(string stat, int returnCount)
+        {
+            StringBuilder topMods = new StringBuilder();
+
+            var theList = new List<KeyValuePair<int, decimal>>();
+            var filteredModList = new List<Mod>();
+            var modList = m_dataBuilder.UnitData.SelectMany(b => b.Mods).ToList();
+
+            theList.AddRange(modList.Where(a => a.ModSecondaryOneName == stat).ToDictionary(x => x.Id, x => x.ModSecondaryOne).ToList());
+            theList.AddRange(modList.Where(a => a.ModSecondaryTwoName == stat).ToDictionary(x => x.Id, x => x.ModSecondaryTwo).ToList());
+            theList.AddRange(modList.Where(a => a.ModSecondaryThreeName == stat).ToDictionary(x => x.Id, x => x.ModSecondaryThree).ToList());
+            theList.AddRange(modList.Where(a => a.ModSecondaryFourName == stat).ToDictionary(x => x.Id, x => x.ModSecondaryFour).ToList());
+
+            var topOfTheList = theList.OrderByDescending(a => a.Value).Take(returnCount).Select(b => b.Key);
+
+            foreach (var topItemKey in topOfTheList)
+                filteredModList.Add(modList.FirstOrDefault(a => a.Id == topItemKey));
+            
+            //Bold highlighted stat, add mod slot(shape)
+            foreach(var topMod in filteredModList)
+                topMods.AppendLine(HTMLConstructor.AddTableData(new string[] 
+                { 
+                    topMod.PlayerName, 
+                    topMod.UnitName, 
+                    topMod.ModRarity, 
+                    topMod.ModSet, 
+                    topMod.ModPrimaryName, 
+                    $"{topMod.ModSecondaryOneName} {topMod.ModSecondaryOne}", 
+                    $"{topMod.ModSecondaryOneName} {topMod.ModSecondaryOne}", 
+                    $"{topMod.ModSecondaryOneName} {topMod.ModSecondaryOne}", 
+                    $"{topMod.ModSecondaryOneName} {topMod.ModSecondaryOne}", 
+                }));
+
+            return topMods.ToString();
         }
 
         /// <summary>

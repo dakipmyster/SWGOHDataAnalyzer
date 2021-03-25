@@ -279,7 +279,7 @@ FROM {m_oldSnapshot} WHERE is_ship = 0";
                     unit.HasGearSlotFive = Convert.ToInt32(row["gear_five_equipped"].ToString());
                     unit.HasGearSlotSix = Convert.ToInt32(row["gear_six_equipped"].ToString());
 
-                    var modSqlQuery = $@"SELECT mod_set, mod_primary_name, mod_secondary_one, mod_secondary_one_name, mod_secondary_two, mod_secondary_two_name, mod_secondary_three, mod_secondary_three_name, mod_secondary_four, mod_secondary_four_name, mod_tier, mod_rarity
+                    var modSqlQuery = $@"SELECT id, mod_set, mod_primary_name, mod_secondary_one, mod_secondary_one_name, mod_secondary_two, mod_secondary_two_name, mod_secondary_three, mod_secondary_three_name, mod_secondary_four, mod_secondary_four_name, mod_tier, mod_rarity
 FROM MOD_{m_newSnapshot} WHERE toon_id = @toonid AND player_id = @allycode";
                     var modSqlParams = new List<SQLiteParameter>(){ 
                         new SQLiteParameter() { ParameterName = "@allycode", Value = row["ally_code"].ToString() },
@@ -291,10 +291,13 @@ FROM MOD_{m_newSnapshot} WHERE toon_id = @toonid AND player_id = @allycode";
                     foreach(DataRow modRow in modResults.Rows)
                     {
                         unit.Mods.Add(new Mod()
-                        { 
+                        {
+                            Id = Convert.ToInt32(modRow["id"].ToString()),
+                            UnitName = unit.UnitName,
+                            PlayerName = unit.PlayerName,
                             ModSet = modRow["mod_set"].ToString(),
                             ModPrimaryName = modRow["mod_primary_name"].ToString(),                            
-                            ModRarity = $"{modRow["mod_tier"]}{modRow["mod_rarity"]}",
+                            ModRarity = $"{modRow["mod_rarity"]}{modRow["mod_tier"]}",
                             ModSecondaryOneName = modRow["mod_secondary_one_name"].ToString(),
                             ModSecondaryTwoName = modRow["mod_secondary_two_name"].ToString(),
                             ModSecondaryThreeName = modRow["mod_secondary_three_name"].ToString(),
