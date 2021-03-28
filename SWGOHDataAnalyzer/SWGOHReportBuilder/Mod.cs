@@ -15,6 +15,9 @@ namespace SWGOHReportBuilder
 
         public string ModRarity { get; set; }
 
+        public string ModShape { get; set; }
+
+
         public string ModSecondaryOneName { get; set; }
         public string ModSecondaryTwoName { get; set; }
         public string ModSecondaryThreeName { get; set; }
@@ -24,6 +27,11 @@ namespace SWGOHReportBuilder
         public decimal ModSecondaryTwo { get; set; }
         public decimal ModSecondaryThree { get; set; }
         public decimal ModSecondaryFour { get; set; }
+
+        public string ModSecondaryOneRoll { get; set; }
+        public string ModSecondaryTwoRoll { get; set; }
+        public string ModSecondaryThreeRoll { get; set; }
+        public string ModSecondaryFourRoll { get; set; }
 
         public string PlayerName { get; set; }
         public string UnitName { get; set; }

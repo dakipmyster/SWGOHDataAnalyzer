@@ -27,6 +27,9 @@ namespace SWGOHInterface
         [JsonProperty("rarity")]
         public string Rarity { get; set; }
 
+        [JsonProperty("slot")]
+        public string Slot { get; set; }
+
         [JsonProperty("secondary_stats")]
         public List<ModDetails> SecondaryStats { get; set; }
     }

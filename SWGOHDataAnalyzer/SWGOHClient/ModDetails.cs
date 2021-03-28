@@ -15,5 +15,8 @@ namespace SWGOHInterface
 
         [JsonProperty("display_value")]
         public string Value { get; set; }
+
+        [JsonProperty("roll")]
+        public string Roll { get; set; }
     }
 }

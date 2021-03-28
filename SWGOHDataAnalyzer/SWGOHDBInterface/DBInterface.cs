@@ -121,8 +121,8 @@ VALUES (@guild_name, @player_name, @ally_code, @player_power, @toon, @toon_id, @
 
                             //Yes, the SQL Injection again
                             cmd.CommandText = $@"INSERT INTO MOD_{m_dbTableName}
-(player_id, toon_id, mod_set, mod_primary_name, mod_secondary_one_name, mod_secondary_one, mod_secondary_two_name, mod_secondary_two, mod_secondary_three_name, mod_secondary_three, mod_secondary_four_name, mod_secondary_four, mod_tier, mod_rarity) 
-VALUES (@player_id, @toon_id, @mod_set, @mod_primary_name, @mod_secondary_one_name, @mod_secondary_one, @mod_secondary_two_name, @mod_secondary_two, @mod_secondary_three_name, @mod_secondary_three, @mod_secondary_four_name, @mod_secondary_four, @mod_tier, @mod_rarity);";
+(player_id, toon_id, mod_set, mod_primary_name, mod_secondary_one_name, mod_secondary_one, mod_secondary_two_name, mod_secondary_two, mod_secondary_three_name, mod_secondary_three, mod_secondary_four_name, mod_secondary_four, mod_tier, mod_rarity, mod_slot, mod_secondary_one_roll, mod_secondary_two_roll, mod_secondary_three_roll, mod_secondary_four_roll) 
+VALUES (@player_id, @toon_id, @mod_set, @mod_primary_name, @mod_secondary_one_name, @mod_secondary_one, @mod_secondary_two_name, @mod_secondary_two, @mod_secondary_three_name, @mod_secondary_three, @mod_secondary_four_name, @mod_secondary_four, @mod_tier, @mod_rarity, @mod_slot, @mod_secondary_one_roll, @mod_secondary_two_roll, @mod_secondary_three_roll, @mod_secondary_four_roll);";
 
 
                             cmd.ExecuteNonQuery();
@@ -203,6 +203,33 @@ VALUES (@player_id, @toon_id, @mod_set, @mod_primary_name, @mod_secondary_one_na
                     break;
             }
 
+            switch(modData.Slot)
+            {
+                case "1":
+                    modData.Slot = "Square";
+                    break;
+
+                case "2":
+                    modData.Slot = "Arrow";
+                    break;
+
+                case "3":
+                    modData.Slot = "Diamond";
+                    break;
+
+                case "4":
+                    modData.Slot = "Triangle";
+                    break;
+
+                case "5":
+                    modData.Slot = "Circle";
+                    break;
+
+                case "6":
+                    modData.Slot = "Cross";
+                    break;
+            }
+
             sqlParams.Add(new SQLiteParameter("@player_id", modData.PlayerId));
             sqlParams.Add(new SQLiteParameter("@toon_id", modData.ToonId));
             sqlParams.Add(new SQLiteParameter("@mod_set", modData.Set));
@@ -215,8 +242,13 @@ VALUES (@player_id, @toon_id, @mod_set, @mod_primary_name, @mod_secondary_one_na
             sqlParams.Add(new SQLiteParameter("@mod_secondary_three", modData.SecondaryStats.ElementAtOrDefault(2)?.Value));
             sqlParams.Add(new SQLiteParameter("@mod_secondary_four_name", DetermineModName(modData.SecondaryStats.ElementAtOrDefault(3)?.Value, modData.SecondaryStats.ElementAtOrDefault(3)?.Name)));
             sqlParams.Add(new SQLiteParameter("@mod_secondary_four", modData.SecondaryStats.ElementAtOrDefault(3)?.Value));
+            sqlParams.Add(new SQLiteParameter("@mod_secondary_one_roll", modData.SecondaryStats.ElementAtOrDefault(0)?.Roll));
+            sqlParams.Add(new SQLiteParameter("@mod_secondary_two_roll", modData.SecondaryStats.ElementAtOrDefault(1)?.Roll));
+            sqlParams.Add(new SQLiteParameter("@mod_secondary_three_roll", modData.SecondaryStats.ElementAtOrDefault(2)?.Roll));
+            sqlParams.Add(new SQLiteParameter("@mod_secondary_four_roll", modData.SecondaryStats.ElementAtOrDefault(3)?.Roll));
             sqlParams.Add(new SQLiteParameter("@mod_tier", modData.Tier));
             sqlParams.Add(new SQLiteParameter("@mod_rarity", modData.Rarity));
+            sqlParams.Add(new SQLiteParameter("@mod_slot", modData.Slot));
 
             return sqlParams.ToArray();
         }
@@ -380,7 +412,12 @@ VALUES (@player_id, @toon_id, @mod_set, @mod_primary_name, @mod_secondary_one_na
     mod_secondary_four_name varchar(20),
     mod_secondary_four double,
     mod_tier varchar (2),
-    mod_rarity
+    mod_rarity,
+    mod_slot varchar(20),
+    mod_secondary_one_roll varchar(2),
+    mod_secondary_two_roll varchar(2),
+    mod_secondary_three_roll varchar(2),
+    mod_secondary_four_roll varchar(2)
 )";
 
             using (SQLiteConnection conn = new SQLiteConnection($"Data Source={m_folderPath}\\{m_dbName}"))

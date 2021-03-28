@@ -279,7 +279,8 @@ FROM {m_oldSnapshot} WHERE is_ship = 0";
                     unit.HasGearSlotFive = Convert.ToInt32(row["gear_five_equipped"].ToString());
                     unit.HasGearSlotSix = Convert.ToInt32(row["gear_six_equipped"].ToString());
 
-                    var modSqlQuery = $@"SELECT id, mod_set, mod_primary_name, mod_secondary_one, mod_secondary_one_name, mod_secondary_two, mod_secondary_two_name, mod_secondary_three, mod_secondary_three_name, mod_secondary_four, mod_secondary_four_name, mod_tier, mod_rarity
+                    var modSqlQuery = $@"SELECT id, mod_set, mod_primary_name, mod_secondary_one, mod_secondary_one_name, mod_secondary_two, mod_secondary_two_name, mod_secondary_three, 
+mod_secondary_three_name, mod_secondary_four, mod_secondary_four_name, mod_tier, mod_rarity, mod_slot, mod_secondary_one_roll, mod_secondary_two_roll, mod_secondary_three_roll, mod_secondary_four_roll
 FROM MOD_{m_newSnapshot} WHERE toon_id = @toonid AND player_id = @allycode";
                     var modSqlParams = new List<SQLiteParameter>(){ 
                         new SQLiteParameter() { ParameterName = "@allycode", Value = row["ally_code"].ToString() },
@@ -298,6 +299,7 @@ FROM MOD_{m_newSnapshot} WHERE toon_id = @toonid AND player_id = @allycode";
                             ModSet = modRow["mod_set"].ToString(),
                             ModPrimaryName = modRow["mod_primary_name"].ToString(),                            
                             ModRarity = $"{modRow["mod_rarity"]}{modRow["mod_tier"]}",
+                            ModShape = modRow["mod_slot"].ToString(),
                             ModSecondaryOneName = modRow["mod_secondary_one_name"].ToString(),
                             ModSecondaryTwoName = modRow["mod_secondary_two_name"].ToString(),
                             ModSecondaryThreeName = modRow["mod_secondary_three_name"].ToString(),
@@ -305,7 +307,11 @@ FROM MOD_{m_newSnapshot} WHERE toon_id = @toonid AND player_id = @allycode";
                             ModSecondaryOne = String.IsNullOrEmpty(modRow["mod_secondary_one"].ToString()) ? 0 : Convert.ToDecimal(modRow["mod_secondary_one"].ToString()),
                             ModSecondaryTwo = String.IsNullOrEmpty(modRow["mod_secondary_two"].ToString()) ? 0 : Convert.ToDecimal(modRow["mod_secondary_two"].ToString()),
                             ModSecondaryThree = String.IsNullOrEmpty(modRow["mod_secondary_three"].ToString()) ? 0 : Convert.ToDecimal(modRow["mod_secondary_three"].ToString()),
-                            ModSecondaryFour = String.IsNullOrEmpty(modRow["mod_secondary_four"].ToString()) ? 0 : Convert.ToDecimal(modRow["mod_secondary_four"].ToString())
+                            ModSecondaryFour = String.IsNullOrEmpty(modRow["mod_secondary_four"].ToString()) ? 0 : Convert.ToDecimal(modRow["mod_secondary_four"].ToString()),
+                            ModSecondaryOneRoll = modRow["mod_secondary_one_roll"].ToString(),
+                            ModSecondaryTwoRoll = modRow["mod_secondary_two_roll"].ToString(),
+                            ModSecondaryThreeRoll = modRow["mod_secondary_three_roll"].ToString(),
+                            ModSecondaryFourRoll = modRow["mod_secondary_four_roll"].ToString()
 
                         });
                     }

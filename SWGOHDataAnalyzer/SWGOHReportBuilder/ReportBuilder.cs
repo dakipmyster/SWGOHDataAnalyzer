@@ -1442,69 +1442,69 @@ div {
 
             sb.AppendLine("<div id=\"modstats\">");
             sb.AppendLine(HTMLConstructor.SectionHeader("Top mods per secondary"));
-            sb.AppendLine("Mods is where the geeks hang out. Here is the top X mods per secondary stat in the guild.");
+            sb.AppendLine("Mods is where the geeks hang out. Here is the top 25 mods per secondary stat in the guild.");
             sb.AppendLine("<p/>");
                         
-            var headers = new string[] { "Player Name", "Toon Name", "Tier", "Set", "Primary Stat", "Slot 1", "Slot 2", "Slot 3", "Slot 4" };
+            var headers = new string[] { "Player Name", "Toon Name", "Tier", "Shape/Slot", "Set", "Primary Stat", "Slot 1", "Slot 2", "Slot 3", "Slot 4" };
 
             sb.AppendLine("<b>Speed:</b>");
 
-            sb.AppendLine(HTMLConstructor.AddTable(headers, GetModListForStat("Speed", 20)));
+            sb.AppendLine(HTMLConstructor.AddTable(headers, GetModListForStat("Speed", 25)));
 
             sb.AppendLine("</p style=\"page-break-after: always\">");
             sb.AppendLine("<b>Health:</b>");
 
-            sb.AppendLine(HTMLConstructor.AddTable(headers, GetModListForStat("Health", 20)));
+            sb.AppendLine(HTMLConstructor.AddTable(headers, GetModListForStat("Health", 25)));
 
             sb.AppendLine("</p style=\"page-break-after: always\">");
             sb.AppendLine("<b>Health %:</b>");
 
-            sb.AppendLine(HTMLConstructor.AddTable(headers, GetModListForStat("Health %", 20)));
+            sb.AppendLine(HTMLConstructor.AddTable(headers, GetModListForStat("Health %", 25)));
 
             sb.AppendLine("</p style=\"page-break-after: always\">");
             sb.AppendLine("<b>Protection:</b>");
 
-            sb.AppendLine(HTMLConstructor.AddTable(headers, GetModListForStat("Protection", 20)));
+            sb.AppendLine(HTMLConstructor.AddTable(headers, GetModListForStat("Protection", 25)));
 
             sb.AppendLine("</p style=\"page-break-after: always\">");
             sb.AppendLine("<b>Protection %:</b>");
 
-            sb.AppendLine(HTMLConstructor.AddTable(headers, GetModListForStat("Protection %", 20)));
+            sb.AppendLine(HTMLConstructor.AddTable(headers, GetModListForStat("Protection %", 25)));
 
             sb.AppendLine("</p style=\"page-break-after: always\">");
             sb.AppendLine("<b>Defense:</b>");
 
-            sb.AppendLine(HTMLConstructor.AddTable(headers, GetModListForStat("Defense", 20)));
+            sb.AppendLine(HTMLConstructor.AddTable(headers, GetModListForStat("Defense", 25)));
 
             sb.AppendLine("</p style=\"page-break-after: always\">");
             sb.AppendLine("<b>Defense %:</b>");
 
-            sb.AppendLine(HTMLConstructor.AddTable(headers, GetModListForStat("Defense %", 20)));
+            sb.AppendLine(HTMLConstructor.AddTable(headers, GetModListForStat("Defense %", 25)));
 
             sb.AppendLine("</p style=\"page-break-after: always\">");
             sb.AppendLine("<b>Offense:</b>");
 
-            sb.AppendLine(HTMLConstructor.AddTable(headers, GetModListForStat("Offense", 20)));
+            sb.AppendLine(HTMLConstructor.AddTable(headers, GetModListForStat("Offense", 25)));
 
             sb.AppendLine("</p style=\"page-break-after: always\">");
             sb.AppendLine("<b>Offense %:</b>");
 
-            sb.AppendLine(HTMLConstructor.AddTable(headers, GetModListForStat("Offense %", 20)));
+            sb.AppendLine(HTMLConstructor.AddTable(headers, GetModListForStat("Offense %", 25)));
 
             sb.AppendLine("</p style=\"page-break-after: always\">");
             sb.AppendLine("<b>Critical Chance:</b>");
 
-            sb.AppendLine(HTMLConstructor.AddTable(headers, GetModListForStat("Critical Chance", 20)));
+            sb.AppendLine(HTMLConstructor.AddTable(headers, GetModListForStat("Critical Chance", 25)));
 
             sb.AppendLine("</p style=\"page-break-after: always\">");
             sb.AppendLine("<b>Tenacity:</b>");
 
-            sb.AppendLine(HTMLConstructor.AddTable(headers, GetModListForStat("Tenacity", 20)));
+            sb.AppendLine(HTMLConstructor.AddTable(headers, GetModListForStat("Tenacity", 25)));
 
             sb.AppendLine("</p style=\"page-break-after: always\">");
             sb.AppendLine("<b>Potency:</b>");
 
-            sb.AppendLine(HTMLConstructor.AddTable(headers, GetModListForStat("Potency", 20)));
+            sb.AppendLine(HTMLConstructor.AddTable(headers, GetModListForStat("Potency", 25)));
 
             sb.AppendLine("<p/></div>");
 
@@ -1683,12 +1683,13 @@ div {
                     topMod.PlayerName, 
                     topMod.UnitName, 
                     topMod.ModRarity, 
+                    topMod.ModShape,
                     topMod.ModSet, 
                     topMod.ModPrimaryName, 
-                    $"{topMod.ModSecondaryOneName} {topMod.ModSecondaryOne}", 
-                    $"{topMod.ModSecondaryOneName} {topMod.ModSecondaryOne}", 
-                    $"{topMod.ModSecondaryOneName} {topMod.ModSecondaryOne}", 
-                    $"{topMod.ModSecondaryOneName} {topMod.ModSecondaryOne}", 
+                    topMod.ModSecondaryOneName == stat ? $"<b>({topMod.ModSecondaryOneRoll}) {topMod.ModSecondaryOneName} {topMod.ModSecondaryOne}</b>" : $"({topMod.ModSecondaryOneRoll}) {topMod.ModSecondaryOneName} {topMod.ModSecondaryOne}",
+                    topMod.ModSecondaryTwoName == stat ? $"<b>({topMod.ModSecondaryTwoRoll}) {topMod.ModSecondaryTwoName} {topMod.ModSecondaryTwo}</b>" : $"({topMod.ModSecondaryTwoRoll}) {topMod.ModSecondaryTwoName} {topMod.ModSecondaryTwo}",
+                    topMod.ModSecondaryThreeName == stat ? $"<b>({topMod.ModSecondaryThreeRoll}) {topMod.ModSecondaryThreeName} {topMod.ModSecondaryThree}</b>" : $"({topMod.ModSecondaryThreeRoll}) {topMod.ModSecondaryThreeName} {topMod.ModSecondaryThree}",
+                    topMod.ModSecondaryFourName == stat ? $"<b>({topMod.ModSecondaryFourRoll}) {topMod.ModSecondaryFourName} {topMod.ModSecondaryFour}</b>" : $"({topMod.ModSecondaryFourRoll}) {topMod.ModSecondaryFourName} {topMod.ModSecondaryFour}",
                 }));
 
             return topMods.ToString();

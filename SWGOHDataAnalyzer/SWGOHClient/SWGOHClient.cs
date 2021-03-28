@@ -51,24 +51,32 @@ namespace SWGOHInterface
 
             await Guild.Players.ParallelForEachAsync(async player =>
             {
-                var playerMod = new PlayerMod();
-                var modHttpClient = new HttpClient();
-                var modResponse = await modHttpClient.GetAsync($"https://swgoh.gg/api/players/{player.PlayerData.AllyCode}/mods");
-
-                if (modResponse.StatusCode == HttpStatusCode.OK)
-                    playerMod = JsonConvert.DeserializeObject<PlayerMod>(await modResponse.Content.ReadAsStringAsync());
-
-                if(playerMod.Mods?.Count > 0)
+                try
                 {
-                    foreach(var unit in player.PlayerUnits)
+                    var playerMod = new PlayerMod();
+                    var modHttpClient = new HttpClient();
+                    var modResponse = await modHttpClient.GetAsync($"https://swgoh.gg/api/players/{player.PlayerData.AllyCode}/mods");
+
+                    if (modResponse.StatusCode == HttpStatusCode.OK)
+                        playerMod = JsonConvert.DeserializeObject<PlayerMod>(await modResponse.Content.ReadAsStringAsync());
+
+                    if (playerMod.Mods?.Count > 0)
                     {
-                        unit.UnitData.UnitMods = new List<Mod>();
-                        unit.UnitData.UnitMods.AddRange(playerMod.Mods.Where(a => a.ToonId == unit.UnitData.UnitId));
-                        unit.UnitData.UnitMods.ForEach(a => a.PlayerId = player.PlayerData.AllyCode);
+                        foreach (var unit in player.PlayerUnits)
+                        {
+                            unit.UnitData.UnitMods = new List<Mod>();
+                            unit.UnitData.UnitMods.AddRange(playerMod.Mods.Where(a => a.ToonId == unit.UnitData.UnitId));
+                            unit.UnitData.UnitMods.ForEach(a => a.PlayerId = player.PlayerData.AllyCode);
+                        }
                     }
                 }
-                
+                catch(Exception ex)
+                {
+
+                }
+
             }, maxDegreeOfParallelism: Environment.ProcessorCount);
+            //}, maxDegreeOfParallelism: 1);
 
             ResponseCode = response.StatusCode;
         }
