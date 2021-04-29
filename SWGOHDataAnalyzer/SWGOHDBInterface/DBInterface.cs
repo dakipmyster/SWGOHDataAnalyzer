@@ -100,7 +100,7 @@ namespace SWGOHDBInterface
                             {
                                 cmd.Parameters.AddRange(CollectSQLParams(player.PlayerData, guild.GuildData.GuildName, unit));
 
-                                //Yes, the SQL Injection again
+                                //TODO: Yes, the SQL Injection again, should move to non relational database to avoid this and increase performance
                                 cmd.CommandText = $@"INSERT INTO {m_dbTableName}
 (guild_name, player_name, ally_code, player_power, toon, toon_id, toon_power, toon_level, is_ship, gear_level, rarity, health, protection, speed, p_offense, s_offense, p_defense, s_defense, p_crit_chance, s_crit_chance, potency, tenacity, total_zetas, zeta_one, zeta_two, zeta_three, zeta_four, zeta_five, zeta_six, pull_date, relic_tier, gear_one_equipped, gear_two_equipped, gear_three_equipped, gear_four_equipped, gear_five_equipped, gear_six_equipped) 
 VALUES (@guild_name, @player_name, @ally_code, @player_power, @toon, @toon_id, @toon_power, @toon_level, @is_ship, @gear_level, @rarity, @health, @protection, @speed, @p_offense, @s_offense, @p_defense, @s_defense, @p_crit_chance, @s_crit_chance, @potency, @tenacity, @total_zetas, @zeta_one, @zeta_two, @zeta_three, @zeta_four, @zeta_five, @zeta_six, @pull_date, @relic_tier, @gear_one_equipped, @gear_two_equipped, @gear_three_equipped, @gear_four_equipped, @gear_five_equipped, @gear_six_equipped) ;";
@@ -119,7 +119,7 @@ VALUES (@guild_name, @player_name, @ally_code, @player_power, @toon, @toon_id, @
                         {
                             cmd.Parameters.AddRange(CollectSQLParamsForMods(unitMod));
 
-                            //Yes, the SQL Injection again
+                            //TODO: Yes, the SQL Injection again, should move to non relational database to avoid this and increase performance
                             cmd.CommandText = $@"INSERT INTO MOD_{m_dbTableName}
 (player_id, toon_id, mod_set, mod_primary_name, mod_secondary_one_name, mod_secondary_one, mod_secondary_two_name, mod_secondary_two, mod_secondary_three_name, mod_secondary_three, mod_secondary_four_name, mod_secondary_four, mod_tier, mod_rarity, mod_slot, mod_secondary_one_roll, mod_secondary_two_roll, mod_secondary_three_roll, mod_secondary_four_roll) 
 VALUES (@player_id, @toon_id, @mod_set, @mod_primary_name, @mod_secondary_one_name, @mod_secondary_one, @mod_secondary_two_name, @mod_secondary_two, @mod_secondary_three_name, @mod_secondary_three, @mod_secondary_four_name, @mod_secondary_four, @mod_tier, @mod_rarity, @mod_slot, @mod_secondary_one_roll, @mod_secondary_two_roll, @mod_secondary_three_roll, @mod_secondary_four_roll);";
@@ -334,8 +334,8 @@ VALUES (@player_id, @toon_id, @mod_set, @mod_primary_name, @mod_secondary_one_na
         /// Creates the new table based on the snapshot name the user wanted
         /// </summary>
         private void CreateTable()
-        {            
-            //Yes, I'm opening it to SQL Injection. Bite me. Unless future plans for this project means it is stored in a cloud based service you can only hurt yourself.
+        {
+            //TODO: Yes, the SQL Injection again, should move to non relational database to avoid this and increase performance
             string sql = $@"CREATE TABLE {m_dbTableName}
 (
     ID INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -395,7 +395,7 @@ VALUES (@player_id, @toon_id, @mod_set, @mod_primary_name, @mod_secondary_one_na
         /// </summary>
         private void CreateModTable()
         {
-            //Yes, I'm opening it to SQL Injection. Bite me. Unless future plans for this project means it is stored in a cloud based service you can only hurt yourself.
+            //TODO: Yes, the SQL Injection again, should move to non relational database to avoid this and increase performance
             string sql = $@"CREATE TABLE MOD_{m_dbTableName}
 (
     ID INTEGER PRIMARY KEY AUTOINCREMENT,
