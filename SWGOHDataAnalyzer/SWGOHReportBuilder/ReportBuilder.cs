@@ -1032,8 +1032,6 @@ div {
             string echo = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "CT-21-0408 \"Echo\""), 94, out progressList, progressList);
             string arc = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "ARC Trooper"), 94, out progressList, progressList);
 
-            m_glCharacterProgressList.FirstOrDefault(a => a.PlayerName == playerName).ReyOverallProgress = Math.Round(progressList.Average(), 2).ToString();
-
             return HTMLConstructor.AddTableData(new string[] { playerName, shaak, rex, fives, echo, arc });
         }
 
