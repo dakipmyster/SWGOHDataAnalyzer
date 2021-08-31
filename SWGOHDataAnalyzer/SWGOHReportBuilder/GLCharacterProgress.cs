@@ -13,6 +13,7 @@ namespace SWGOHReportBuilder
         public string GLLukeOverallProgress { get; set; }
         public string GLPalpOverallProgress { get; set; }
         public string GLKenobiProgress { get; set; }
+        public string GLVaderProgress { get; set; }
         public string PlayerName { get; set; }
     }
 }
