@@ -851,7 +851,7 @@ div {
             sb.AppendLine("</p>");
             sb.AppendLine("<b>Lord Vader:</b>");
 
-            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Hunt", "Tech", "Wrek", "Tusk", "Padme", "Embo", "Echo", "BB Echo", "CD", "Zam", "GMT", "ARC", "GAS", "Nute", "Y Wing" }, kenobi.ToString()));
+            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Hunt", "Tech", "Wrek", "Tusk", "Padme", "Embo", "Echo", "BB Echo", "CD", "Zam", "GMT", "ARC", "GAS", "Nute", "Y Wing" }, lv.ToString()));
 
             sb.AppendLine("</p>");
             sb.AppendLine("<b>Overall Progress:</b>");
@@ -1137,6 +1137,9 @@ div {
                     break;
                 case 8:
                     relicPoints = 36;
+                    break;
+                case 9:
+                    relicPoints = 45;
                     break;
             }
 
