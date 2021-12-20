@@ -38,6 +38,9 @@ namespace SWGOHInterface
         [JsonProperty("zeta_abilities")]
         public List<string> AppliedZetas { get; set; }
 
+        [JsonProperty("omicron_abilities")]
+        public List<string> AppliedOmicrons { get; set; }
+
         public List<Mod> UnitMods { get; set; }
     }
 }

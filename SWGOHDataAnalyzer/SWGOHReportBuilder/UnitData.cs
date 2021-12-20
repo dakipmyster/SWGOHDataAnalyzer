@@ -22,6 +22,10 @@ namespace SWGOHReportBuilder
 
         public List<string> NewZetas { get; set; }
 
+        public List<string> OldOmicrons { get; set; }
+
+        public List<string> NewOmicrons { get; set; }
+
         public int OldPower { get; set; }
 
         public int NewPower { get; set; }
@@ -76,6 +80,8 @@ namespace SWGOHReportBuilder
         {
             OldZetas = new List<string>();
             NewZetas = new List<string>();
+            OldOmicrons = new List<string>();
+            NewOmicrons = new List<string>();
             Mods = new List<Mod>();
         }
     }

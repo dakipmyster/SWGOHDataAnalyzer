@@ -102,8 +102,8 @@ namespace SWGOHDBInterface
 
                                 //TODO: Yes, the SQL Injection again, should move to non relational database to avoid this and increase performance
                                 cmd.CommandText = $@"INSERT INTO {m_dbTableName}
-(guild_name, player_name, ally_code, player_power, toon, toon_id, toon_power, toon_level, is_ship, gear_level, rarity, health, protection, speed, p_offense, s_offense, p_defense, s_defense, p_crit_chance, s_crit_chance, potency, tenacity, total_zetas, zeta_one, zeta_two, zeta_three, zeta_four, zeta_five, zeta_six, pull_date, relic_tier, gear_one_equipped, gear_two_equipped, gear_three_equipped, gear_four_equipped, gear_five_equipped, gear_six_equipped) 
-VALUES (@guild_name, @player_name, @ally_code, @player_power, @toon, @toon_id, @toon_power, @toon_level, @is_ship, @gear_level, @rarity, @health, @protection, @speed, @p_offense, @s_offense, @p_defense, @s_defense, @p_crit_chance, @s_crit_chance, @potency, @tenacity, @total_zetas, @zeta_one, @zeta_two, @zeta_three, @zeta_four, @zeta_five, @zeta_six, @pull_date, @relic_tier, @gear_one_equipped, @gear_two_equipped, @gear_three_equipped, @gear_four_equipped, @gear_five_equipped, @gear_six_equipped) ;";
+(guild_name, player_name, ally_code, player_power, toon, toon_id, toon_power, toon_level, is_ship, gear_level, rarity, health, protection, speed, p_offense, s_offense, p_defense, s_defense, p_crit_chance, s_crit_chance, potency, tenacity, total_zetas, zeta_one, zeta_two, zeta_three, zeta_four, zeta_five, zeta_six, total_omicrons, omicron_one, omicron_two, omicron_three, omicron_four, omicron_five, omicron_six, pull_date, relic_tier, gear_one_equipped, gear_two_equipped, gear_three_equipped, gear_four_equipped, gear_five_equipped, gear_six_equipped) 
+VALUES (@guild_name, @player_name, @ally_code, @player_power, @toon, @toon_id, @toon_power, @toon_level, @is_ship, @gear_level, @rarity, @health, @protection, @speed, @p_offense, @s_offense, @p_defense, @s_defense, @p_crit_chance, @s_crit_chance, @potency, @tenacity, @total_zetas, @zeta_one, @zeta_two, @zeta_three, @zeta_four, @zeta_five, @zeta_six, @total_omicrons, @omicron_one, @omicron_two, @omicron_three, @omicron_four, @omicron_five, @omicron_six, @pull_date, @relic_tier, @gear_one_equipped, @gear_two_equipped, @gear_three_equipped, @gear_four_equipped, @gear_five_equipped, @gear_six_equipped) ;";
 
 
                                 cmd.ExecuteNonQuery();
@@ -280,12 +280,21 @@ VALUES (@player_id, @toon_id, @mod_set, @mod_primary_name, @mod_secondary_one_na
 
             int isShip = unit.UnitData.Gear.Count > 0 ? 0 : 1;
             List<string> zetas = new List<string>();
+            List<string> omicrons = new List<string>();
 
             foreach (string zeta in unit.UnitData.AppliedZetas)
             {
                 if (unit.UnitData.UnitAbilities.FirstOrDefault(a => a.AbilityId == zeta) != null)
                 {
                     zetas.Add(unit.UnitData.UnitAbilities.FirstOrDefault(a => a.AbilityId == zeta).AbilityName);
+                }
+            }
+
+            foreach (string omicron in unit.UnitData.AppliedZetas)
+            {
+                if (unit.UnitData.UnitAbilities.FirstOrDefault(a => a.AbilityId == omicron) != null)
+                {
+                    omicrons.Add(unit.UnitData.UnitAbilities.FirstOrDefault(a => a.AbilityId == omicron).AbilityName);
                 }
             }
 
@@ -318,6 +327,13 @@ VALUES (@player_id, @toon_id, @mod_set, @mod_primary_name, @mod_secondary_one_na
             sqlParams.Add(new SQLiteParameter("@zeta_four", zetas.ElementAtOrDefault(3)));
             sqlParams.Add(new SQLiteParameter("@zeta_five", zetas.ElementAtOrDefault(4)));
             sqlParams.Add(new SQLiteParameter("@zeta_six", zetas.ElementAtOrDefault(5)));
+            sqlParams.Add(new SQLiteParameter("@total_omicrons", unit.UnitData.AppliedOmicrons.Count));
+            sqlParams.Add(new SQLiteParameter("@omicron_one", omicrons.ElementAtOrDefault(0)));
+            sqlParams.Add(new SQLiteParameter("@omicron_two", omicrons.ElementAtOrDefault(1)));
+            sqlParams.Add(new SQLiteParameter("@omicron_three", omicrons.ElementAtOrDefault(2)));
+            sqlParams.Add(new SQLiteParameter("@omicron_four", omicrons.ElementAtOrDefault(3)));
+            sqlParams.Add(new SQLiteParameter("@omicron_five", omicrons.ElementAtOrDefault(4)));
+            sqlParams.Add(new SQLiteParameter("@omicron_six", omicrons.ElementAtOrDefault(5)));
             sqlParams.Add(new SQLiteParameter("@pull_date", DateTime.Now));
             sqlParams.Add(new SQLiteParameter("@relic_tier", unit.UnitData.RelicTier >= 3 ? unit.UnitData.RelicTier - 2 : 0));
             sqlParams.Add(new SQLiteParameter("@gear_one_equipped", unit.UnitData.Gear.Count > 0 && unit.UnitData.Gear.FirstOrDefault(a => a.SlotPosition == 0).IsObtained ? 1 : 0));
@@ -368,6 +384,13 @@ VALUES (@player_id, @toon_id, @mod_set, @mod_primary_name, @mod_secondary_one_na
     zeta_four varchar(50),
     zeta_five varchar(50),
     zeta_six varchar(50),
+    total_omicrons int,
+    omicron_one varchar(50),
+    omicron_two varchar(50),
+    omicron_three varchar(50),
+    omicron_four varchar(50),
+    omicron_five varchar(50),
+    omicron_six varchar(50),
     pull_date date,
     relic_tier int,
     gear_one_equipped int,

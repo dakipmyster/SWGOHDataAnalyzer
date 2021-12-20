@@ -196,16 +196,16 @@ FROM {m_oldSnapshot} WHERE is_ship = 1";
         internal async Task CollectUnitDataFromDB()
         {
             string sqlQuery = $@"SELECT player_name, toon, rarity, player_power, gear_level, toon_power, toon_level, health, protection, speed, p_offense, toon_id, ally_code,
-s_offense, p_defense, s_defense, p_crit_chance, s_crit_chance, potency, tenacity, zeta_one, zeta_two, zeta_three, zeta_four, zeta_five, zeta_six, relic_tier, gear_one_equipped, gear_two_equipped, gear_three_equipped, gear_four_equipped, gear_five_equipped, gear_six_equipped, 'New' as 'State'
+s_offense, p_defense, s_defense, p_crit_chance, s_crit_chance, potency, tenacity, zeta_one, zeta_two, zeta_three, zeta_four, zeta_five, zeta_six, total_omicrons, omicron_one, omicron_two, omicron_three, omicron_four, omicron_five, omicron_six, relic_tier, gear_one_equipped, gear_two_equipped, gear_three_equipped, gear_four_equipped, gear_five_equipped, gear_six_equipped, 'New' as 'State'
 FROM {m_newSnapshot} WHERE is_ship = 0
 UNION
 SELECT player_name, toon, rarity, player_power, gear_level, toon_power, toon_level, health, protection, speed, p_offense, toon_id, ally_code,
-s_offense, p_defense, s_defense, p_crit_chance, s_crit_chance, potency, tenacity, zeta_one, zeta_two, zeta_three, zeta_four, zeta_five, zeta_six, relic_tier, gear_one_equipped, gear_two_equipped, gear_three_equipped, gear_four_equipped, gear_five_equipped, gear_six_equipped, 'Old' as 'State'
+s_offense, p_defense, s_defense, p_crit_chance, s_crit_chance, potency, tenacity, zeta_one, zeta_two, zeta_three, zeta_four, zeta_five, zeta_six, total_omicrons, omicron_one, omicron_two, omicron_three, omicron_four, omicron_five, omicron_six, relic_tier, gear_one_equipped, gear_two_equipped, gear_three_equipped, gear_four_equipped, gear_five_equipped, gear_six_equipped, 'Old' as 'State'
 FROM {m_oldSnapshot} WHERE is_ship = 0";
 
             DataTable results = await m_dbInterface.ExecuteQueryAndReturnResults(sqlQuery, null);
 
-            foreach (DataRow row in results.Rows)
+            Parallel.ForEach(results.Rows, new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount }, (row) =>
             {
                 string playerName = row["player_name"].ToString();
                 string state = row["State"].ToString();
@@ -236,6 +236,25 @@ FROM {m_oldSnapshot} WHERE is_ship = 0";
                 if (!String.IsNullOrEmpty(row["zeta_six"].ToString()))
                     zetas.Add(row["zeta_six"].ToString());
 
+                List<string> omicrons = new List<string>();
+                if (!String.IsNullOrEmpty(row["omicron_one"].ToString()))
+                    omicrons.Add(row["omicron_one"].ToString());
+
+                if (!String.IsNullOrEmpty(row["omicron_two"].ToString()))
+                    omicrons.Add(row["omicron_two"].ToString());
+
+                if (!String.IsNullOrEmpty(row["omicron_three"].ToString()))
+                    omicrons.Add(row["omicron_three"].ToString());
+
+                if (!String.IsNullOrEmpty(row["omicron_four"].ToString()))
+                    omicrons.Add(row["omicron_four"].ToString());
+
+                if (!String.IsNullOrEmpty(row["omicron_five"].ToString()))
+                    omicrons.Add(row["omicron_five"].ToString());
+
+                if (!String.IsNullOrEmpty(row["omicron_six"].ToString()))
+                    omicrons.Add(row["omicron_six"].ToString());
+
                 UnitData unit;
 
                 if (UnitData.Exists(a => a.PlayerName == playerName && a.UnitName == unitName))
@@ -247,8 +266,9 @@ FROM {m_oldSnapshot} WHERE is_ship = 0";
                         PlayerName = playerName,
                         UnitName = unitName
                     };
-                    
-                    UnitData.Add(unit);
+
+                    lock (UnitData)
+                        UnitData.Add(unit);
                 }
 
                 if (state == "New")
@@ -256,6 +276,7 @@ FROM {m_oldSnapshot} WHERE is_ship = 0";
                     unit.NewRarity = rarity;
                     unit.NewGalaticPower = playerPower;
                     unit.NewZetas = zetas;
+                    unit.NewOmicrons = omicrons;
                     unit.NewGearLevel = gearLevel;
                     unit.NewPower = unitPower;
                     unit.NewLevel = unitLevel;
@@ -282,14 +303,14 @@ FROM {m_oldSnapshot} WHERE is_ship = 0";
                     var modSqlQuery = $@"SELECT id, mod_set, mod_primary_name, mod_secondary_one, mod_secondary_one_name, mod_secondary_two, mod_secondary_two_name, mod_secondary_three, 
 mod_secondary_three_name, mod_secondary_four, mod_secondary_four_name, mod_tier, mod_rarity, mod_slot, mod_secondary_one_roll, mod_secondary_two_roll, mod_secondary_three_roll, mod_secondary_four_roll
 FROM MOD_{m_newSnapshot} WHERE toon_id = @toonid AND player_id = @allycode";
-                    var modSqlParams = new List<SQLiteParameter>(){ 
+                    var modSqlParams = new List<SQLiteParameter>(){
                         new SQLiteParameter() { ParameterName = "@allycode", Value = row["ally_code"].ToString() },
                         new SQLiteParameter() { ParameterName = "@toonid", Value = row["toon_id"].ToString() }
                     };
 
                     DataTable modResults = await m_dbInterface.ExecuteQueryAndReturnResults(modSqlQuery, modSqlParams.ToArray());
 
-                    foreach(DataRow modRow in modResults.Rows)
+                    foreach (DataRow modRow in modResults.Rows)
                     {
                         unit.Mods.Add(new Mod()
                         {
@@ -297,7 +318,7 @@ FROM MOD_{m_newSnapshot} WHERE toon_id = @toonid AND player_id = @allycode";
                             UnitName = unit.UnitName,
                             PlayerName = unit.PlayerName,
                             ModSet = modRow["mod_set"].ToString(),
-                            ModPrimaryName = modRow["mod_primary_name"].ToString(),                            
+                            ModPrimaryName = modRow["mod_primary_name"].ToString(),
                             ModRarity = $"{modRow["mod_rarity"]}{modRow["mod_tier"]}",
                             ModShape = modRow["mod_slot"].ToString(),
                             ModSecondaryOneName = modRow["mod_secondary_one_name"].ToString(),
@@ -321,12 +342,13 @@ FROM MOD_{m_newSnapshot} WHERE toon_id = @toonid AND player_id = @allycode";
                     unit.OldRarity = rarity;
                     unit.OldGalaticPower = playerPower;
                     unit.OldZetas = zetas;
+                    unit.OldOmicrons = omicrons;
                     unit.OldGearLevel = gearLevel;
                     unit.OldPower = unitPower;
                     unit.OldLevel = unitLevel;
                     unit.OldRelicTier = relicTier;
                 }
-            }
+            });
             
             foreach (UnitData unit in UnitData)
                 unit.PowerDifference = unit.NewPower - unit.OldPower;

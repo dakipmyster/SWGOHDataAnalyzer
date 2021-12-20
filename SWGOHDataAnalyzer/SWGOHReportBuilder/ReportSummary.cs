@@ -10,6 +10,8 @@ namespace SWGOHReportBuilder
     {
         public int TotalZetasApplied { get; set; }
 
+        public int TotalOmicronsApplied { get; set; }
+
         public int TotalRelicLevelsIncreased { get; set; }
 
         public int TotalGearThirteenToons { get; set; }

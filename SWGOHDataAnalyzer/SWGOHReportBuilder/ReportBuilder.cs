@@ -26,6 +26,7 @@ namespace SWGOHReportBuilder
         string m_gearThirteenToons;
         string m_relicTiers;
         string m_zetasApplied;
+        string m_omicronsApplied;
         string m_journeyOrLegendaryUnlock;
         string m_journeyPrepared;
         //string m_goldMembers;
@@ -159,6 +160,7 @@ div {
                 tasks.Add(Task.Run(() => GearTwelveToons()));
                 tasks.Add(Task.Run(() => GearThirteenToons()));
                 tasks.Add(Task.Run(() => ZetasApplied()));
+                tasks.Add(Task.Run(() => OmicronsApplied()));
                 tasks.Add(Task.Run(() => PlayerGPDifferences()));
                 tasks.Add(Task.Run(() => RelicTierDifferences()));                
             }
@@ -196,6 +198,7 @@ div {
                 pdfString.AppendLine(m_gearThirteenToons);
                 pdfString.AppendLine(m_relicTiers);
                 pdfString.AppendLine(m_zetasApplied);
+                pdfString.AppendLine(m_omicronsApplied);
                 pdfString.AppendLine(m_journeyOrLegendaryUnlock);
                 pdfString.AppendLine(m_modStats);
                 pdfString.AppendLine(m_guildFocusProgress);
@@ -264,6 +267,7 @@ div {
                 sb.AppendLine("<li><a href=\"#gearthirteen\">Gear 13 Toons</a></li>");
                 sb.AppendLine("<li><a href=\"#relictiers\">Relic Tier Upgrades</a></li>");
                 sb.AppendLine("<li><a href=\"#zetas\">Zetas Applied</a></li>");
+                sb.AppendLine("<li><a href=\"#omicrons\">Omicrons Applied</a></li>");
                 sb.AppendLine("<li><a href=\"#toonunlock\">Journey/Legendary/Galactic Legend Unlocks</a></li>");
                 sb.AppendLine("<li><a href=\"#modstats\">Top mods per secondary stat</a></li>");
                 sb.AppendLine("<li><a href=\"#guildfocus\">Guild Focus Teams</a></li>");
@@ -291,6 +295,8 @@ div {
                 sb.AppendLine($"Sum of Relic Levels Applied: {m_reportSummary.TotalRelicLevelsIncreased}");
                 sb.AppendLine("<p/>");
                 sb.AppendLine($"Sum of Zeta Abilites Unlocked: {m_reportSummary.TotalZetasApplied}");
+                sb.AppendLine("</div>");
+                sb.AppendLine($"Sum of Omicron Abilites Unlocked: {m_reportSummary.TotalOmicronsApplied}");
                 sb.AppendLine("</div>");
 
             }
@@ -1264,6 +1270,39 @@ div {
             sb.AppendLine("<p/></div>");
                         
             m_zetasApplied = sb.ToString();
+
+            await Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// Applied Omicrons to various toons
+        /// </summary>
+        /// <returns></returns>
+        private async Task OmicronsApplied()
+        {
+            StringBuilder sb = new StringBuilder();
+
+            sb.AppendLine("<div id=\"omicrons\">");
+            sb.AppendLine(HTMLConstructor.SectionHeader("Omicrons Applied"));
+            sb.AppendLine("This section highlights all of the toons that have been given omicrons since the last snapshot.");
+            sb.AppendLine("</p>");
+
+            StringBuilder omicrons = new StringBuilder();
+
+            foreach (UnitData unit in m_filteredUnitData.OrderBy(a => a.PlayerName))
+            {
+                if (unit.OldOmicrons.Count < unit.NewOmicrons.Count)
+                {
+                    omicrons.AppendLine(HTMLConstructor.AddTableData(new string[] { unit.PlayerName, unit.UnitName, string.Join(",", unit.NewOmicrons.Except(unit.OldOmicrons).ToArray()) }));
+                    m_reportSummary.TotalOmicronsApplied++;
+                }
+            }
+
+            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Toon", "Omicrons" }, omicrons.ToString()));
+
+            sb.AppendLine("<p/></div>");
+
+            m_omicronsApplied = sb.ToString();
 
             await Task.CompletedTask;
         }
