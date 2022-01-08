@@ -205,7 +205,7 @@ FROM {m_oldSnapshot} WHERE is_ship = 0";
 
             DataTable results = await m_dbInterface.ExecuteQueryAndReturnResults(sqlQuery, null);
 
-            Parallel.ForEach(results.Rows, new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount }, (row) =>
+            Parallel.ForEach(results.Rows.OfType<DataRow>().AsEnumerable(), new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount }, (row) =>
             {
                 string playerName = row["player_name"].ToString();
                 string state = row["State"].ToString();
@@ -257,18 +257,21 @@ FROM {m_oldSnapshot} WHERE is_ship = 0";
 
                 UnitData unit;
 
-                if (UnitData.Exists(a => a.PlayerName == playerName && a.UnitName == unitName))
-                    unit = UnitData.First(a => a.PlayerName == playerName && a.UnitName == unitName);
-                else
+                lock (UnitData)
                 {
-                    unit = new UnitData()
+                    if (UnitData.Exists(a => a.PlayerName == playerName && a.UnitName == unitName))
+                        unit = UnitData.First(a => a.PlayerName == playerName && a.UnitName == unitName);
+                    else
                     {
-                        PlayerName = playerName,
-                        UnitName = unitName
-                    };
+                        unit = new UnitData()
+                        {
+                            PlayerName = playerName,
+                            UnitName = unitName
+                        };
 
-                    lock (UnitData)
+
                         UnitData.Add(unit);
+                    }
                 }
 
                 if (state == "New")
@@ -308,7 +311,7 @@ FROM MOD_{m_newSnapshot} WHERE toon_id = @toonid AND player_id = @allycode";
                         new SQLiteParameter() { ParameterName = "@toonid", Value = row["toon_id"].ToString() }
                     };
 
-                    DataTable modResults = await m_dbInterface.ExecuteQueryAndReturnResults(modSqlQuery, modSqlParams.ToArray());
+                    DataTable modResults = m_dbInterface.ExecuteQueryAndReturnResults(modSqlQuery, modSqlParams.ToArray()).GetAwaiter().GetResult();
 
                     foreach (DataRow modRow in modResults.Rows)
                     {

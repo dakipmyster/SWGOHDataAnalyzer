@@ -290,7 +290,7 @@ VALUES (@player_id, @toon_id, @mod_set, @mod_primary_name, @mod_secondary_one_na
                 }
             }
 
-            foreach (string omicron in unit.UnitData.AppliedZetas)
+            foreach (string omicron in unit.UnitData.AppliedOmicrons)
             {
                 if (unit.UnitData.UnitAbilities.FirstOrDefault(a => a.AbilityId == omicron) != null)
                 {
