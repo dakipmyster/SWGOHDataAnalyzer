@@ -809,6 +809,8 @@ div {
             StringBuilder palp = new StringBuilder();
             StringBuilder kenobi = new StringBuilder();
             StringBuilder lv = new StringBuilder();
+            StringBuilder exec = new StringBuilder();
+            StringBuilder sk = new StringBuilder();
             StringBuilder overall = new StringBuilder();
             m_glCharacterProgressList = new List<GLCharacterProgress>();
 
@@ -826,6 +828,8 @@ div {
                 palp.AppendLine(GetGLPalpProgressForPlayer(playerName));
                 kenobi.AppendLine(GetGLKenobiProgressForPlayer(playerName));
                 lv.AppendLine(GetGLVaderProgressForPlayer(playerName));
+                exec.AppendLine(GetExecProgressForPlayer(playerName));
+                sk.AppendLine(GetStarKillerProgressForPlayer(playerName));
                 overall.AppendLine(GetOverallGLProgressForPlayer(playerName));
             }
 
@@ -860,9 +864,19 @@ div {
             sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Hunt", "Tech", "Wrek", "Tusk", "Padme", "Embo", "Echo", "BB Echo", "CD", "Zam", "GMT", "ARC", "GAS", "Nute", "Y Wing" }, lv.ToString()));
 
             sb.AppendLine("</p>");
+            sb.AppendLine("<b>Executor:</b>");
+
+            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Vader", "Piett", "Boba", "Dengar", "IG-88", "Bossk", "TFP", "TIE A", "Bomber", "HT", "SI", "IG2K", "TIEF", "RC" }, exec.ToString()));
+
+            sb.AppendLine("</p>");
+            sb.AppendLine("<b>Starkiller:</b>");
+
+            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Dash", "Kyle", "Talon", "Mara" }, sk.ToString()));
+
+            sb.AppendLine("</p>");
             sb.AppendLine("<b>Overall Progress:</b>");
 
-            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Rey", "SLKR", "JML", "SEE", "GLOW", "LV" }, overall.ToString()));
+            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Rey", "SLKR", "JML", "SEE", "GLOW", "LV", "Exec", "StarKiller" }, overall.ToString()));
 
             sb.AppendLine("<p/></div>");
 
@@ -913,7 +927,7 @@ div {
         private string GetOverallGLProgressForPlayer(string playerName)
         {
             GLCharacterProgress playerProgress = m_glCharacterProgressList.FirstOrDefault(a => a.PlayerName == playerName);
-            return HTMLConstructor.AddTableData(new string[] { playerName, playerProgress.ReyOverallProgress, playerProgress.SLKROverallProgress, playerProgress.GLLukeOverallProgress, playerProgress.GLPalpOverallProgress, playerProgress.GLKenobiProgress, playerProgress.GLVaderProgress });
+            return HTMLConstructor.AddTableData(new string[] { playerName, playerProgress.ReyOverallProgress, playerProgress.SLKROverallProgress, playerProgress.GLLukeOverallProgress, playerProgress.GLPalpOverallProgress, playerProgress.GLKenobiProgress, playerProgress.GLVaderProgress, playerProgress.Exec, playerProgress.StarKiller });
         }
 
 
@@ -925,21 +939,21 @@ div {
         private string GetGLLukeProgressForPlayer(string playerName)
         {
             List<decimal> progressList = new List<decimal>();
-            string big = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Biggs Darklighter"), 85, out progressList, progressList);
-            string c3p0 = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "C-3PO"), 94, out progressList, progressList);
-            string chew = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Chewbacca"), 100, out progressList, progressList);
-            string han = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Han Solo"), 100, out progressList, progressList);
-            string yoda = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Hermit Yoda"), 94, out progressList, progressList);
-            string jkl = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Jedi Knight Luke Skywalker"), 107, out progressList, progressList);
-            string land = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Lando Calrissian"), 94, out progressList, progressList);
-            string mon = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Mon Mothma"), 94, out progressList, progressList);
-            string obi = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Obi-Wan Kenobi (Old Ben)"), 94, out progressList, progressList);
-            string leia = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Princess Leia"), 85, out progressList, progressList);
-            string r2d2 = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "R2-D2"), 107, out progressList, progressList);
-            string jtr = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Rey (Jedi Training)"), 107, out progressList, progressList);
-            string chwp = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Threepio & Chewie"), 94, out progressList, progressList);
-            string wed = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Wedge Antilles"), 85, out progressList, progressList);
-            string ywin = CalculatePercentProgressForGL(m_dataBuilder.ShipData.FirstOrDefault(a => a.PlayerName == playerName && a.ShipName == "Rebel Y-wing"), 6, out progressList, progressList);
+            string big = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Biggs Darklighter"), GLProgressScore.RelicThree, out progressList, progressList);
+            string c3p0 = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "C-3PO"), GLProgressScore.RelicFive, out progressList, progressList);
+            string chew = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Chewbacca"), GLProgressScore.RelicSix, out progressList, progressList);
+            string han = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Han Solo"), GLProgressScore.RelicSix, out progressList, progressList);
+            string yoda = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Hermit Yoda"), GLProgressScore.RelicFive, out progressList, progressList);
+            string jkl = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Jedi Knight Luke Skywalker"), GLProgressScore.RelicSeven, out progressList, progressList);
+            string land = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Lando Calrissian"), GLProgressScore.RelicFive, out progressList, progressList);
+            string mon = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Mon Mothma"), GLProgressScore.RelicFive, out progressList, progressList);
+            string obi = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Obi-Wan Kenobi (Old Ben)"), GLProgressScore.RelicFive, out progressList, progressList);
+            string leia = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Princess Leia"), GLProgressScore.RelicThree, out progressList, progressList);
+            string r2d2 = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "R2-D2"), GLProgressScore.RelicSeven, out progressList, progressList);
+            string jtr = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Rey (Jedi Training)"), GLProgressScore.RelicSeven, out progressList, progressList);
+            string chwp = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Threepio & Chewie"), GLProgressScore.RelicFive, out progressList, progressList);
+            string wed = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Wedge Antilles"), GLProgressScore.RelicThree, out progressList, progressList);
+            string ywin = CalculatePercentProgressForGL(m_dataBuilder.ShipData.FirstOrDefault(a => a.PlayerName == playerName && a.ShipName == "Rebel Y-wing"), GLProgressScore.SixStar, out progressList, progressList);
 
             m_glCharacterProgressList.FirstOrDefault(a => a.PlayerName == playerName).GLLukeOverallProgress = Math.Round(progressList.Average(), 2).ToString();
 
@@ -954,21 +968,21 @@ div {
         private string GetGLPalpProgressForPlayer(string playerName)
         {
             List<decimal> progressList = new List<decimal>();
-            string pie = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Admiral Piett"), 94, out progressList, progressList);
-            string star = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Colonel Starck"), 85, out progressList, progressList);
-            string dook = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Count Dooku"), 100, out progressList, progressList);
-            string maul = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Darth Maul"), 89, out progressList, progressList);
-            string sidi = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Darth Sidious"), 107, out progressList, progressList);
-            string vad = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Darth Vader"), 107, out progressList, progressList);
-            string kren = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Director Krennic"), 89, out progressList, progressList);
-            string palp = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Emperor Palpatine"), 107, out progressList, progressList);
-            string veer = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "General Veers"), 85, out progressList, progressList);
-            string thra = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Grand Admiral Thrawn"), 100, out progressList, progressList);
-            string tark = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Grand Moff Tarkin"), 85, out progressList, progressList);
-            string jka = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Jedi Knight Anakin"), 107, out progressList, progressList);
-            string rgua = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Royal Guard"), 85, out progressList, progressList);
-            string mara = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Sith Marauder"), 107, out progressList, progressList);
-            string bomb = CalculatePercentProgressForGL(m_dataBuilder.ShipData.FirstOrDefault(a => a.PlayerName == playerName && a.ShipName == "Imperial TIE Bomber"), 6, out progressList, progressList);
+            string pie = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Admiral Piett"), GLProgressScore.RelicFive, out progressList, progressList);
+            string star = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Colonel Starck"), GLProgressScore.RelicThree, out progressList, progressList);
+            string dook = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Count Dooku"), GLProgressScore.RelicSix, out progressList, progressList);
+            string maul = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Darth Maul"), GLProgressScore.RelicFour, out progressList, progressList);
+            string sidi = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Darth Sidious"), GLProgressScore.RelicSeven, out progressList, progressList);
+            string vad = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Darth Vader"), GLProgressScore.RelicSeven, out progressList, progressList);
+            string kren = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Director Krennic"), GLProgressScore.RelicFour, out progressList, progressList);
+            string palp = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Emperor Palpatine"), GLProgressScore.RelicSeven, out progressList, progressList);
+            string veer = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "General Veers"), GLProgressScore.RelicThree, out progressList, progressList);
+            string thra = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Grand Admiral Thrawn"), GLProgressScore.RelicSix, out progressList, progressList);
+            string tark = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Grand Moff Tarkin"), GLProgressScore.RelicThree, out progressList, progressList);
+            string jka = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Jedi Knight Anakin"), GLProgressScore.RelicSeven, out progressList, progressList);
+            string rgua = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Royal Guard"), GLProgressScore.RelicThree, out progressList, progressList);
+            string mara = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Sith Marauder"), GLProgressScore.RelicSeven, out progressList, progressList);
+            string bomb = CalculatePercentProgressForGL(m_dataBuilder.ShipData.FirstOrDefault(a => a.PlayerName == playerName && a.ShipName == "Imperial TIE Bomber"), GLProgressScore.SixStar, out progressList, progressList);
 
             m_glCharacterProgressList.FirstOrDefault(a => a.PlayerName == playerName).GLPalpOverallProgress = Math.Round(progressList.Average(), 2).ToString();
 
@@ -983,21 +997,21 @@ div {
         private string GetGLKenobiProgressForPlayer(string playerName)
         {
             List<decimal> progressList = new List<decimal>();
-            string kenobi = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "General Kenobi"), 115, out progressList, progressList);
-            string mace = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Mace Windu"), 85, out progressList, progressList);
-            string aayla = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Aayla Secura"), 85, out progressList, progressList);
-            string katan = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Bo-Katan Kryze"), 94, out progressList, progressList);
-            string jinn = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Qui-Gon Jinn"), 85, out progressList, progressList);
-            string magna = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "IG-100 MagnaGuard"), 94, out progressList, progressList);
-            string clone = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Clone Sergeant - Phase I"), 94, out progressList, progressList);
-            string wat = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Wat Tambor"), 107, out progressList, progressList);
-            string gg = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "General Grievous"), 107, out progressList, progressList);
-            string cadbane = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Cad Bane"), 94, out progressList, progressList);
-            string cody = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "CC-2224 \"Cody\""), 94, out progressList, progressList);
-            string jango = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Jango Fett"), 107, out progressList, progressList);
-            string shaak = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Shaak Ti"), 107, out progressList, progressList);
-            string gmy = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Grand Master Yoda"), 115, out progressList, progressList);
-            string nego = CalculatePercentProgressForGL(m_dataBuilder.ShipData.FirstOrDefault(a => a.PlayerName == playerName && a.ShipName == "Negotiator"), 6, out progressList, progressList);
+            string kenobi = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "General Kenobi"), GLProgressScore.RelicEight, out progressList, progressList);
+            string mace = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Mace Windu"), GLProgressScore.RelicThree, out progressList, progressList);
+            string aayla = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Aayla Secura"), GLProgressScore.RelicThree, out progressList, progressList);
+            string katan = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Bo-Katan Kryze"), GLProgressScore.RelicFive, out progressList, progressList);
+            string jinn = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Qui-Gon Jinn"), GLProgressScore.RelicThree, out progressList, progressList);
+            string magna = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "IG-100 MagnaGuard"), GLProgressScore.RelicFive, out progressList, progressList);
+            string clone = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Clone Sergeant - Phase I"), GLProgressScore.RelicFive, out progressList, progressList);
+            string wat = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Wat Tambor"), GLProgressScore.RelicSeven, out progressList, progressList);
+            string gg = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "General Grievous"), GLProgressScore.RelicSeven, out progressList, progressList);
+            string cadbane = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Cad Bane"), GLProgressScore.RelicFive, out progressList, progressList);
+            string cody = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "CC-2224 \"Cody\""), GLProgressScore.RelicFive, out progressList, progressList);
+            string jango = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Jango Fett"), GLProgressScore.RelicSeven, out progressList, progressList);
+            string shaak = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Shaak Ti"), GLProgressScore.RelicSeven, out progressList, progressList);
+            string gmy = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Grand Master Yoda"), GLProgressScore.RelicEight, out progressList, progressList);
+            string nego = CalculatePercentProgressForGL(m_dataBuilder.ShipData.FirstOrDefault(a => a.PlayerName == playerName && a.ShipName == "Negotiator"), GLProgressScore.SixStar, out progressList, progressList);
 
             m_glCharacterProgressList.FirstOrDefault(a => a.PlayerName == playerName).GLKenobiProgress = Math.Round(progressList.Average(), 2).ToString();
 
@@ -1007,25 +1021,62 @@ div {
         private string GetGLVaderProgressForPlayer(string playerName)
         {
             List<decimal> progressList = new List<decimal>();
-            string hunter = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Hunter"), 94, out progressList, progressList);
-            string tech = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Tech"), 94, out progressList, progressList);
-            string wrecker = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Wrecker"), 94, out progressList, progressList);
-            string tusken = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Tusken Raider"), 94, out progressList, progressList);
-            string padme = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Padmé Amidala"), 115, out progressList, progressList);
-            string embo = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Embo"), 94, out progressList, progressList);
-            string echo = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "CT-21-0408 \"Echo\""), 107, out progressList, progressList);
-            string bbEcho = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Echo"), 94, out progressList, progressList);
-            string dooku = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Count Dooku"), 115, out progressList, progressList);
-            string zam = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Zam Wesell"), 107, out progressList, progressList);
-            string tarkin = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Grand Moff Tarkin"), 107, out progressList, progressList);
-            string arc = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "ARC Trooper"), 115, out progressList, progressList);
-            string gas = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "General Skywalker"), 115, out progressList, progressList);
-            string nute = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Nute Gunray"), 107, out progressList, progressList);
-            string ywing = CalculatePercentProgressForGL(m_dataBuilder.ShipData.FirstOrDefault(a => a.PlayerName == playerName && a.ShipName == "BTL-B Y-wing Starfighter"), 7, out progressList, progressList);
+            string hunter = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Hunter"), GLProgressScore.RelicFive, out progressList, progressList);
+            string tech = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Tech"), GLProgressScore.RelicFive, out progressList, progressList);
+            string wrecker = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Wrecker"), GLProgressScore.RelicFive, out progressList, progressList);
+            string tusken = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Tusken Raider"), GLProgressScore.RelicFive, out progressList, progressList);
+            string padme = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Padmé Amidala"), GLProgressScore.RelicEight, out progressList, progressList);
+            string embo = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Embo"), GLProgressScore.RelicFive, out progressList, progressList);
+            string echo = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "CT-21-0408 \"Echo\""), GLProgressScore.RelicSeven, out progressList, progressList);
+            string bbEcho = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Echo"), GLProgressScore.RelicFive, out progressList, progressList);
+            string dooku = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Count Dooku"), GLProgressScore.RelicEight, out progressList, progressList);
+            string zam = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Zam Wesell"), GLProgressScore.RelicSeven, out progressList, progressList);
+            string tarkin = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Grand Moff Tarkin"), GLProgressScore.RelicSeven, out progressList, progressList);
+            string arc = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "ARC Trooper"), GLProgressScore.RelicEight, out progressList, progressList);
+            string gas = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "General Skywalker"), GLProgressScore.RelicEight, out progressList, progressList);
+            string nute = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Nute Gunray"), GLProgressScore.RelicSeven, out progressList, progressList);
+            string ywing = CalculatePercentProgressForGL(m_dataBuilder.ShipData.FirstOrDefault(a => a.PlayerName == playerName && a.ShipName == "BTL-B Y-wing Starfighter"), GLProgressScore.SevenStar, out progressList, progressList);
 
             m_glCharacterProgressList.FirstOrDefault(a => a.PlayerName == playerName).GLVaderProgress = Math.Round(progressList.Average(), 2).ToString();
 
             return HTMLConstructor.AddTableData(new string[] { playerName, hunter, tech, wrecker, tusken, padme, embo, echo, bbEcho, dooku, zam, tarkin, arc, gas, nute, ywing});
+        }
+
+        private string GetExecProgressForPlayer(string playerName)
+        {
+            List<decimal> progressList = new List<decimal>();
+            string vader = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Darth Vader"), GLProgressScore.RelicSeven, out progressList, progressList);
+            string piett = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Admiral Piett"), GLProgressScore.RelicEight, out progressList, progressList);
+            string boba = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Boba Fett"), GLProgressScore.RelicEight, out progressList, progressList);
+            string dengar = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Dengar"), GLProgressScore.RelicFive, out progressList, progressList);
+            string ig88 = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "IG-88"), GLProgressScore.RelicFive, out progressList, progressList);
+            string bossk = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Bossk"), GLProgressScore.RelicFive, out progressList, progressList);
+            string tfp = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "TIE Fighter Pilot"), GLProgressScore.RelicFive, out progressList, progressList);
+
+            string advanced = CalculatePercentProgressForGL(m_dataBuilder.ShipData.FirstOrDefault(a => a.PlayerName == playerName && a.ShipName == "TIE Advanced x1"), GLProgressScore.FourStar, out progressList, progressList);
+            string bomber = CalculatePercentProgressForGL(m_dataBuilder.ShipData.FirstOrDefault(a => a.PlayerName == playerName && a.ShipName == "Imperial TIE Bomber"), GLProgressScore.FourStar, out progressList, progressList);
+            string ht = CalculatePercentProgressForGL(m_dataBuilder.ShipData.FirstOrDefault(a => a.PlayerName == playerName && a.ShipName == "Hound's Tooth"), GLProgressScore.FourStar, out progressList, progressList);
+            string slave = CalculatePercentProgressForGL(m_dataBuilder.ShipData.FirstOrDefault(a => a.PlayerName == playerName && a.ShipName == "Slave I"), GLProgressScore.FourStar, out progressList, progressList);
+            string ig2000 = CalculatePercentProgressForGL(m_dataBuilder.ShipData.FirstOrDefault(a => a.PlayerName == playerName && a.ShipName == "IG-2000"), GLProgressScore.FourStar, out progressList, progressList);
+            string tie = CalculatePercentProgressForGL(m_dataBuilder.ShipData.FirstOrDefault(a => a.PlayerName == playerName && a.ShipName == "Imperial TIE Fighter"), GLProgressScore.FourStar, out progressList, progressList);
+            string rc = CalculatePercentProgressForGL(m_dataBuilder.ShipData.FirstOrDefault(a => a.PlayerName == playerName && a.ShipName == "Razor Crest"), GLProgressScore.FiveStar, out progressList, progressList);
+            
+            m_glCharacterProgressList.FirstOrDefault(a => a.PlayerName == playerName).Exec = Math.Round(progressList.Average(), 2).ToString();
+
+            return HTMLConstructor.AddTableData(new string[] { playerName, vader, piett, boba, dengar, ig88, bossk, tfp, advanced, bomber, ht, slave, ig2000, tie, rc });
+        }
+
+        private string GetStarKillerProgressForPlayer(string playerName)
+        {
+            List<decimal> progressList = new List<decimal>();
+            string dash = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Dash Rendar"), GLProgressScore.RelicFive, out progressList, progressList);
+            string kyle = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Kyle Katarn"), GLProgressScore.RelicFive, out progressList, progressList);
+            string talon = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Darth Talon"), GLProgressScore.RelicFive, out progressList, progressList);
+            string mara = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Mara Jade, The Emperor's Hand"), GLProgressScore.RelicFive, out progressList, progressList);
+
+            m_glCharacterProgressList.FirstOrDefault(a => a.PlayerName == playerName).StarKiller = Math.Round(progressList.Average(), 2).ToString();
+
+            return HTMLConstructor.AddTableData(new string[] { playerName, dash, kyle, talon, mara });
         }
 
         /// <summary>
@@ -1036,19 +1087,19 @@ div {
         private string GetGLKyloProgressForPlayer(string playerName)
         {
             List<decimal> progressList = new List<decimal>();
-            string kru = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Kylo Ren (Unmasked)"), 107, out progressList, progressList);
-            string fos = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "First Order Stormtrooper"), 94, out progressList, progressList);
-            string foo = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "First Order Officer"), 94, out progressList, progressList);
-            string kyloRen = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Kylo Ren"), 107, out progressList, progressList);
-            string phasma = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Captain Phasma"), 94, out progressList, progressList);
-            string fox = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "First Order Executioner"), 94, out progressList, progressList);
-            string vetHan = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Veteran Smuggler Han Solo"), 85, out progressList, progressList);
-            string sithTroop = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Sith Trooper"), 94, out progressList, progressList);
-            string fosftp = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "First Order SF TIE Pilot"), 85, out progressList, progressList);
-            string hux = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "General Hux"), 94, out progressList, progressList);
-            string fotp = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "First Order TIE Pilot"), 85, out progressList, progressList);
-            string palp = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Emperor Palpatine"), 107, out progressList, progressList);
-            string finalizer = CalculatePercentProgressForGL(m_dataBuilder.ShipData.FirstOrDefault(a => a.PlayerName == playerName && a.ShipName == "Finalizer"), 5, out progressList, progressList);
+            string kru = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Kylo Ren (Unmasked)"), GLProgressScore.RelicSeven, out progressList, progressList);
+            string fos = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "First Order Stormtrooper"), GLProgressScore.RelicFive, out progressList, progressList);
+            string foo = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "First Order Officer"), GLProgressScore.RelicFive, out progressList, progressList);
+            string kyloRen = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Kylo Ren"), GLProgressScore.RelicSeven, out progressList, progressList);
+            string phasma = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Captain Phasma"), GLProgressScore.RelicFive, out progressList, progressList);
+            string fox = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "First Order Executioner"), GLProgressScore.RelicFive, out progressList, progressList);
+            string vetHan = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Veteran Smuggler Han Solo"), GLProgressScore.RelicThree, out progressList, progressList);
+            string sithTroop = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Sith Trooper"), GLProgressScore.RelicFive, out progressList, progressList);
+            string fosftp = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "First Order SF TIE Pilot"), GLProgressScore.RelicThree, out progressList, progressList);
+            string hux = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "General Hux"), GLProgressScore.RelicFive, out progressList, progressList);
+            string fotp = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "First Order TIE Pilot"), GLProgressScore.RelicThree, out progressList, progressList);
+            string palp = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Emperor Palpatine"), GLProgressScore.RelicSeven, out progressList, progressList);
+            string finalizer = CalculatePercentProgressForGL(m_dataBuilder.ShipData.FirstOrDefault(a => a.PlayerName == playerName && a.ShipName == "Finalizer"), GLProgressScore.FiveStar, out progressList, progressList);
 
             m_glCharacterProgressList.FirstOrDefault(a => a.PlayerName == playerName).SLKROverallProgress = Math.Round(progressList.Average(), 2).ToString();
 
@@ -1063,11 +1114,11 @@ div {
         private string GetKAMProgressForPlayer(string playerName)
         {
             List<decimal> progressList = new List<decimal>();
-            string shaak = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Shaak Ti"), 94, out progressList, progressList);
-            string rex = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "CT-7567 \"Rex\""), 94, out progressList, progressList);
-            string fives = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "CT-5555 \"Fives\""), 94, out progressList, progressList);
-            string echo = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "CT-21-0408 \"Echo\""), 94, out progressList, progressList);
-            string arc = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "ARC Trooper"), 94, out progressList, progressList);
+            string shaak = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Shaak Ti"), GLProgressScore.RelicFive, out progressList, progressList);
+            string rex = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "CT-7567 \"Rex\""), GLProgressScore.RelicFive, out progressList, progressList);
+            string fives = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "CT-5555 \"Fives\""), GLProgressScore.RelicFive, out progressList, progressList);
+            string echo = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "CT-21-0408 \"Echo\""), GLProgressScore.RelicFive, out progressList, progressList);
+            string arc = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "ARC Trooper"), GLProgressScore.RelicFive, out progressList, progressList);
 
             return HTMLConstructor.AddTableData(new string[] { playerName, shaak, rex, fives, echo, arc });
         }
@@ -1080,19 +1131,19 @@ div {
         private string GetGLReyProgressForPlayer(string playerName)
         {
             List<decimal> progressList = new List<decimal>();
-            string scavRey = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Rey (Scavenger)"), 107, out progressList, progressList);
-            string jtr = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Rey (Jedi Training)"), 107, out progressList, progressList);
-            string finn = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Finn"), 94, out progressList, progressList);
-            string rhFinn = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Resistance Hero Finn"), 94, out progressList, progressList);
-            string poe = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Poe Dameron"), 94, out progressList, progressList);
-            string rhPoe = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Resistance Hero Poe"), 94, out progressList, progressList);
-            string holdo = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Amilyn Holdo"), 94, out progressList, progressList);
-            string rose = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Rose Tico"), 94, out progressList, progressList);
-            string resTrooper = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Resistance Trooper"), 94, out progressList, progressList);
-            string resPilot = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Resistance Pilot"), 85, out progressList, progressList);
-            string bbEight = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "BB-8"), 107, out progressList, progressList);
-            string vetChewie = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Veteran Smuggler Chewbacca"), 85, out progressList, progressList);
-            string raddus = CalculatePercentProgressForGL(m_dataBuilder.ShipData.FirstOrDefault(a => a.PlayerName == playerName && a.ShipName == "Raddus"), 5, out progressList, progressList);
+            string scavRey = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Rey (Scavenger)"), GLProgressScore.RelicSeven, out progressList, progressList);
+            string jtr = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Rey (Jedi Training)"), GLProgressScore.RelicSeven, out progressList, progressList);
+            string finn = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Finn"), GLProgressScore.RelicFive, out progressList, progressList);
+            string rhFinn = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Resistance Hero Finn"), GLProgressScore.RelicFive, out progressList, progressList);
+            string poe = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Poe Dameron"), GLProgressScore.RelicFive, out progressList, progressList);
+            string rhPoe = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Resistance Hero Poe"), GLProgressScore.RelicFive, out progressList, progressList);
+            string holdo = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Amilyn Holdo"), GLProgressScore.RelicFive, out progressList, progressList);
+            string rose = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Rose Tico"), GLProgressScore.RelicFive, out progressList, progressList);
+            string resTrooper = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Resistance Trooper"), GLProgressScore.RelicFive, out progressList, progressList);
+            string resPilot = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Resistance Pilot"), GLProgressScore.RelicThree, out progressList, progressList);
+            string bbEight = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "BB-8"), GLProgressScore.RelicSeven, out progressList, progressList);
+            string vetChewie = CalculatePercentProgressForGL(m_dataBuilder.UnitData.FirstOrDefault(a => a.PlayerName == playerName && a.UnitName == "Veteran Smuggler Chewbacca"), GLProgressScore.ThreeStar, out progressList, progressList);
+            string raddus = CalculatePercentProgressForGL(m_dataBuilder.ShipData.FirstOrDefault(a => a.PlayerName == playerName && a.ShipName == "Raddus"), GLProgressScore.FiveStar, out progressList, progressList);
 
             m_glCharacterProgressList.FirstOrDefault(a => a.PlayerName == playerName).ReyOverallProgress = Math.Round(progressList.Average(), 2).ToString();
 
@@ -1107,7 +1158,7 @@ div {
         /// <param name="progressList">The overall progresss</param>
         /// <param name="currentList">The current snapsho of the overall progress</param>
         /// <returns></returns>
-        private string CalculatePercentProgressForGL(UnitData unitData, int maxPoints, out List<decimal> progressList, List<decimal> currentList)
+        private string CalculatePercentProgressForGL(UnitData unitData, GLProgressScore score, out List<decimal> progressList, List<decimal> currentList)
         {
             progressList = currentList;            
             
@@ -1149,6 +1200,8 @@ div {
                     break;
             }
 
+            var maxPoints = (int)score;
+
             //-1 because we want to count the number of gear pieces equipped not the current gear level ie Gear 1 if not the -1 would award 6 points
             int points = ((unitData.NewGearLevel-1) * 6) + relicPoints + unitData.HasGearSlotOne + unitData.HasGearSlotTwo + unitData.HasGearSlotThree + unitData.HasGearSlotFour + unitData.HasGearSlotFive + unitData.HasGearSlotSix + unitData.NewRarity;
 
@@ -1164,7 +1217,7 @@ div {
         /// <param name="progressList">The overall progresss</param>
         /// <param name="currentList">The current snapsho of the overall progress</param>
         /// <returns></returns>
-        private string CalculatePercentProgressForGL(ShipData shipData, int maxPoints, out List<decimal> progressList, List<decimal> currentList)
+        private string CalculatePercentProgressForGL(ShipData shipData, GLProgressScore score, out List<decimal> progressList, List<decimal> currentList)
         {
             progressList = currentList;
 
@@ -1173,6 +1226,8 @@ div {
                 progressList.Add(Convert.ToDecimal(0.0));
                 return "0";
             }
+
+            var maxPoints = (int)score;
             
             progressList.Add(Math.Round(Decimal.Divide(shipData.NewRarity, maxPoints) * 100, 2) > 100 ? 100 : Math.Round(Decimal.Divide(shipData.NewRarity, maxPoints) * 100, 2));
             return Math.Round(Decimal.Divide(shipData.NewRarity, maxPoints) * 100, 2) > 100 ? "100" : Math.Round(Decimal.Divide(shipData.NewRarity, maxPoints) * 100, 0).ToString();
