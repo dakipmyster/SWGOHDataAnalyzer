@@ -23,7 +23,8 @@ namespace SWGOHDataAnalyzer
 2. Compare Snapshots
 3. Generate simple report from latest data
 4. Omegas Left
-5. Quit app"))
+5. Add player to snapshot
+6. Quit app"))
                     {
                         case "1":
                             await GetGuildData();
@@ -38,6 +39,9 @@ namespace SWGOHDataAnalyzer
                             await OmegasLeft();
                             break;
                         case "5":
+                            await GetPlayerData();
+                            break;
+                        case "6":
                             Environment.Exit(0);
                             break;
                         default:
@@ -65,6 +69,34 @@ namespace SWGOHDataAnalyzer
         }
 
         /// <summary>
+        /// Method to start running the collection of a single player data
+        /// </summary>
+        /// <returns></returns>
+        private static async Task GetPlayerData()
+        {
+            SWGOHClient client = new SWGOHClient(SWGOHMessageSystem.InputMessage("Enter in the SWGOH.GG player Id."));
+
+            Task dataPullTask = client.GetPlayerData();
+
+            DBInterface dBInterface = new DBInterface(SWGOHMessageSystem.InputMessage("Type in the snapshot name for the data being pulled right now.  Press Enter to continue"));
+
+            SWGOHMessageSystem.OutputMessage("Pulling down player data...");
+
+            await dataPullTask;
+
+            if (client.ResponseCode == HttpStatusCode.OK)
+            {
+                SWGOHMessageSystem.OutputMessage("Data pull complete, writing to snapshot.");
+
+                dBInterface.WriteDataToDB(client.Guild, false);
+            }
+            else
+            {
+                SWGOHMessageSystem.OutputMessage($"Data pull failed with the following HTTP status code: {client.ResponseCode.ToString()}");
+            }
+        }
+
+        /// <summary>
         /// Method to start the running of collecting guild data
         /// </summary>
         /// <returns></returns>
@@ -84,7 +116,7 @@ namespace SWGOHDataAnalyzer
             {
                 SWGOHMessageSystem.OutputMessage("Data pull complete, writing to snapshot.");
 
-                dBInterface.WriteDataToDB(client.Guild);
+                dBInterface.WriteDataToDB(client.Guild, true);
             }
             else
             {

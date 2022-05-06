@@ -77,11 +77,15 @@ namespace SWGOHDBInterface
         /// Collects all of the data from the interface data pull and inserts it into the snapshot database
         /// </summary>
         /// <param name="guild"></param>
-        public void WriteDataToDB(Guild guild)
+        public void WriteDataToDB(Guild guild, bool makeTables)
         {
             var unitMods = new List<Mod>();
-            CreateTable();
-            CreateModTable();
+
+            if (makeTables)
+            {
+                CreateTable();
+                CreateModTable();
+            }
 
             using (SQLiteConnection conn = new SQLiteConnection($"Data Source={m_folderPath}\\{m_dbName}"))
             {
