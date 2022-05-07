@@ -876,7 +876,7 @@ div {
             sb.AppendLine("</p>");
             sb.AppendLine("<b>Overall Progress:</b>");
 
-            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Rey", "SLKR", "JML", "SEE", "GLOW", "LV", "Exec", "StarKiller" }, overall.ToString()));
+            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Rey", "SLKR", "JML", "SEE", "JMK", "LV", "Exec", "StarKiller" }, overall.ToString()));
 
             sb.AppendLine("<p/></div>");
 
