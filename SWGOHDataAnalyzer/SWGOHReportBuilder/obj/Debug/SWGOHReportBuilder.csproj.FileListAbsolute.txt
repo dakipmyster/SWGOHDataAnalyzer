@@ -100,7 +100,6 @@ C:\Users\Kyle\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHReportBu
 C:\Users\Kyle\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHReportBuilder\bin\Debug\itext.styledxmlparser.xml
 C:\Users\Kyle\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHReportBuilder\bin\Debug\itext.svg.xml
 C:\Users\Kyle\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHReportBuilder\bin\Debug\Newtonsoft.Json.xml
-C:\Users\Kyle\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHReportBuilder\obj\Debug\SWGOHReportBuilder.csprojAssemblyReference.cache
 C:\Users\Kyle\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHReportBuilder\obj\Debug\SWGOHReportBuilder.csproj.CoreCompileInputs.cache
 C:\Users\Kyle\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHReportBuilder\obj\Debug\SWGOHReportBuilder.csproj.CopyComplete
 C:\Users\Kyle\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHReportBuilder\obj\Debug\SWGOHReportBuilder.dll
@@ -113,3 +112,4 @@ C:\Users\Kyle\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHReportBu
 C:\Users\Kyle\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHReportBuilder\bin\Debug\Microsoft.Bcl.AsyncInterfaces.xml
 C:\Users\Kyle\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHReportBuilder\bin\Debug\System.Threading.Tasks.Extensions.xml
 C:\Users\Kyle\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHReportBuilder\bin\Debug\System.Runtime.CompilerServices.Unsafe.xml
+C:\Users\Kyle\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHReportBuilder\obj\Debug\SWGOHReportBuilder.csproj.AssemblyReference.cache

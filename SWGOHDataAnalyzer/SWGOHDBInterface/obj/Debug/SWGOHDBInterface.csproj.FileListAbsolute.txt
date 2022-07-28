@@ -38,7 +38,6 @@ C:\Users\Kyle\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHDBInterf
 C:\Users\Kyle\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHDBInterface\bin\Debug\System.Data.SQLite.xml
 C:\Users\Kyle\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHDBInterface\bin\Debug\System.Data.SQLite.dll.config
 C:\Users\Kyle\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHDBInterface\bin\Debug\Newtonsoft.Json.xml
-C:\Users\Kyle\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHDBInterface\obj\Debug\SWGOHDBInterface.csprojAssemblyReference.cache
 C:\Users\Kyle\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHDBInterface\obj\Debug\SWGOHDBInterface.csproj.CoreCompileInputs.cache
 C:\Users\Kyle\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHDBInterface\obj\Debug\SWGOHDBInterface.csproj.CopyComplete
 C:\Users\Kyle\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHDBInterface\obj\Debug\SWGOHDBInterface.dll
@@ -51,3 +50,4 @@ C:\Users\Kyle\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHDBInterf
 C:\Users\Kyle\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHDBInterface\bin\Debug\Microsoft.Bcl.AsyncInterfaces.xml
 C:\Users\Kyle\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHDBInterface\bin\Debug\System.Threading.Tasks.Extensions.xml
 C:\Users\Kyle\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHDBInterface\bin\Debug\System.Runtime.CompilerServices.Unsafe.xml
+C:\Users\Kyle\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHDBInterface\obj\Debug\SWGOHDBInterface.csproj.AssemblyReference.cache

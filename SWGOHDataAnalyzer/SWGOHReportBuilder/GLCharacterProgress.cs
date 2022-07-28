@@ -14,7 +14,9 @@ namespace SWGOHReportBuilder
         public string GLPalpOverallProgress { get; set; }
         public string GLKenobiProgress { get; set; }
         public string GLVaderProgress { get; set; }
+        public string GLJabbaProgress { get; set; }
         public string Exec { get; set; }
+        public string Profundity { get; set; }
         public string StarKiller { get; set; }
         public string PlayerName { get; set; }
     }
