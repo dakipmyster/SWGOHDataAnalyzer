@@ -8,3 +8,4 @@ C:\Users\Kyle\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWOGHHelper\b
 C:\Users\Kyle\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWOGHHelper\obj\Debug\SWOGHHelper.csproj.CoreCompileInputs.cache
 C:\Users\Kyle\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWOGHHelper\obj\Debug\SWOGHHelper.dll
 C:\Users\Kyle\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWOGHHelper\obj\Debug\SWOGHHelper.pdb
+C:\Users\Kyle\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWOGHHelper\obj\Debug\SWOGHHelper.csproj.AssemblyReference.cache

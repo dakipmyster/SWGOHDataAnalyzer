@@ -275,3 +275,8 @@ SWGOHDataAnalyzer/SWGOHReportBuilder/obj/Debug/SWGOHReportBuilder.dll
 SWGOHDataAnalyzer/SWGOHReportBuilder/obj/Debug/SWGOHReportBuilder.csprojAssemblyReference.cache
 SWGOHDataAnalyzer/SWGOHReportBuilder/obj/Debug/SWGOHReportBuilder.pdb
 SWGOHDataAnalyzer/SWOGHHelper/obj/Debug/SWOGHHelper.csprojAssemblyReference.cache
+*.cache
+*.txt
+*.dll
+*.cache
+SWGOHDataAnalyzer/SWGOHReportBuilder/obj/Debug/SWGOHReportBuilder.csproj.AssemblyReference.cache

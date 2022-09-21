@@ -73,6 +73,12 @@ namespace SWGOHDBInterface
 
                 JsonSerializer.CreateDefault().Serialize(jsonWriter, players);
             }
+
+            using (StreamReader file = File.OpenText($"{m_folderPath}\\{m_snapshotName}.json"))
+            {
+                JsonSerializer serializer = new JsonSerializer();
+                List<Player> movie2 = (List<Player>)serializer.Deserialize(file, typeof(List<Player>));
+            }
         }
 
         /// <summary>
