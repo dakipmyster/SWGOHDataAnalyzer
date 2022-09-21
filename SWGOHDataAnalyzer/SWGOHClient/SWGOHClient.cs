@@ -15,6 +15,7 @@ namespace SWGOHInterface
         private HttpClient m_httpClient;
 
         public Guild Guild;        
+        public List<Player> Players;
         public HttpStatusCode ResponseCode;
 
         /// <summary>
@@ -25,6 +26,7 @@ namespace SWGOHInterface
         {
             m_GuildId = guildId;
             m_httpClient = new HttpClient();
+            Players = new List<Player>();
         }
 
         /// <summary>
@@ -40,37 +42,39 @@ namespace SWGOHInterface
 
         public async Task GetPlayerData()
         {
-            var response = await m_httpClient.GetAsync($"http://api.swgoh.gg/player/{m_GuildId}");
+            throw new NotImplementedException();
+            //TODO: If I want this to do something, refactor it
+            //var response = await m_httpClient.GetAsync($"http://api.swgoh.gg/player/{m_GuildId}");
 
-            var player = new Player();
-            var playerMod = new PlayerMod();
+            //var player = new Player();
+            //var playerMod = new PlayerMod();
 
-            Guild = new Guild();
-            Guild.GuildData = new GuildData();
-            Guild.GuildData.GuildName = "";
+            //Guild = new Guild();
+            //Guild.GuildData = new GuildData();
+            //Guild.GuildData.GuildName = "";
 
-            if (response.StatusCode == HttpStatusCode.OK)
-            {
-                player = JsonConvert.DeserializeObject<Player>(await response.Content.ReadAsStringAsync());
-                playerMod = JsonConvert.DeserializeObject<PlayerMod>(await response.Content.ReadAsStringAsync());
-            }
-            else throw new Exception("No data found");
+            //if (response.StatusCode == HttpStatusCode.OK)
+            //{
+            //    player = JsonConvert.DeserializeObject<Player>(await response.Content.ReadAsStringAsync());
+            //    playerMod = JsonConvert.DeserializeObject<PlayerMod>(await response.Content.ReadAsStringAsync());
+            //}
+            //else throw new Exception("No data found");
 
-            if (playerMod.Mods?.Count > 0)
-            {
-                await player.PlayerUnits.ParallelForEachAsync(async unit =>
-                {
-                    unit.UnitData.UnitMods = new List<Mod>();
-                    unit.UnitData.UnitMods.AddRange(playerMod.Mods.Where(a => a.ToonId == unit.UnitData.UnitId));
-                    unit.UnitData.UnitMods.ForEach(a => a.PlayerId = player.PlayerData.AllyCode);
+            //if (playerMod.Mods?.Count > 0)
+            //{
+            //    await player.PlayerUnits.ParallelForEachAsync(async unit =>
+            //    {
+            //        unit.UnitData.UnitMods = new List<Mod>();
+            //        unit.UnitData.UnitMods.AddRange(playerMod.Mods.Where(a => a.ToonId == unit.UnitData.UnitId));
+            //        unit.UnitData.UnitMods.ForEach(a => a.PlayerId = player.PlayerData.AllyCode);
 
-                }, maxDegreeOfParallelism: Environment.ProcessorCount);
-            }
+            //    }, maxDegreeOfParallelism: Environment.ProcessorCount);
+            //}
 
-            Guild.Players = new List<Player>();
-            Guild.Players.Add(player);
+            //Guild.Players = new List<Player>();
+            //Guild.Players.Add(player);
 
-            ResponseCode = response.StatusCode;
+            //ResponseCode = response.StatusCode;
         }
 
         /// <summary>
@@ -84,26 +88,19 @@ namespace SWGOHInterface
             if (response.StatusCode == HttpStatusCode.OK)
                 Guild = JsonConvert.DeserializeObject<Guild>(await response.Content.ReadAsStringAsync());
 
-            await Guild.Players.ParallelForEachAsync(async player =>
+            await Guild.GuildData.Members.ParallelForEachAsync(async guildMember =>
             {
                 try
                 {
-                    var playerMod = new PlayerMod();
-                    var modHttpClient = new HttpClient();
-                    var modResponse = await modHttpClient.GetAsync($"http://api.swgoh.gg/player/{player.PlayerData.AllyCode}/mods");
+                    var player = new Player();
+                    var playerHttpClient = new HttpClient();
+                    var modResponse = await playerHttpClient.GetAsync($"http://api.swgoh.gg/player/{guildMember.AllyClode}");
 
                     if (modResponse.StatusCode == HttpStatusCode.OK)
-                        playerMod = JsonConvert.DeserializeObject<PlayerMod>(await modResponse.Content.ReadAsStringAsync());
+                        player = JsonConvert.DeserializeObject<Player>(await modResponse.Content.ReadAsStringAsync());
 
-                    if (playerMod.Mods?.Count > 0)
-                    {
-                        foreach (var unit in player.PlayerUnits)
-                        {
-                            unit.UnitData.UnitMods = new List<Mod>();
-                            unit.UnitData.UnitMods.AddRange(playerMod.Mods.Where(a => a.ToonId == unit.UnitData.UnitId));
-                            unit.UnitData.UnitMods.ForEach(a => a.PlayerId = player.PlayerData.AllyCode);
-                        }
-                    }
+                    lock(Players)
+                        Players.Add(player);
                 }
                 catch(Exception ex)
                 {

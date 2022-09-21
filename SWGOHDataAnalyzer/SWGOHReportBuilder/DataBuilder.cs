@@ -366,8 +366,8 @@ FROM MOD_{m_newSnapshot} WHERE toon_id = @toonid AND player_id = @allycode";
         {
             GuildName = guild.GuildData.GuildName;
             DateRange = DateTime.Now.ToString("d");
-
-            foreach(Player player in guild.Players)
+            var players = new List<Player>();
+            foreach(Player player in players)
             {
                 PlayerData.Add(new PlayerData() { PlayerName = player.PlayerData.Name, AllyCode = player.PlayerData.AllyCode });
 

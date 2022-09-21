@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
-using System.Data.SQLite;
 using SWGOHInterface;
 using SWGOHMessage;
 using System.Data;
+using Newtonsoft.Json;
+using System.Data.SQLite;
 
 namespace SWGOHDBInterface
 {
@@ -16,8 +17,7 @@ namespace SWGOHDBInterface
         #region Private Members
 
         private string m_folderPath = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\\SWGOHDataAnalyzer";
-        private string m_dbTableName;
-        private string m_dbName = "SWGOH.db";
+        private string m_snapshotName;
         #endregion
 
         #region Public Members
@@ -31,124 +31,56 @@ namespace SWGOHDBInterface
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="dbName">Name of the db table the user wants</param>
+        /// <param name="dbName">Name of the snapshot the user wants</param>
         public DBInterface(string dbTableName)
         {
             if (!Directory.Exists(m_folderPath))
                 Directory.CreateDirectory(m_folderPath);
 
-            if (!File.Exists($"{m_folderPath}\\SWGOH.db"))
-                SQLiteConnection.CreateFile($"{m_folderPath}\\{m_dbName}");
+            m_snapshotName = dbTableName;
 
-            m_dbTableName = dbTableName;
-
-            CollectTables();
+            CollectSnapshots();
         }
 
         public DBInterface()
         {
-            CollectTables();
+            CollectSnapshots();
         }
 
         /// <summary>
-        /// Method to collect the name of all the tables in the system as snapshot names
+        /// Method to collect the name of all the snapshots
         /// </summary>
-        private void CollectTables()
+        private void CollectSnapshots()
         {
-            string sql = "SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%' AND name NOT LIKE 'MOD_%'";
+            Tables.AddRange(Directory.GetFiles(m_folderPath, "*.json", SearchOption.TopDirectoryOnly));
+        }
 
-            using (SQLiteConnection m_dbConnection = new SQLiteConnection($"Data Source={m_folderPath}\\{m_dbName}"))
+        public void WriteDataToJsonFile(List<Player> players)
+        {
+            Parallel.ForEach(players.AsEnumerable(), new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount }, (player) =>
             {
-                m_dbConnection.Open();
+                SWGOHMessageSystem.OutputMessage($"Sanitizing mods for player {player.PlayerData.Name}");
 
-                using (SQLiteCommand command = new SQLiteCommand(sql, m_dbConnection))
-                {
-                    command.CommandType = CommandType.Text;
-                    using (SQLiteDataReader reader = command.ExecuteReader())
-                    {
-                        while (reader.Read())
-                            Tables.Add(reader.GetString(0));
-                    }
-                }
+                foreach (var mod in player.Mods)
+                    SanitizeModData(mod);
+            });
+
+            SWGOHMessageSystem.OutputMessage($"Saving snapshot");
+
+            using (var file = File.CreateText($"{m_folderPath}\\{m_snapshotName}.json"))
+            {
+                var jsonWriter = new JsonTextWriter(file);
+
+                JsonSerializer.CreateDefault().Serialize(jsonWriter, players);
             }
         }
 
         /// <summary>
-        /// Collects all of the data from the interface data pull and inserts it into the snapshot database
-        /// </summary>
-        /// <param name="guild"></param>
-        public void WriteDataToDB(Guild guild, bool makeTables)
-        {
-            var unitMods = new List<Mod>();
-
-            if (makeTables)
-            {
-                CreateTable();
-                CreateModTable();
-            }
-
-            using (SQLiteConnection conn = new SQLiteConnection($"Data Source={m_folderPath}\\{m_dbName}"))
-            {
-                conn.Open();
-                
-                    Parallel.ForEach(guild.Players.AsEnumerable(), new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount }, (player) =>
-                    {
-                        SWGOHMessageSystem.OutputMessage($"Processing player {player.PlayerData.Name} for snapshot");
-
-                        foreach (PlayerUnit unit in player.PlayerUnits)
-                        {
-                            lock (unitMods)
-                                { unitMods.AddRange(unit.UnitData.UnitMods); }
-
-                            using (var cmd = new SQLiteCommand(conn))
-                            {
-                                cmd.Parameters.AddRange(CollectSQLParams(player.PlayerData, guild.GuildData.GuildName, unit));
-
-                                //TODO: Yes, the SQL Injection again, should move to non relational database to avoid this and increase performance
-                                cmd.CommandText = $@"INSERT INTO {m_dbTableName}
-(guild_name, player_name, ally_code, player_power, toon, toon_id, toon_power, toon_level, is_ship, gear_level, rarity, health, protection, speed, p_offense, s_offense, p_defense, s_defense, p_crit_chance, s_crit_chance, potency, tenacity, total_zetas, zeta_one, zeta_two, zeta_three, zeta_four, zeta_five, zeta_six, total_omicrons, omicron_one, omicron_two, omicron_three, omicron_four, omicron_five, omicron_six, pull_date, relic_tier, gear_one_equipped, gear_two_equipped, gear_three_equipped, gear_four_equipped, gear_five_equipped, gear_six_equipped) 
-VALUES (@guild_name, @player_name, @ally_code, @player_power, @toon, @toon_id, @toon_power, @toon_level, @is_ship, @gear_level, @rarity, @health, @protection, @speed, @p_offense, @s_offense, @p_defense, @s_defense, @p_crit_chance, @s_crit_chance, @potency, @tenacity, @total_zetas, @zeta_one, @zeta_two, @zeta_three, @zeta_four, @zeta_five, @zeta_six, @total_omicrons, @omicron_one, @omicron_two, @omicron_three, @omicron_four, @omicron_five, @omicron_six, @pull_date, @relic_tier, @gear_one_equipped, @gear_two_equipped, @gear_three_equipped, @gear_four_equipped, @gear_five_equipped, @gear_six_equipped) ;";
-
-
-                                cmd.ExecuteNonQuery();
-                            }
-                        }
-                    });
-
-                    SWGOHMessageSystem.OutputMessage($"Processing guild mods");
-
-                    Parallel.ForEach(unitMods.AsEnumerable(), new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount }, (unitMod) =>
-                    {                        
-                        using (var cmd = new SQLiteCommand(conn))
-                        {
-                            cmd.Parameters.AddRange(CollectSQLParamsForMods(unitMod));
-
-                            //TODO: Yes, the SQL Injection again, should move to non relational database to avoid this and increase performance
-                            cmd.CommandText = $@"INSERT INTO MOD_{m_dbTableName}
-(player_id, toon_id, mod_set, mod_primary_name, mod_secondary_one_name, mod_secondary_one, mod_secondary_two_name, mod_secondary_two, mod_secondary_three_name, mod_secondary_three, mod_secondary_four_name, mod_secondary_four, mod_tier, mod_rarity, mod_slot, mod_secondary_one_roll, mod_secondary_two_roll, mod_secondary_three_roll, mod_secondary_four_roll) 
-VALUES (@player_id, @toon_id, @mod_set, @mod_primary_name, @mod_secondary_one_name, @mod_secondary_one, @mod_secondary_two_name, @mod_secondary_two, @mod_secondary_three_name, @mod_secondary_three, @mod_secondary_four_name, @mod_secondary_four, @mod_tier, @mod_rarity, @mod_slot, @mod_secondary_one_roll, @mod_secondary_two_roll, @mod_secondary_three_roll, @mod_secondary_four_roll);";
-
-
-                            cmd.ExecuteNonQuery();
-                        }
-                        
-                    });
-
-                conn.Close();
-            }
-
-            SWGOHMessageSystem.OutputMessage("Snapshot Complete!");
-        }
-
-        /// <summary>
-        /// Puts together the parameters for the sql insert
+        /// Cleans up data before its stored
         /// </summary>
         /// <param name="modData">Mod data for character</param>
-        /// <returns>An array of all the sql params needed to insert the data</returns>
-        private SQLiteParameter[] CollectSQLParamsForMods(Mod modData)        
+        private void SanitizeModData(Mod modData)        
         {
-            List<SQLiteParameter> sqlParams = new List<SQLiteParameter>();
-
             switch(modData.Set)
             {
                 case "1":
@@ -234,228 +166,22 @@ VALUES (@player_id, @toon_id, @mod_set, @mod_primary_name, @mod_secondary_one_na
                     break;
             }
 
-            sqlParams.Add(new SQLiteParameter("@player_id", modData.PlayerId));
-            sqlParams.Add(new SQLiteParameter("@toon_id", modData.ToonId));
-            sqlParams.Add(new SQLiteParameter("@mod_set", modData.Set));
-            sqlParams.Add(new SQLiteParameter("@mod_primary_name", modData.PrimaryModData.Name));
-            sqlParams.Add(new SQLiteParameter("@mod_secondary_one_name", DetermineModName(modData.SecondaryStats.ElementAtOrDefault(0)?.Value, modData.SecondaryStats.ElementAtOrDefault(0)?.Name)));
-            sqlParams.Add(new SQLiteParameter("@mod_secondary_one", modData.SecondaryStats.ElementAtOrDefault(0)?.Value));
-            sqlParams.Add(new SQLiteParameter("@mod_secondary_two_name", DetermineModName(modData.SecondaryStats.ElementAtOrDefault(1)?.Value, modData.SecondaryStats.ElementAtOrDefault(1)?.Name)));
-            sqlParams.Add(new SQLiteParameter("@mod_secondary_two", modData.SecondaryStats.ElementAtOrDefault(1)?.Value));
-            sqlParams.Add(new SQLiteParameter("@mod_secondary_three_name", DetermineModName(modData.SecondaryStats.ElementAtOrDefault(2)?.Value, modData.SecondaryStats.ElementAtOrDefault(2)?.Name)));
-            sqlParams.Add(new SQLiteParameter("@mod_secondary_three", modData.SecondaryStats.ElementAtOrDefault(2)?.Value));
-            sqlParams.Add(new SQLiteParameter("@mod_secondary_four_name", DetermineModName(modData.SecondaryStats.ElementAtOrDefault(3)?.Value, modData.SecondaryStats.ElementAtOrDefault(3)?.Name)));
-            sqlParams.Add(new SQLiteParameter("@mod_secondary_four", modData.SecondaryStats.ElementAtOrDefault(3)?.Value));
-            sqlParams.Add(new SQLiteParameter("@mod_secondary_one_roll", modData.SecondaryStats.ElementAtOrDefault(0)?.Roll));
-            sqlParams.Add(new SQLiteParameter("@mod_secondary_two_roll", modData.SecondaryStats.ElementAtOrDefault(1)?.Roll));
-            sqlParams.Add(new SQLiteParameter("@mod_secondary_three_roll", modData.SecondaryStats.ElementAtOrDefault(2)?.Roll));
-            sqlParams.Add(new SQLiteParameter("@mod_secondary_four_roll", modData.SecondaryStats.ElementAtOrDefault(3)?.Roll));
-            sqlParams.Add(new SQLiteParameter("@mod_tier", modData.Tier));
-            sqlParams.Add(new SQLiteParameter("@mod_rarity", modData.Rarity));
-            sqlParams.Add(new SQLiteParameter("@mod_slot", modData.Slot));
-
-            return sqlParams.ToArray();
-        }
-
-        /// <summary>
-        /// Gets the proper name for 
-        /// </summary>
-        /// <param name="value"></param>
-        /// <param name="name"></param>
-        /// <returns>Modfied name</returns>
-        private string DetermineModName(string value, string name)
-        {
-            if (!String.IsNullOrEmpty(value) && !String.IsNullOrEmpty(name) && value.Contains("%") && !name.Contains("Potency") && !name.Contains("Critical Chance") && !name.Contains("Tenacity"))
-                return $"{name} %";
-            else
-                return name;
-        }
-
-        /// <summary>
-        /// Puts together the parameters for the sql insert
-        /// </summary>
-        /// <param name="playerData">Data relative to the player</param>
-        /// <param name="guildName">Guild name</param>
-        /// <param name="unit">Unit object of all the data</param>
-        /// <returns>An array of all the sql params needed to insert the data</returns>
-        private SQLiteParameter[] CollectSQLParams(PlayerData playerData, string guildName, PlayerUnit unit)
-        {
-            List<SQLiteParameter> sqlParams = new List<SQLiteParameter>();
-
-            int isShip = unit.UnitData.Gear.Count > 0 ? 0 : 1;
-            List<string> zetas = new List<string>();
-            List<string> omicrons = new List<string>();
-
-            foreach (string zeta in unit.UnitData.AppliedZetas)
+            for(int secondaryStatPosition = 0; secondaryStatPosition >= 4; secondaryStatPosition++)
             {
-                if (unit.UnitData.UnitAbilities.FirstOrDefault(a => a.AbilityId == zeta) != null)
+                var secondaryDetails = modData.SecondaryStats.ElementAtOrDefault(secondaryStatPosition);
+
+                if (secondaryDetails == null)
+                    continue;
+
+                if (!String.IsNullOrEmpty(secondaryDetails.Value) 
+                    && !String.IsNullOrEmpty(secondaryDetails.Name) 
+                    && secondaryDetails.Value.Contains("%") 
+                    && !secondaryDetails.Name.Contains("Potency") 
+                    && !secondaryDetails.Name.Contains("Critical Chance") 
+                    && !secondaryDetails.Name.Contains("Tenacity"))
                 {
-                    zetas.Add(unit.UnitData.UnitAbilities.FirstOrDefault(a => a.AbilityId == zeta).AbilityName);
-                }
-            }
-
-            foreach (string omicron in unit.UnitData.AppliedOmicrons)
-            {
-                if (unit.UnitData.UnitAbilities.FirstOrDefault(a => a.AbilityId == omicron) != null)
-                {
-                    omicrons.Add(unit.UnitData.UnitAbilities.FirstOrDefault(a => a.AbilityId == omicron).AbilityName);
-                }
-            }
-
-            sqlParams.Add(new SQLiteParameter("@guild_name", guildName));
-            sqlParams.Add(new SQLiteParameter("@player_name", playerData.Name));
-            sqlParams.Add(new SQLiteParameter("@ally_code", playerData.AllyCode));
-            sqlParams.Add(new SQLiteParameter("@player_power", playerData.PlayerPower));
-            sqlParams.Add(new SQLiteParameter("@toon", unit.UnitData.Name));
-            sqlParams.Add(new SQLiteParameter("@toon_id", unit.UnitData.UnitId));
-            sqlParams.Add(new SQLiteParameter("@toon_power", unit.UnitData.Power));
-            sqlParams.Add(new SQLiteParameter("@toon_level", unit.UnitData.Level));
-            sqlParams.Add(new SQLiteParameter("@is_ship", isShip));
-            sqlParams.Add(new SQLiteParameter("@gear_level", unit.UnitData.GearLevel));
-            sqlParams.Add(new SQLiteParameter("@rarity", unit.UnitData.Rarity));
-            sqlParams.Add(new SQLiteParameter("@health", unit.UnitData.UnitStats.Health));
-            sqlParams.Add(new SQLiteParameter("@protection", unit.UnitData.UnitStats.Protection));
-            sqlParams.Add(new SQLiteParameter("@speed", unit.UnitData.UnitStats.Speed));
-            sqlParams.Add(new SQLiteParameter("@p_offense", unit.UnitData.UnitStats.PhysicalOffense));
-            sqlParams.Add(new SQLiteParameter("@s_offense", unit.UnitData.UnitStats.SpecialOffense));
-            sqlParams.Add(new SQLiteParameter("@p_defense", Math.Round(unit.UnitData.UnitStats.PhysicalDefense, 2)));
-            sqlParams.Add(new SQLiteParameter("@s_defense", Math.Round(unit.UnitData.UnitStats.SpeicalDefense, 2)));
-            sqlParams.Add(new SQLiteParameter("@p_crit_chance", Math.Round(unit.UnitData.UnitStats.PhysicalCriticalChance, 2)));
-            sqlParams.Add(new SQLiteParameter("@s_crit_chance", Math.Round(unit.UnitData.UnitStats.SpecialCriticalChance, 2)));
-            sqlParams.Add(new SQLiteParameter("@potency", Math.Round(unit.UnitData.UnitStats.Potency * 100, 2)));
-            sqlParams.Add(new SQLiteParameter("@tenacity", Math.Round(unit.UnitData.UnitStats.Tenacity * 100, 2)));
-            sqlParams.Add(new SQLiteParameter("@total_zetas", unit.UnitData.AppliedZetas.Count));
-            sqlParams.Add(new SQLiteParameter("@zeta_one", zetas.ElementAtOrDefault(0)));
-            sqlParams.Add(new SQLiteParameter("@zeta_two", zetas.ElementAtOrDefault(1)));
-            sqlParams.Add(new SQLiteParameter("@zeta_three", zetas.ElementAtOrDefault(2)));
-            sqlParams.Add(new SQLiteParameter("@zeta_four", zetas.ElementAtOrDefault(3)));
-            sqlParams.Add(new SQLiteParameter("@zeta_five", zetas.ElementAtOrDefault(4)));
-            sqlParams.Add(new SQLiteParameter("@zeta_six", zetas.ElementAtOrDefault(5)));
-            sqlParams.Add(new SQLiteParameter("@total_omicrons", unit.UnitData.AppliedOmicrons.Count));
-            sqlParams.Add(new SQLiteParameter("@omicron_one", omicrons.ElementAtOrDefault(0)));
-            sqlParams.Add(new SQLiteParameter("@omicron_two", omicrons.ElementAtOrDefault(1)));
-            sqlParams.Add(new SQLiteParameter("@omicron_three", omicrons.ElementAtOrDefault(2)));
-            sqlParams.Add(new SQLiteParameter("@omicron_four", omicrons.ElementAtOrDefault(3)));
-            sqlParams.Add(new SQLiteParameter("@omicron_five", omicrons.ElementAtOrDefault(4)));
-            sqlParams.Add(new SQLiteParameter("@omicron_six", omicrons.ElementAtOrDefault(5)));
-            sqlParams.Add(new SQLiteParameter("@pull_date", DateTime.Now));
-            sqlParams.Add(new SQLiteParameter("@relic_tier", unit.UnitData.RelicTier >= 3 ? unit.UnitData.RelicTier - 2 : 0));
-            sqlParams.Add(new SQLiteParameter("@gear_one_equipped", unit.UnitData.Gear.Count > 0 && unit.UnitData.Gear.FirstOrDefault(a => a.SlotPosition == 0).IsObtained ? 1 : 0));
-            sqlParams.Add(new SQLiteParameter("@gear_two_equipped", unit.UnitData.Gear.Count > 0 && unit.UnitData.Gear.FirstOrDefault(a => a.SlotPosition == 1).IsObtained ? 1 : 0));
-            sqlParams.Add(new SQLiteParameter("@gear_three_equipped", unit.UnitData.Gear.Count > 0 && unit.UnitData.Gear.FirstOrDefault(a => a.SlotPosition == 2).IsObtained ? 1 : 0));
-            sqlParams.Add(new SQLiteParameter("@gear_four_equipped", unit.UnitData.Gear.Count > 0 && unit.UnitData.Gear.FirstOrDefault(a => a.SlotPosition == 3).IsObtained ? 1 : 0));
-            sqlParams.Add(new SQLiteParameter("@gear_five_equipped", unit.UnitData.Gear.Count > 0 && unit.UnitData.Gear.FirstOrDefault(a => a.SlotPosition == 4).IsObtained ? 1 : 0));
-            sqlParams.Add(new SQLiteParameter("@gear_six_equipped", unit.UnitData.Gear.Count > 0 && unit.UnitData.Gear.FirstOrDefault(a => a.SlotPosition == 5).IsObtained ? 1 : 0));
-
-            return sqlParams.ToArray();
-        }
-
-        /// <summary>
-        /// Creates the new table based on the snapshot name the user wanted
-        /// </summary>
-        private void CreateTable()
-        {
-            //TODO: Yes, the SQL Injection again, should move to non relational database to avoid this and increase performance
-            string sql = $@"CREATE TABLE {m_dbTableName}
-(
-    ID INTEGER PRIMARY KEY AUTOINCREMENT,
-    guild_name varchar(40),
-    player_name varchar(30),
-    ally_code int,
-    player_power int,
-    toon varchar(50),
-    toon_id varchar(50),
-    toon_power int,
-    toon_level int,
-    is_ship boolean,
-    gear_level int,
-    rarity int,
-    health double,
-    protection double,
-    speed double,
-    p_offense double,
-    s_offense double,
-    p_defense double,
-    s_defense double,
-    p_crit_chance double,
-    s_crit_chance double,
-    potency double,
-    tenacity double,
-    total_zetas int,
-    zeta_one varchar(50),
-    zeta_two varchar(50),
-    zeta_three varchar(50),
-    zeta_four varchar(50),
-    zeta_five varchar(50),
-    zeta_six varchar(50),
-    total_omicrons int,
-    omicron_one varchar(50),
-    omicron_two varchar(50),
-    omicron_three varchar(50),
-    omicron_four varchar(50),
-    omicron_five varchar(50),
-    omicron_six varchar(50),
-    pull_date date,
-    relic_tier int,
-    gear_one_equipped int,
-    gear_two_equipped int,
-    gear_three_equipped int,
-    gear_four_equipped int,
-    gear_five_equipped int,
-    gear_six_equipped int
-)";
-
-            using (SQLiteConnection conn = new SQLiteConnection($"Data Source={m_folderPath}\\{m_dbName}"))
-            {
-                conn.Open();
-
-                using (SQLiteCommand command = new SQLiteCommand(sql, conn))
-                {
-                    command.CommandType = System.Data.CommandType.Text;
-                    command.ExecuteNonQuery();
-                }
-            }
-        }
-
-        /// <summary>
-        /// Creates the new mod table based on the snapshot name the user wanted
-        /// </summary>
-        private void CreateModTable()
-        {
-            //TODO: Yes, the SQL Injection again, should move to non relational database to avoid this and increase performance
-            string sql = $@"CREATE TABLE MOD_{m_dbTableName}
-(
-    ID INTEGER PRIMARY KEY AUTOINCREMENT,
-    player_id int,
-    toon_id varchar(50),
-    mod_set varchar(20),
-    mod_primary_name varchar(20),
-    mod_secondary_one_name varchar(20),
-    mod_secondary_one double,
-    mod_secondary_two_name varchar(20),
-    mod_secondary_two double,
-    mod_secondary_three_name varchar(20),
-    mod_secondary_three double,
-    mod_secondary_four_name varchar(20),
-    mod_secondary_four double,
-    mod_tier varchar (2),
-    mod_rarity,
-    mod_slot varchar(20),
-    mod_secondary_one_roll varchar(2),
-    mod_secondary_two_roll varchar(2),
-    mod_secondary_three_roll varchar(2),
-    mod_secondary_four_roll varchar(2)
-)";
-
-            using (SQLiteConnection conn = new SQLiteConnection($"Data Source={m_folderPath}\\{m_dbName}"))
-            {
-                conn.Open();
-
-                using (SQLiteCommand command = new SQLiteCommand(sql, conn))
-                {
-                    command.CommandType = System.Data.CommandType.Text;
-                    command.ExecuteNonQuery();
-                }
+                    secondaryDetails.Name = $"{secondaryDetails.Name} %";
+                }   
             }
         }
 
@@ -469,7 +195,7 @@ VALUES (@player_id, @toon_id, @mod_set, @mod_primary_name, @mod_secondary_one_na
         {
             DataTable table = new DataTable();
 
-            using (SQLiteConnection m_dbConnection = new SQLiteConnection($"Data Source={m_folderPath}\\{m_dbName}"))
+            using (SQLiteConnection m_dbConnection = new SQLiteConnection($"Data Source={m_folderPath}\\{m_snapshotName}"))
             {
                 m_dbConnection.Open();
 
@@ -477,16 +203,16 @@ VALUES (@player_id, @toon_id, @mod_set, @mod_primary_name, @mod_secondary_one_na
                 {
                     command.CommandType = CommandType.Text;
 
-                    if(parameters != null)
+                    if (parameters != null)
                         command.Parameters.AddRange(parameters);
-                    
+
                     using (SQLiteDataReader reader = command.ExecuteReader())
                     {
                         table.Load(reader);
                     }
                 }
             }
-                        
+
             return await Task.FromResult(table);
         }
     }

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using Newtonsoft.Json;
 
 namespace SWGOHInterface
@@ -11,5 +7,8 @@ namespace SWGOHInterface
     {
         [JsonProperty("name")]
         public string GuildName { get; set; }
+
+        [JsonProperty("members")]
+        public List<GuildMember> Members { get; set; }
     }
 }

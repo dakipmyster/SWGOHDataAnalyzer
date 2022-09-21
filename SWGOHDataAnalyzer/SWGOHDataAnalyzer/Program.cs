@@ -88,7 +88,7 @@ namespace SWGOHDataAnalyzer
             {
                 SWGOHMessageSystem.OutputMessage("Data pull complete, writing to snapshot.");
 
-                dBInterface.WriteDataToDB(client.Guild, false);
+                //dBInterface.WriteDataToJsonFile(client.Guild, false);
             }
             else
             {
@@ -116,7 +116,9 @@ namespace SWGOHDataAnalyzer
             {
                 SWGOHMessageSystem.OutputMessage("Data pull complete, writing to snapshot.");
 
-                dBInterface.WriteDataToDB(client.Guild, true);
+                dBInterface.WriteDataToJsonFile(client.Players);
+
+                SWGOHMessageSystem.OutputMessage("Snapshot complete.");
             }
             else
             {

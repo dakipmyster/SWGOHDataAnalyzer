@@ -14,5 +14,11 @@ namespace SWGOHInterface
 
         [JsonProperty("data")]
         public PlayerData PlayerData { get; set; }
+
+        [JsonProperty("mods")]
+        public List<Mod> Mods { get; set; }
+
+        [JsonProperty("datacrons")]
+        public List<Datacron> Datacrons { get; set; }
     }
 }
