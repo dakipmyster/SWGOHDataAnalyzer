@@ -1,12 +1,14 @@
-﻿using System;
+﻿using Newtonsoft.Json;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SWGOHInterface
 {
     public class Datacron
     {
+        [JsonProperty("tier")]
+        public decimal Tier { get; set; }
+
+        [JsonProperty("tiers")]
+        public List<DatacronTier> Tiers { get; set; }
     }
 }
