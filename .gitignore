@@ -318,3 +318,6 @@ SWGOHDataAnalyzer/SWGOHClient/obj/Debug/SWGOHInterface.csproj.CoreCompileInputs.
 SWGOHDataAnalyzer/SWGOHClient/obj/Debug/SWGOHInterface.csproj.CopyComplete
 SWGOHDataAnalyzer/SWGOHClient/obj/Debug/DesignTimeResolveAssemblyReferencesInput.cache
 SWGOHDataAnalyzer/.vs/SWGOHDataAnalyzer/v16/.suo
+SWGOHDataAnalyzer/SWOGHHelper/obj/Debug/SWOGHHelper.csproj.FileListAbsolute.txt
+SWGOHDataAnalyzer/MessageSystem/obj/Debug/SWGOHMessageSystem.csproj.FileListAbsolute.txt
+SWGOHDataAnalyzer/.vs/SWGOHDataAnalyzer/v16/.suo
