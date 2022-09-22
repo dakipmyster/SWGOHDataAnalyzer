@@ -8,6 +8,12 @@ namespace SWGOHInterface
         [JsonProperty("tier")]
         public decimal Tier { get; set; }
 
+        [JsonProperty("reroll_count")]
+        public decimal RerollCount { get; set; }
+
+        [JsonProperty("id")]
+        public string DataCronId { get; set; }
+
         [JsonProperty("tiers")]
         public List<DatacronTier> Tiers { get; set; }
     }

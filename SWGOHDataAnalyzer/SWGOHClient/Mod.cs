@@ -12,6 +12,9 @@ namespace SWGOHInterface
     {
         public int PlayerId { get; set; }
 
+        [JsonProperty("id")]
+        public string ModId { get; set; }
+
         [JsonProperty("character")]
         public string ToonId { get; set; }
 
