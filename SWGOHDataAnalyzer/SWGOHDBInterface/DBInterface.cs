@@ -55,9 +55,9 @@ namespace SWGOHDBInterface
             Tables.AddRange(Directory.GetFiles(m_folderPath, "*.json", SearchOption.TopDirectoryOnly));
         }
 
-        public void WriteDataToJsonFile(List<Player> players)
+        public void WriteDataToJsonFile(Guild guild)
         {
-            Parallel.ForEach(players.AsEnumerable(), new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount }, (player) =>
+            Parallel.ForEach(guild.Players.AsEnumerable(), new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount }, (player) =>
             {
                 SWGOHMessageSystem.OutputMessage($"Sanitizing mods for player {player.PlayerData.Name}");
 
@@ -71,14 +71,15 @@ namespace SWGOHDBInterface
             {
                 var jsonWriter = new JsonTextWriter(file);
 
-                JsonSerializer.CreateDefault().Serialize(jsonWriter, players);
+                JsonSerializer.CreateDefault().Serialize(jsonWriter, guild);
             }
 
-            using (StreamReader file = File.OpenText($"{m_folderPath}\\{m_snapshotName}.json"))
-            {
-                JsonSerializer serializer = new JsonSerializer();
-                List<Player> movie2 = (List<Player>)serializer.Deserialize(file, typeof(List<Player>));
-            }
+            //use for reading file
+            //using (StreamReader file = File.OpenText($"{m_folderPath}\\{m_snapshotName}.json"))
+            //{
+            //    JsonSerializer serializer = new JsonSerializer();
+            //    List<Player> movie2 = (List<Player>)serializer.Deserialize(file, typeof(List<Player>));
+            //}
         }
 
         /// <summary>

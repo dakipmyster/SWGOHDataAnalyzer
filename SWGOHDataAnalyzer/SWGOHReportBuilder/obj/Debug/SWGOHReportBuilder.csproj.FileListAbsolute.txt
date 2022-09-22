@@ -52,6 +52,8 @@ C:\Users\klarsen\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHRepor
 C:\Users\klarsen\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHReportBuilder\bin\Debug\SQLitePCLRaw.provider.e_sqlite3.dll
 C:\Users\klarsen\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHReportBuilder\bin\Debug\SWOGHHelper.dll
 C:\Users\klarsen\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHReportBuilder\bin\Debug\SWOGHHelper.pdb
+C:\Users\Kyle\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHReportBuilder\obj\Debug\SWGOHReportBuilder.csproj.AssemblyReference.cache
+C:\Users\Kyle\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHReportBuilder\obj\Debug\SWGOHReportBuilder.csproj.CoreCompileInputs.cache
 C:\Users\Kyle\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHReportBuilder\bin\Debug\x86\e_sqlite3.dll
 C:\Users\Kyle\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHReportBuilder\bin\Debug\x64\e_sqlite3.dll
 C:\Users\Kyle\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHReportBuilder\bin\Debug\SWGOHReportBuilder.dll.config
@@ -108,8 +110,6 @@ C:\Users\Kyle\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHReportBu
 C:\Users\Kyle\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHReportBuilder\bin\Debug\Microsoft.Bcl.AsyncInterfaces.xml
 C:\Users\Kyle\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHReportBuilder\bin\Debug\System.Threading.Tasks.Extensions.xml
 C:\Users\Kyle\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHReportBuilder\bin\Debug\System.Runtime.CompilerServices.Unsafe.xml
-C:\Users\Kyle\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHReportBuilder\obj\Debug\SWGOHReportBuilder.csproj.AssemblyReference.cache
-C:\Users\Kyle\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHReportBuilder\obj\Debug\SWGOHReportBuilder.csproj.CoreCompileInputs.cache
 C:\Users\Kyle\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHReportBuilder\obj\Debug\SWGOHReportBuilder.csproj.CopyComplete
 C:\Users\Kyle\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHReportBuilder\obj\Debug\SWGOHReportBuilder.dll
 C:\Users\Kyle\Documents\GitHub\SWGOHDataAnalyzer\SWGOHDataAnalyzer\SWGOHReportBuilder\obj\Debug\SWGOHReportBuilder.pdb

@@ -13,6 +13,7 @@ namespace SWGOHInterface
     {
         private string m_GuildId;
         private HttpClient m_httpClient;
+        private SWGOHGuild m_guild;
 
         public Guild Guild;        
         public List<Player> Players;
@@ -86,9 +87,9 @@ namespace SWGOHInterface
             var response = await m_httpClient.GetAsync($"http://api.swgoh.gg/guild/{m_GuildId}");
 
             if (response.StatusCode == HttpStatusCode.OK)
-                Guild = JsonConvert.DeserializeObject<Guild>(await response.Content.ReadAsStringAsync());
+                m_guild = JsonConvert.DeserializeObject<SWGOHGuild>(await response.Content.ReadAsStringAsync());
 
-            await Guild.GuildData.Members.ParallelForEachAsync(async guildMember =>
+            await m_guild.GuildData.Members.ParallelForEachAsync(async guildMember =>
             {
                 try
                 {
@@ -108,7 +109,11 @@ namespace SWGOHInterface
                 }
 
             }, maxDegreeOfParallelism: Environment.ProcessorCount);
-            //}, maxDegreeOfParallelism: 1);
+
+            Guild = new Guild();
+            Guild.GuildName = m_guild.GuildData.GuildName;
+            Guild.SnapshotDate = DateTime.Now;
+            Guild.Players = Players;
 
             ResponseCode = response.StatusCode;
         }

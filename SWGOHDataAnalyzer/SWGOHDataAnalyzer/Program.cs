@@ -116,7 +116,7 @@ namespace SWGOHDataAnalyzer
             {
                 SWGOHMessageSystem.OutputMessage("Data pull complete, writing to snapshot.");
 
-                dBInterface.WriteDataToJsonFile(client.Players);
+                dBInterface.WriteDataToJsonFile(client.Guild);                
 
                 SWGOHMessageSystem.OutputMessage("Snapshot complete.");
             }
@@ -145,7 +145,7 @@ namespace SWGOHDataAnalyzer
 
             ReportBuilder builder = new ReportBuilder(fileName, characterName);
                         
-            await builder.CompileSimpleReport(client.Guild);
+            //await builder.CompileSimpleReport(client.Guild);
         }
 
         private static async Task OmegasLeft()

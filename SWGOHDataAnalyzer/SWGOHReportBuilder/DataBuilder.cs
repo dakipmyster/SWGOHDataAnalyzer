@@ -362,7 +362,7 @@ FROM MOD_{m_newSnapshot} WHERE toon_id = @toonid AND player_id = @allycode";
         /// </summary>
         /// <param name="guild">Guild data from the interface</param>
         /// <returns></returns>
-        internal async Task CollectUnitDataFromInterface(Guild guild)
+        internal async Task CollectUnitDataFromInterface(SWGOHGuild guild)
         {
             GuildName = guild.GuildData.GuildName;
             DateRange = DateTime.Now.ToString("d");
