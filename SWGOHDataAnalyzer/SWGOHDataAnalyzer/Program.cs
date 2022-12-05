@@ -64,8 +64,7 @@ namespace SWGOHDataAnalyzer
         {
             ReportBuilder builder = new ReportBuilder();
 
-            if (builder.CanRunReport())
-                await builder.CompileReport();
+            await builder.CompileReport();
         }
 
         /// <summary>

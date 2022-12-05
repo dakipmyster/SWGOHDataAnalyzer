@@ -90,14 +90,6 @@ namespace SWGOHReportBuilder
         }
 
         /// <summary>
-        /// Determines if the report can be ran
-        /// </summary>
-        public bool CanRunReport()
-        {
-            return m_dataBuilder.CanRunReport();
-        }
-
-        /// <summary>
         /// Grabs the data needed to run the detailed report
         /// </summary>
         /// <returns></returns>
@@ -107,10 +99,7 @@ namespace SWGOHReportBuilder
             
             List<Task> tasks = new List<Task>();
 
-            tasks.Add(Task.Run(() => m_dataBuilder.CollectUnitDataFromDB()));
-            tasks.Add(Task.Run(() => m_dataBuilder.CollectShipDataFromDB()));
-            tasks.Add(Task.Run(() => m_dataBuilder.CollectPlayerGPDifferencesFromDB()));
-            tasks.Add(Task.Run(() => m_dataBuilder.CollectSnapshotMetadataFromDB()));
+            tasks.Add(Task.Run(() => m_dataBuilder.GetGuildData()));
 
             m_fileName = SWGOHMessageSystem.InputMessage("Enter in the filename for the report");
             m_toonName = SWGOHMessageSystem.InputMessage("Enter in the toon to highlight for the report. Multiple toons can be added via comma delimited. If there is not a toon you wish to highlight, press enter to continue.");
@@ -118,8 +107,8 @@ namespace SWGOHReportBuilder
 
             await Task.WhenAll(tasks.ToArray());
 
-            m_filteredPlayerNames = m_dataBuilder.PlayerData.Select(a => a.PlayerName).ToList();
-            m_filteredUnitData = m_dataBuilder.UnitData.Where(a => m_filteredPlayerNames.Contains(a.PlayerName)).ToList();            
+            m_filteredPlayerNames = m_dataBuilder.Guild.Players.Select(a => a.PlayerData.Name).ToList();
+            m_filteredUnitData = m_dataBuilder.Guild.Players.SelectMany(x => x.PlayerUnits).Where(a => m_filteredPlayerNames.Contains(a.UnitData.PlayerName)).ToList();            
             m_filteredShipData = m_dataBuilder.ShipData.Where(a => m_filteredPlayerNames.Contains(a.PlayerName)).ToList();
             await BuildReport();            
         }
