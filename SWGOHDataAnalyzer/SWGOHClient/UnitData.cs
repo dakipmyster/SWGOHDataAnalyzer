@@ -41,6 +41,9 @@ namespace SWGOHInterface
         [JsonProperty("omicron_abilities")]
         public List<string> AppliedOmicrons { get; set; }
 
+        [JsonProperty("combat_type")]
+        public CombatType UnitType { get; set; }
+
         public List<Mod> UnitMods { get; set; }
     }
 }

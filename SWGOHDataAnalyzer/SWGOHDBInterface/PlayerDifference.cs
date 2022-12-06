@@ -18,6 +18,7 @@ namespace SWGOHDBInterface
         public int OldGP { get; set; }
         public int NewGP { get; set; }
         public int GPDifference => NewGP - OldGP;
+        public decimal GPPercentDifference => Math.Round(Decimal.Divide(GPDifference, OldGP) * 100, 3);
         public List<UnitDifference> Units { get; set; }
     }
 }

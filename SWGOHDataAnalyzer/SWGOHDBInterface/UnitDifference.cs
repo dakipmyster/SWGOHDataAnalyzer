@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using SWGOHInterface;
 
 namespace SWGOHDBInterface
 {
@@ -14,7 +11,8 @@ namespace SWGOHDBInterface
             NewOmicrons = new List<string>();
         }
 
-        public bool IsShip { get; set; }
+        public string PlayerName { get; set; }
+        public CombatType UnitType { get; set; }
         public string Name { get; set; }
         public int OldGP { get; set; }
         public int NewGP { get; set; }

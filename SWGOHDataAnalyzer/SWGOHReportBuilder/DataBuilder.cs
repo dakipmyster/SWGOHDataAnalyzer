@@ -19,7 +19,7 @@ namespace SWGOHReportBuilder
 
         internal GuildDifference DifferencesGuildData { get; private set; }
         internal Guild NewGuildData { get; private set; }
-        private Guild OldGuildData { get; set; }
+        internal Guild OldGuildData { get; set; }
 
         private List<string> Snapshots { get; set; }
 
@@ -65,7 +65,20 @@ namespace SWGOHReportBuilder
                 NewGuildData = (Guild)serializer.Deserialize(file, typeof(Guild));
             }
 
+            CleanData();
             BuildComparisonData();
+        }
+
+        private void CleanData()
+        {
+            NewGuildData.Players.SelectMany(x => x.PlayerUnits).Select(y => y.UnitData.UnitStats.PhysicalDefense == Math.Round(y.UnitData.UnitStats.PhysicalDefense, 2));
+            NewGuildData.Players.SelectMany(x => x.PlayerUnits).Select(y => y.UnitData.UnitStats.SpeicalDefense == Math.Round(y.UnitData.UnitStats.SpeicalDefense, 2));
+            NewGuildData.Players.SelectMany(x => x.PlayerUnits).Select(y => y.UnitData.UnitStats.PhysicalCriticalChance == Math.Round(y.UnitData.UnitStats.PhysicalCriticalChance, 2));
+            NewGuildData.Players.SelectMany(x => x.PlayerUnits).Select(y => y.UnitData.UnitStats.SpecialCriticalChance == Math.Round(y.UnitData.UnitStats.SpecialCriticalChance, 2));
+            NewGuildData.Players.SelectMany(x => x.PlayerUnits).Select(y => y.UnitData.UnitStats.Potency == Math.Round(y.UnitData.UnitStats.Potency * 100, 2));
+            NewGuildData.Players.SelectMany(x => x.PlayerUnits).Select(y => y.UnitData.UnitStats.Tenacity == Math.Round(y.UnitData.UnitStats.Tenacity * 100, 2));
+            NewGuildData.Players.SelectMany(x => x.PlayerUnits).Select(y => y.UnitData.RelicTier = y.UnitData.RelicTier >= 3 ? y.UnitData.RelicTier - 2 : 0);
+            OldGuildData.Players.SelectMany(x => x.PlayerUnits).Select(y => y.UnitData.RelicTier = y.UnitData.RelicTier >= 3 ? y.UnitData.RelicTier - 2 : 0);
         }
 
         private void BuildComparisonData()
@@ -100,8 +113,9 @@ namespace SWGOHReportBuilder
 
                 var unitDifference = new UnitDifference()
                 {
-                    IsShip = newUnit.UnitData.GearLevel == 0 ? true : false,
-                    Name = newUnit.UnitData.Name
+                    UnitType = newUnit.UnitData.UnitType,
+                    Name = newUnit.UnitData.Name,
+                    PlayerName = newPlayerData.PlayerData.Name
                 };
 
                 differencesDetected.Add(IsUnitGPDifference(oldUnit, newUnit, unitDifference));
@@ -111,8 +125,11 @@ namespace SWGOHReportBuilder
                 differencesDetected.Add(IsZetaDifferences(oldUnit, newUnit, unitDifference));
                 differencesDetected.Add(IsOmicronDifferences(oldUnit, newUnit, unitDifference));
 
-                lock (playerDifference)
-                    playerDifference.Units.Add(unitDifference);                
+                if (differencesDetected.Any(x => x == true))
+                {
+                    lock (playerDifference)
+                        playerDifference.Units.Add(unitDifference);
+                }
             });
 
             return playerDifference;
@@ -120,26 +137,63 @@ namespace SWGOHReportBuilder
 
         private bool IsOmicronDifferences(PlayerUnit oldUnit, PlayerUnit newUnit, UnitDifference unitDifference)
         {
+            if (oldUnit == null || oldUnit.UnitData.AppliedOmicrons.Count() < newUnit.UnitData.AppliedOmicrons.Count())
+            {
+                foreach (var omicronName in newUnit.UnitData.AppliedOmicrons.Where(x => !oldUnit.UnitData.AppliedOmicrons.Contains(x)))
+                    unitDifference.NewOmicrons.Add(omicronName);
+
+                return true;
+            }
+
             return false;
         }
 
         private bool IsZetaDifferences(PlayerUnit oldUnit, PlayerUnit newUnit, UnitDifference unitDifference)
         {
+            if (oldUnit == null || oldUnit.UnitData.AppliedZetas.Count() < newUnit.UnitData.AppliedZetas.Count())
+            {
+                foreach (var zetaName in newUnit.UnitData.AppliedZetas.Where(x => !oldUnit.UnitData.AppliedZetas.Contains(x)))
+                    unitDifference.NewZetas.Add(zetaName);
+
+                return true;
+            }
+
             return false;
         }
 
         private bool IsGearLevelDifference(PlayerUnit oldUnit, PlayerUnit newUnit, UnitDifference unitDifference)
         {
+            if (oldUnit == null || oldUnit.UnitData.GearLevel < newUnit.UnitData.GearLevel)
+            {
+                unitDifference.OldGearLevel = oldUnit != null ? oldUnit.UnitData.GearLevel : 0;
+                unitDifference.NewGearLevel = newUnit.UnitData.GearLevel;
+                return true;
+            }
+
             return false;
         }
 
         private bool IsRelicTierDifference(PlayerUnit oldUnit, PlayerUnit newUnit, UnitDifference unitDifference)
         {
+            if (oldUnit == null || oldUnit.UnitData.RelicTier < newUnit.UnitData.RelicTier)
+            {
+                unitDifference.OldRelicTier = oldUnit != null ? oldUnit.UnitData.RelicTier : 0;
+                unitDifference.NewRelicTier = newUnit.UnitData.RelicTier;
+                return true;
+            }
+
             return false;
         }
 
         private bool IsRarityDifference(PlayerUnit oldUnit, PlayerUnit newUnit, UnitDifference unitDifference)
         {
+            if (oldUnit == null || oldUnit.UnitData.Rarity < newUnit.UnitData.Rarity)
+            {
+                unitDifference.OldRarity = oldUnit != null ? oldUnit.UnitData.Rarity: 0;
+                unitDifference.NewRarity = newUnit.UnitData.Rarity;
+                return true;
+            }
+
             return false;
         }
 
