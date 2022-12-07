@@ -31,6 +31,7 @@ namespace SWGOHReportBuilder
         string m_glProgress;
         string m_guildFocusProgress;
         string m_modStats;
+        string m_datacronSection;
         bool m_isSimpleReport;
 
         List<GLCharacterProgress> m_glCharacterProgressList;
@@ -105,6 +106,7 @@ div {
             if(!m_isSimpleReport)
             {
                 tasks.Add(Task.Run(() => CompileModStats()));
+                tasks.Add(Task.Run(() => CompileDatacronStats()));
                 tasks.Add(Task.Run(() => JourneyOrLegendaryUnlock()));
                 tasks.Add(Task.Run(() => GalaticLegenedProgress()));
                 tasks.Add(Task.Run(() => GuildFocusProgress()));
@@ -144,6 +146,7 @@ div {
                 pdfString.AppendLine(m_omicronsApplied);
                 pdfString.AppendLine(m_journeyOrLegendaryUnlock);
                 pdfString.AppendLine(m_modStats);
+                pdfString.AppendLine(m_datacronSection);
                 pdfString.AppendLine(m_guildFocusProgress);
                 pdfString.AppendLine(m_glProgress);
             }
@@ -210,6 +213,7 @@ div {
                 sb.AppendLine("<li><a href=\"#omicrons\">Omicrons Applied</a></li>");
                 sb.AppendLine("<li><a href=\"#toonunlock\">Journey/Legendary/Galactic Legend Unlocks</a></li>");
                 sb.AppendLine("<li><a href=\"#modstats\">Top mods per secondary stat</a></li>");
+                sb.AppendLine("<li><a href=\"#datacronstats\">Top datacron stats</a></li>");
                 sb.AppendLine("<li><a href=\"#guildfocus\">Guild Focus Teams</a></li>");
                 sb.AppendLine("<li><a href=\"#glprep\">Players prepping for Galatic Legends</a></li>");
                 sb.AppendLine("</ol>");
@@ -1000,6 +1004,52 @@ div {
             await Task.CompletedTask;
         }
 
+        private async Task CompileDatacronStats()
+        {
+            StringBuilder sb = new StringBuilder();
+
+            var guildDatacrons = m_dataBuilder.NewGuildData.Players.SelectMany(x => x.Datacrons);
+
+            //Ability of null means its not a alignment/faction/toon ability granted by the datacron
+            var statNames = guildDatacrons.SelectMany(x => x.Tiers).Where(x => x.Ability == null).Select(x => x.StatName).Distinct().OrderBy(x => x);
+
+            sb.AppendLine("<div id=\"datacronstats\">");
+            sb.AppendLine(HTMLConstructor.SectionHeader("Top Datacon stats"));
+            sb.AppendLine("This section highlights the top 25 of a given stat across all datacrons. This does not assess the unique abilites granted at lvl 3,6 and 9.");
+            sb.AppendLine("<p/>");
+
+            sb.AppendLine(HTMLConstructor.TableGroupStart());
+
+            var makeNextGroup = true;
+            foreach(var statName in statNames)
+            {
+                var datacronsWithStat = guildDatacrons
+                    .Where(x => x.Tiers.Any(y => y.StatName == statName))
+                    .OrderByDescending(x => x.Tiers.Sum(y => y.StatValue));
+
+                sb.Append(HTMLConstructor.AddTable(new string[] { "Player Name", "Datacron Name", "Value" }, GenerateTopStatForDatacronsTable(statName, datacronsWithStat), statName));
+
+                if(makeNextGroup)
+                {
+                    sb.Append(HTMLConstructor.TableGroupNext());
+                    makeNextGroup = false;
+                }
+                else
+                {
+                    sb.AppendLine(HTMLConstructor.TableGroupEnd());
+                    sb.AppendLine(HTMLConstructor.TableGroupStart());
+                    makeNextGroup = false;
+                }
+            }
+
+            sb.AppendLine(HTMLConstructor.TableGroupEnd());
+            sb.AppendLine("<p/></div>");
+
+            m_datacronSection = sb.ToString();
+
+            await Task.CompletedTask;
+        }
+
         /// <summary>
         /// Method to generate 7* characters
         /// </summary>
@@ -1177,6 +1227,24 @@ div {
                 propertyValues.Add(unit.PlayerName);
                 propertyValues.Add(unit.Name);
                 propertyValues.Add(unit.UnitStats.GetType().GetProperty(statName).GetValue(unit.UnitStats, null).ToString());
+
+                sb.AppendLine(HTMLConstructor.AddTableData(propertyValues.ToArray()));
+            }
+
+            return sb.ToString();
+        }
+
+        private string GenerateTopStatForDatacronsTable(string statName, IEnumerable<Datacron> datacrons)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            foreach (Datacron datacron in datacrons)
+            {
+                List<string> propertyValues = new List<string>();
+
+                propertyValues.Add(datacron.PlayerName);
+                propertyValues.Add(datacron.Name);
+                propertyValues.Add(datacron.Tiers.Where(x => x.StatName == statName).Sum(x => Math.Round(x.StatValue * 100, 2)).ToString());
 
                 sb.AppendLine(HTMLConstructor.AddTableData(propertyValues.ToArray()));
             }

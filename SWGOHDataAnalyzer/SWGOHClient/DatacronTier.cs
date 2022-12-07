@@ -9,5 +9,8 @@ namespace SWGOHInterface
 
         [JsonProperty("stat_value")]
         public decimal StatValue { get; set; }
+
+        [JsonProperty("ability_id")]
+        public string Ability { get; set; }
     }
 }

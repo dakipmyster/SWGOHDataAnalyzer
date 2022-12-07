@@ -16,7 +16,11 @@ namespace SWGOHReportBuilder
         private string m_folderPath = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\\SWGOHDataAnalyzer";
         private string m_oldSnapshotName;
         private string m_newSnapshotName;
-
+        private Dictionary<string, string> m_datacronNames => new Dictionary<string, string>()
+        {
+            { "datacron_set_4_base","Security Primer" },
+            { "datacron_set_5_base","Projecting Power" }
+        };
         internal GuildDifference DifferencesGuildData { get; private set; }
         internal Guild NewGuildData { get; private set; }
         internal Guild OldGuildData { get; set; }
@@ -83,6 +87,7 @@ namespace SWGOHReportBuilder
             {
                 player.PlayerUnits.ForEach(x => x.UnitData.PlayerName = player.PlayerData.Name);
                 player.Datacrons.ForEach(x => x.PlayerName = player.PlayerData.Name);
+                player.Datacrons.ForEach(x => x.Name = m_datacronNames[x.Name]);
                 player.Mods.ForEach(x => x.PlayerName = player.PlayerData.Name);
                 player.Mods.ForEach(x => x.UnitName = unitDictionary[x.ToonId]);
                 player.PlayerUnits.ForEach(x => x.UnitData.UnitStats.PhysicalDefense = Math.Round(x.UnitData.UnitStats.PhysicalDefense, 2));
