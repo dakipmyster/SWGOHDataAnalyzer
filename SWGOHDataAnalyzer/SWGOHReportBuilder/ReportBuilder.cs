@@ -382,7 +382,7 @@ div {
         private async Task GuildFocusProgress()
         {
             StringBuilder sb = new StringBuilder();
-            StringBuilder KAM = new StringBuilder();
+            StringBuilder reva = new StringBuilder();
             
             m_glCharacterProgressList = new List<GLCharacterProgress>();
 
@@ -394,13 +394,13 @@ div {
             foreach (Player player in m_dataBuilder.NewGuildData.Players.OrderBy(a => a.PlayerData.Name))
             {
                 m_glCharacterProgressList.Add(new GLCharacterProgress() { PlayerName = player.PlayerData.Name });
-                KAM.AppendLine(GetKAMProgressForPlayer(player));
+                reva.AppendLine(GetRevaProgressForPlayer(player));
             }
 
             sb.AppendLine("</p>");
-            sb.AppendLine("<b>KAM Mission (R5 all around):</b>");
+            sb.AppendLine("<b>Reva Mission (R7 all around):</b>");
 
-            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Shaak Ti", "Rex", "5's", "Echo", "Arc" }, KAM.ToString()));
+            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Second", "Fifth", "Seventh", "Eighth", "Ninth", "GI" }, reva.ToString()));
 
             sb.AppendLine("<p/></div>");
 
@@ -659,16 +659,17 @@ div {
         /// </summary>
         /// <param name="playerName"></param>
         /// <returns></returns>
-        private string GetKAMProgressForPlayer(Player player)
+        private string GetRevaProgressForPlayer(Player player)
         {
             List<decimal> progressList = new List<decimal>();
-            string shaak = CalculatePercentProgressForGL(player.PlayerUnits.FirstOrDefault(a => a.UnitData.Name == "Shaak Ti"), GLProgressScore.RelicFive, out progressList, progressList);
-            string rex = CalculatePercentProgressForGL(player.PlayerUnits.FirstOrDefault(a => a.UnitData.Name == "CT-7567 \"Rex\""), GLProgressScore.RelicFive, out progressList, progressList);
-            string fives = CalculatePercentProgressForGL(player.PlayerUnits.FirstOrDefault(a => a.UnitData.Name == "CT-5555 \"Fives\""), GLProgressScore.RelicFive, out progressList, progressList);
-            string echo = CalculatePercentProgressForGL(player.PlayerUnits.FirstOrDefault(a => a.UnitData.Name == "CT-21-0408 \"Echo\""), GLProgressScore.RelicFive, out progressList, progressList);
-            string arc = CalculatePercentProgressForGL(player.PlayerUnits.FirstOrDefault(a => a.UnitData.Name == "ARC Trooper"), GLProgressScore.RelicFive, out progressList, progressList);
+            string second = CalculatePercentProgressForGL(player.PlayerUnits.FirstOrDefault(a => a.UnitData.Name == "Second Sister"), GLProgressScore.RelicSeven, out progressList, progressList);
+            string fifth = CalculatePercentProgressForGL(player.PlayerUnits.FirstOrDefault(a => a.UnitData.Name == "Fifth Brother"), GLProgressScore.RelicSeven, out progressList, progressList);
+            string seventh = CalculatePercentProgressForGL(player.PlayerUnits.FirstOrDefault(a => a.UnitData.Name == "Seventh Sister"), GLProgressScore.RelicSeven, out progressList, progressList);
+            string eighth = CalculatePercentProgressForGL(player.PlayerUnits.FirstOrDefault(a => a.UnitData.Name == "Eighth Brother"), GLProgressScore.RelicSeven, out progressList, progressList);
+            string ninth = CalculatePercentProgressForGL(player.PlayerUnits.FirstOrDefault(a => a.UnitData.Name == "Ninth Sister"), GLProgressScore.RelicSeven, out progressList, progressList);
+            string gi = CalculatePercentProgressForGL(player.PlayerUnits.FirstOrDefault(a => a.UnitData.Name == "Grand Inquisitor"), GLProgressScore.RelicSeven, out progressList, progressList);
 
-            return HTMLConstructor.AddTableData(new string[] { player.PlayerData.Name, shaak, rex, fives, echo, arc });
+            return HTMLConstructor.AddTableData(new string[] { player.PlayerData.Name, second, fifth, seventh, eighth, ninth });
         }
 
         /// <summary>
@@ -751,13 +752,40 @@ div {
                 }
             }
 
+            int rarityPoints = 0;
+            switch (playerUnit.UnitData.Rarity)
+            {
+                case 1:
+                    rarityPoints = 1;
+                    break;
+                case 2:
+                    rarityPoints = 3;
+                    break;
+                case 3:
+                    rarityPoints = 6;
+                    break;
+                case 4:
+                    rarityPoints = 10;
+                    break;
+                case 5:
+                    rarityPoints = 15;
+                    break;
+                case 6:
+                    rarityPoints = 21;
+                    break;
+                case 7:
+                    rarityPoints = 28;
+                    break;
+            }
+
             var maxPoints = (int)score;
 
             //-1 because we want to count the number of gear pieces equipped not the current gear level ie Gear 1 if not the -1 would award 6 points
             int points = ((playerUnit.UnitData.GearLevel-1) * 6) 
-                + relicPoints 
+                + playerUnit.UnitData.GearLevel == 13 ? 6 : 0 //Bonus 6 for getting to relic level
+                + relicPoints
                 + playerUnit.UnitData.UnitType == CombatType.Ship ? 0 : playerUnit.UnitData.Gear.Count()
-                + playerUnit.UnitData.Rarity;
+                + rarityPoints;
 
             progressList.Add(Math.Round(Decimal.Divide(points, maxPoints) * 100, 2) > 100 ? 100 : Math.Round(Decimal.Divide(points, maxPoints) * 100, 2));
             return Math.Round(Decimal.Divide(points, maxPoints) * 100, 2) > 100 ? "100" : Math.Round(Decimal.Divide(points, maxPoints) * 100, 0).ToString();
