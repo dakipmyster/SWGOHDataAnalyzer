@@ -5,6 +5,8 @@ namespace SWGOHInterface
 {
     public class Datacron
     {
+        public string PlayerName { get; set; }
+
         [JsonProperty("tier")]
         public decimal Tier { get; set; }
 

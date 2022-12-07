@@ -5,6 +5,8 @@ namespace SWGOHInterface
 {
     public class UnitData
     {
+        public string PlayerName { get; set; }
+
         [JsonProperty("relic_tier")]
         public int RelicTier { get; set; }
 

@@ -22,17 +22,11 @@ namespace SWGOHReportBuilder
         string m_UnitGPDifferences;
         string m_topTwentySection;
         string m_sevenStarSection;
-        string m_gearTwelveToons;
-        string m_gearThirteenToons;
         string m_relicTiers;
         string m_zetasApplied;
         string m_omicronsApplied;
         string m_journeyOrLegendaryUnlock;
-        string m_journeyPrepared;
-        string m_detailedData;
-        string m_characterHighlight;
         string m_introduction;
-        string m_toonName;
         string m_fileName;
         string m_glProgress;
         string m_guildFocusProgress;
@@ -61,7 +55,6 @@ namespace SWGOHReportBuilder
         {
             m_dataBuilder = new DataBuilder();
             m_fileName = fileName;
-            m_toonName = characterName;
             m_isSimpleReport = true;
         }
 
@@ -78,7 +71,6 @@ namespace SWGOHReportBuilder
             tasks.Add(Task.Run(() => m_dataBuilder.GetGuildData()));
 
             m_fileName = SWGOHMessageSystem.InputMessage("Enter in the filename for the report");
-            m_toonName = SWGOHMessageSystem.InputMessage("Enter in the toon to highlight for the report. Multiple toons can be added via comma delimited. If there is not a toon you wish to highlight, press enter to continue.");
             SWGOHMessageSystem.OutputMessage("Compiling Report Data....");
 
             await Task.WhenAll(tasks.ToArray());
@@ -113,22 +105,18 @@ div {
             if(!m_isSimpleReport)
             {
                 tasks.Add(Task.Run(() => CompileModStats()));
-                tasks.Add(Task.Run(() => DetailedData()));
                 tasks.Add(Task.Run(() => JourneyOrLegendaryUnlock()));
                 tasks.Add(Task.Run(() => GalaticLegenedProgress()));
                 tasks.Add(Task.Run(() => GuildFocusProgress()));
                 tasks.Add(Task.Run(() => UnitGPDifferences()));
                 tasks.Add(Task.Run(() => SevenStarSection()));
-                tasks.Add(Task.Run(() => GearTwelveToons()));
-                tasks.Add(Task.Run(() => GearThirteenToons()));
                 tasks.Add(Task.Run(() => ZetasApplied()));
                 tasks.Add(Task.Run(() => OmicronsApplied()));
                 tasks.Add(Task.Run(() => PlayerGPDifferences()));
                 tasks.Add(Task.Run(() => RelicTierDifferences()));                
             }
                                     
-            tasks.Add(Task.Run(() => TopTwentySection()));            
-            tasks.Add(Task.Run(() => CharacterHighlight()));
+            tasks.Add(Task.Run(() => TopTwentySection()));  
             
             /* For testing processing times
             tasks.Add(Task.Run(() => InvokeAsyncTask("IntroductionPage")));
@@ -142,9 +130,7 @@ div {
             if (m_isSimpleReport)
             {
                 pdfString.AppendLine(m_introduction);
-                pdfString.AppendLine(m_topTwentySection);                                
-                pdfString.AppendLine(m_journeyPrepared);
-                pdfString.AppendLine(m_characterHighlight);
+                pdfString.AppendLine(m_topTwentySection);
             }            
             else
             {
@@ -153,8 +139,6 @@ div {
                 pdfString.AppendLine(m_UnitGPDifferences);
                 pdfString.AppendLine(m_topTwentySection);
                 pdfString.AppendLine(m_sevenStarSection);
-                pdfString.AppendLine(m_gearTwelveToons);
-                pdfString.AppendLine(m_gearThirteenToons);
                 pdfString.AppendLine(m_relicTiers);
                 pdfString.AppendLine(m_zetasApplied);
                 pdfString.AppendLine(m_omicronsApplied);
@@ -162,8 +146,6 @@ div {
                 pdfString.AppendLine(m_modStats);
                 pdfString.AppendLine(m_guildFocusProgress);
                 pdfString.AppendLine(m_glProgress);
-                pdfString.AppendLine(m_characterHighlight);
-                pdfString.AppendLine(m_detailedData);
             }
 
             pdfString.AppendLine(@"</body></html>");
@@ -205,7 +187,6 @@ div {
                 sb.AppendLine("<li></li>");
                 sb.AppendLine("<li><a href=\"#guildsummary\">Guild Summary</a></li>");
                 sb.AppendLine("<li><a href=\"#toptwenty\">Top 20 Stats</a></li>");
-                if (!String.IsNullOrEmpty(m_toonName)) sb.AppendLine($"<li><a href=\"#highlight\">Character Highlight: {m_toonName}</a></li>");
                 sb.AppendLine("</ol></div>");
             }
             else
@@ -224,8 +205,6 @@ div {
                 sb.AppendLine("<li><a href=\"#unitgpdiff\">Toon GP Differences</a></li>");
                 sb.AppendLine("<li><a href=\"#toptwenty\">Top 20 Stats</a></li>");
                 sb.AppendLine("<li><a href=\"#sevenstar\">Seven Stars</a></li>");
-                sb.AppendLine("<li><a href=\"#geartwelve\">Gear 12 Toons</a></li>");
-                sb.AppendLine("<li><a href=\"#gearthirteen\">Gear 13 Toons</a></li>");
                 sb.AppendLine("<li><a href=\"#relictiers\">Relic Tier Upgrades</a></li>");
                 sb.AppendLine("<li><a href=\"#zetas\">Zetas Applied</a></li>");
                 sb.AppendLine("<li><a href=\"#omicrons\">Omicrons Applied</a></li>");
@@ -233,8 +212,6 @@ div {
                 sb.AppendLine("<li><a href=\"#modstats\">Top mods per secondary stat</a></li>");
                 sb.AppendLine("<li><a href=\"#guildfocus\">Guild Focus Teams</a></li>");
                 sb.AppendLine("<li><a href=\"#glprep\">Players prepping for Galatic Legends</a></li>");
-                if (!String.IsNullOrEmpty(m_toonName)) sb.AppendLine($"<li><a href=\"#highlight\">Character Highlight: {m_toonName}</a></li>");
-                sb.AppendLine("<li><a href=\"#details\">Data Details</a></li>");
                 sb.AppendLine("</ol>");
                 sb.AppendLine("<p/>");
                 sb.AppendLine("<p/>");
@@ -261,93 +238,6 @@ div {
             }
 
             m_introduction = sb.ToString();
-
-            await Task.CompletedTask;
-        }
-
-        /// <summary>
-        /// Method to generate the character highlight
-        /// </summary>
-        /// <returns></returns>
-        private async Task CharacterHighlight()
-        {
-            if (!String.IsNullOrEmpty(m_toonName))
-            {
-                StringBuilder sb = new StringBuilder();
-
-                sb.AppendLine("<div id=\"highlight\">");
-                sb.AppendLine(HTMLConstructor.SectionHeader("Character Highlight"));
-                sb.AppendLine($"This section goes over characters to highlight and will rotate every report.  The report takes the top 10 of each stat on the toon from the guild.");
-
-                string[] toonNames = m_toonName.Split(',');
-                foreach (string toonName in toonNames)
-                {
-                    sb.AppendLine($"{toonName.Trim()}");
-                    sb.AppendLine("<p/>");
-
-                    sb.AppendLine(HTMLConstructor.TableGroupStart());
-
-                    sb.Append(HTMLConstructor.AddTable(new string[] { "Player Name", "Health" }, TakeTopXOfStatAndReturnTableData(10, "CurrentHealth", new string[] { "PlayerName", "CurrentHealth" }, toonName.Trim()), "Health"));
-
-                    sb.Append(HTMLConstructor.TableGroupNext());
-
-                    sb.Append(HTMLConstructor.AddTable(new string[] { "Player Name", "Protection" }, TakeTopXOfStatAndReturnTableData(10, "CurrentProtection", new string[] { "PlayerName", "CurrentProtection" }, toonName.Trim()), "Protection"));
-
-                    sb.Append(HTMLConstructor.TableGroupNext());
-
-                    sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Tankiest" }, TakeTopXOfStatAndReturnTableData(10, "CurrentTankiest", new string[] { "PlayerName", "CurrentTankiest" }, toonName.Trim()), "Tankiest"));
-
-                    sb.AppendLine(HTMLConstructor.TableGroupEnd());
-                    sb.AppendLine(HTMLConstructor.TableGroupStart());
-
-                    sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Speed" }, TakeTopXOfStatAndReturnTableData(10, "CurrentSpeed", new string[] { "PlayerName", "CurrentSpeed" }, toonName.Trim()), "Speed"));
-
-                    sb.Append(HTMLConstructor.TableGroupNext());
-
-                    sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "PO" }, TakeTopXOfStatAndReturnTableData(10, "CurrentPhysicalOffense", new string[] { "PlayerName", "CurrentPhysicalOffense" }, toonName.Trim()), "Physical Offense"));
-
-                    sb.Append(HTMLConstructor.TableGroupNext());
-
-                    sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "SO" }, TakeTopXOfStatAndReturnTableData(10, "CurrentSpecialOffense", new string[] { "PlayerName", "CurrentSpecialOffense" }, toonName.Trim()), "Special Offense"));
-
-                    sb.AppendLine(HTMLConstructor.TableGroupEnd());
-                    sb.AppendLine(HTMLConstructor.TableGroupStart());
-
-                    sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "PD" }, TakeTopXOfStatAndReturnTableData(10, "CurrentPhysicalDefense", new string[] { "PlayerName", "CurrentPhysicalDefense" }, toonName.Trim()), "Physical Defense"));
-
-                    sb.Append(HTMLConstructor.TableGroupNext());
-
-                    sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "SD" }, TakeTopXOfStatAndReturnTableData(10, "CurrentSpecialDefense", new string[] { "PlayerName", "CurrentSpecialDefense" }, toonName.Trim()), "Special Defense"));
-
-                    sb.Append(HTMLConstructor.TableGroupNext());
-
-                    sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "PCC" }, TakeTopXOfStatAndReturnTableData(10, "CurrentPhysicalCritChance", new string[] { "PlayerName", "CurrentPhysicalCritChance" }, toonName.Trim()), "Physical CC"));
-
-                    sb.AppendLine(HTMLConstructor.TableGroupEnd());
-                    sb.AppendLine(HTMLConstructor.TableGroupStart());
-
-                    sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "SCC" }, TakeTopXOfStatAndReturnTableData(10, "CurrentSpecialCritChance", new string[] { "PlayerName", "CurrentSpecialCritChance" }, toonName.Trim()), "Special CC"));
-
-                    sb.Append(HTMLConstructor.TableGroupNext());
-
-                    sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Potency" }, TakeTopXOfStatAndReturnTableData(10, "CurrentPotency", new string[] { "PlayerName", "CurrentPotency" }, toonName.Trim()), "Potency"));
-
-                    sb.Append(HTMLConstructor.TableGroupNext());
-
-                    sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Tenacity" }, TakeTopXOfStatAndReturnTableData(10, "CurrentTenacity", new string[] { "PlayerName", "CurrentTenacity" }, toonName.Trim()), "Tenacity"));
-
-                    sb.AppendLine(HTMLConstructor.TableGroupEnd());
-                    sb.AppendLine(HTMLConstructor.TableGroupStart());
-
-                    sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Galactic Power", "Gear Level", "Relic Tier" }, TakeTopXOfStatAndReturnTableData(10, "NewPower", new string[] { "PlayerName", "NewPower", "NewGearLevel", "NewRelicTier" }, toonName.Trim()), "Highest Galatic Power"));
-
-                    sb.AppendLine(HTMLConstructor.TableGroupEnd());
-
-                    sb.AppendLine("<p/></div>");
-                }
-
-                m_characterHighlight = sb.ToString();
-            }
 
             await Task.CompletedTask;
         }
@@ -1023,56 +913,26 @@ div {
         }
 
         /// <summary>
-        /// Method to generate g13 toons
-        /// </summary>
-        /// <returns></returns>
-        private async Task GearThirteenToons()
-        {
-            StringBuilder sb = new StringBuilder();
-
-            sb.AppendLine("<div id=\"gearthirteen\">");
-            sb.AppendLine(HTMLConstructor.SectionHeader("Gear 13 Toons"));
-            sb.AppendLine("This section highlights all of the toons that have been geared to 13 since the last snapshot.");
-            sb.AppendLine("</p>");
-
-            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Toon" }, GetAllToonsOfGearLevelDifference(13)));
-
-            sb.AppendLine("<p/></div>");
-                        
-            m_gearThirteenToons = sb.ToString();
-
-            await Task.CompletedTask;
-        }
-
-        /// <summary>
-        /// Method to generate g12 toons
-        /// </summary>
-        /// <returns></returns>
-        private async Task GearTwelveToons()
-        {
-            StringBuilder sb = new StringBuilder();
-
-            sb.AppendLine("<div id=\"geartwelve\">");
-            sb.AppendLine(HTMLConstructor.SectionHeader("Gear 12 Toons"));
-            sb.AppendLine("This section highlights all of the toons that have been geared to 12 since the last snapshot.");
-            sb.AppendLine("</p>");
-
-            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Toon" }, GetAllToonsOfGearLevelDifference(12)));
-
-            sb.AppendLine("<p/></div>");
-
-            m_gearTwelveToons = sb.ToString();
-
-            await Task.CompletedTask;
-        }
-
-        /// <summary>
         /// Method to generate the top 20 toons of various stats
         /// </summary>
         /// <returns></returns>
         private async Task TopTwentySection()
         {
             StringBuilder sb = new StringBuilder();
+
+            var guildUnitData = m_dataBuilder.NewGuildData.Players.SelectMany(x => x.PlayerUnits).Select(x => x.UnitData).Where(x => x.UnitType == CombatType.Toon);
+            var healthUnits = guildUnitData.OrderByDescending(x => x.UnitStats.Health).Take(20);
+            var protectionUnits = guildUnitData.OrderByDescending(x => x.UnitStats.Protection).Take(20);
+            var tankiestUnits = guildUnitData.OrderByDescending(x => x.UnitStats.Thickness).Take(20);
+            var speedUnits = guildUnitData.OrderByDescending(x => x.UnitStats.Speed).Take(20);
+            var poUnits = guildUnitData.OrderByDescending(x => x.UnitStats.PhysicalOffense).Take(20);
+            var soUnits = guildUnitData.OrderByDescending(x => x.UnitStats.SpecialOffense).Take(20);
+            var pdUnits = guildUnitData.OrderByDescending(x => x.UnitStats.PhysicalDefense).Take(20);
+            var sdUnits = guildUnitData.OrderByDescending(x => x.UnitStats.SpecialDefense).Take(20);
+            var pccUnits = guildUnitData.OrderByDescending(x => x.UnitStats.PhysicalCriticalChance).Take(20);
+            var sccUnits = guildUnitData.OrderByDescending(x => x.UnitStats.SpecialCriticalChance).Take(20);
+            var potencyUnits = guildUnitData.OrderByDescending(x => x.UnitStats.Potency).Take(20);
+            var tenacityUnits = guildUnitData.OrderByDescending(x => x.UnitStats.Tenacity).Take(20);
 
             sb.AppendLine("<div id=\"toptwenty\">");
             sb.AppendLine(HTMLConstructor.SectionHeader("Top 20 Stats"));
@@ -1081,56 +941,56 @@ div {
 
             sb.AppendLine(HTMLConstructor.TableGroupStart());
 
-            sb.Append(HTMLConstructor.AddTable(new string[] { "Player Name", "Toon", "Health" }, TakeTopXOfStatAndReturnTableData(20, "CurrentHealth", new string[] { "PlayerName", "UnitName", "CurrentHealth" }), "Health"));
+            sb.Append(HTMLConstructor.AddTable(new string[] { "Player Name", "Toon", "Health" }, GenerateTopStatForUnitsTable("Health", healthUnits), "Health"));
 
             sb.Append(HTMLConstructor.TableGroupNext());
 
-            sb.Append(HTMLConstructor.AddTable(new string[] { "Player Name", "Toon", "Protection" }, TakeTopXOfStatAndReturnTableData(20, "CurrentProtection", new string[] { "PlayerName", "UnitName", "CurrentProtection" }), "Protection"));
+            sb.Append(HTMLConstructor.AddTable(new string[] { "Player Name", "Toon", "Protection" }, GenerateTopStatForUnitsTable("Protection", protectionUnits), "Protection"));
 
             sb.AppendLine(HTMLConstructor.TableGroupEnd());
             sb.AppendLine(HTMLConstructor.TableGroupStart());
 
-            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Toon", "Tankiest" }, TakeTopXOfStatAndReturnTableData(20, "CurrentTankiest", new string[] { "PlayerName", "UnitName", "CurrentTankiest" }), "Tankiest"));
+            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Toon", "Thickness" }, GenerateTopStatForUnitsTable("Thickness", tankiestUnits), "Tankiest"));
 
             sb.Append(HTMLConstructor.TableGroupNext());
 
-            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Toon", "Speed" }, TakeTopXOfStatAndReturnTableData(20, "CurrentSpeed", new string[] { "PlayerName", "UnitName", "CurrentSpeed" }), "Speed"));
+            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Toon", "Speed" }, GenerateTopStatForUnitsTable("Speed", speedUnits), "Speed"));
 
             sb.AppendLine(HTMLConstructor.TableGroupEnd());
             sb.AppendLine(HTMLConstructor.TableGroupStart());
 
-            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Toon", "PO" }, TakeTopXOfStatAndReturnTableData(20, "CurrentPhysicalOffense", new string[] { "PlayerName", "UnitName", "CurrentPhysicalOffense" }), "Physical Offense"));
+            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Toon", "PO" }, GenerateTopStatForUnitsTable("PhysicalOffense", poUnits), "Physical Offense"));
 
             sb.Append(HTMLConstructor.TableGroupNext());
 
-            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Toon", "SO" }, TakeTopXOfStatAndReturnTableData(20, "CurrentSpecialOffense", new string[] { "PlayerName", "UnitName", "CurrentSpecialOffense" }), "Special Offense"));
+            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Toon", "SO" }, GenerateTopStatForUnitsTable("SpecialOffense", soUnits), "Special Offense"));
 
             sb.AppendLine(HTMLConstructor.TableGroupEnd());
             sb.AppendLine(HTMLConstructor.TableGroupStart());
 
-            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Toon", "PD" }, TakeTopXOfStatAndReturnTableData(20, "CurrentPhysicalDefense", new string[] { "PlayerName", "UnitName", "CurrentPhysicalDefense" }), "Physical Defense"));
+            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Toon", "PD" }, GenerateTopStatForUnitsTable("PhysicalDefense", pdUnits), "Physical Defense"));
 
             sb.Append(HTMLConstructor.TableGroupNext());
 
-            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Toon", "SD" }, TakeTopXOfStatAndReturnTableData(20, "CurrentSpecialDefense", new string[] { "PlayerName", "UnitName", "CurrentSpecialDefense" }), "Special Defense"));
+            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Toon", "SD" }, GenerateTopStatForUnitsTable("SpecialDefense", sdUnits), "Special Defense"));
 
             sb.AppendLine(HTMLConstructor.TableGroupEnd());
             sb.AppendLine(HTMLConstructor.TableGroupStart());
 
-            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Toon", "PCC" }, TakeTopXOfStatAndReturnTableData(20, "CurrentPhysicalCritChance", new string[] { "PlayerName", "UnitName", "CurrentPhysicalCritChance" }), "Physical CC"));
+            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Toon", "PCC" }, GenerateTopStatForUnitsTable("PhysicalCriticalChance", pccUnits), "Physical Critical Chance"));
 
             sb.Append(HTMLConstructor.TableGroupNext());
 
-            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Toon", "SCC" }, TakeTopXOfStatAndReturnTableData(20, "CurrentSpecialCritChance", new string[] { "PlayerName", "UnitName", "CurrentSpecialCritChance" }), "Special CC"));
+            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Toon", "SCC" }, GenerateTopStatForUnitsTable("SpecialCriticalChance", sccUnits), "Special Critical Chance"));
 
             sb.AppendLine(HTMLConstructor.TableGroupEnd());
             sb.AppendLine(HTMLConstructor.TableGroupStart());
 
-            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Toon", "Potency" }, TakeTopXOfStatAndReturnTableData(20, "CurrentPotency", new string[] { "PlayerName", "UnitName", "CurrentPotency" }), "Potency"));
+            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Toon", "Potency" }, GenerateTopStatForUnitsTable("Potency", potencyUnits), "Potency"));
 
             sb.Append(HTMLConstructor.TableGroupNext());
 
-            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Toon", "Tenacity" }, TakeTopXOfStatAndReturnTableData(20, "CurrentTenacity", new string[] { "PlayerName", "UnitName", "CurrentTenacity" }), "Tenacity"));
+            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Toon", "Tenacity" }, GenerateTopStatForUnitsTable("Tenacity", tenacityUnits), "Tenacity"));
 
             sb.AppendLine(HTMLConstructor.TableGroupEnd());
             sb.AppendLine("<p/></div>");
@@ -1306,151 +1166,22 @@ div {
             await Task.CompletedTask;
         }
 
-        /// <summary>
-        /// Method to generate detailed data
-        /// </summary>
-        /// <returns></returns>
-        private async Task DetailedData()
+        private string GenerateTopStatForUnitsTable(string statName, IEnumerable<UnitData> unitDatas)
         {
             StringBuilder sb = new StringBuilder();
 
-            sb.AppendLine("<div id=\"details\">");
-            sb.AppendLine(HTMLConstructor.SectionHeader("Data Details"));
-            sb.AppendLine("For those who are interested, here is some full table data that the stats refer to.");
-            sb.AppendLine("Here is the full list of players and their Galatic Power differences.");
-            sb.AppendLine("<p/>");
-            
-            StringBuilder detailedPlayerData = new StringBuilder();
-            foreach (PlayerDifference player in m_dataBuilder.DifferencesGuildData.Players.OrderBy(a => a.Name).ToList())
-                detailedPlayerData.AppendLine(HTMLConstructor.AddTableData(new string[] { player.Name, player.OldGP.ToString(), player.NewGP.ToString(), player.GPDifference.ToString(), player.GPPercentDifference.ToString() }));
-
-            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Previous Galatic Power", "New Galatic Power", "Galatic Power Increase", "Galatic Power % Increase" }, detailedPlayerData.ToString()));
-
-            sb.AppendLine("</div><div>");
-            sb.AppendLine("Here is the full list of toons within the guild, with their average stat in the guild and max.");
-
-            StringBuilder detailedUnitDataStringBuilder = new StringBuilder();
-            StringBuilder detailedUnitDataStatsStringBuilder = new StringBuilder();
-
-            var unitNames = m_dataBuilder.NewGuildData.Players.SelectMany(x => x.PlayerUnits).Select(x => x.UnitData.Name).Distinct().OrderBy(b => b);
-            var guildUnits = m_dataBuilder.NewGuildData.Players.SelectMany(x => x.PlayerUnits).Where(x => x.UnitData.UnitType == CombatType.Toon);
-
-            foreach (var unitName in unitNames)
-            {                
-                detailedUnitDataStringBuilder.AppendLine(HTMLConstructor.AddTableData(new string[] {
-                    unitName,
-                    guildUnits.Where(b => b.UnitData.Name == unitName).Average(a => a.UnitData.Power).ToString("#."),
-                    guildUnits.Where(b => b.UnitData.Name == unitName).Max(a => a.UnitData.Power).ToString(),
-                    guildUnits.Where(b => b.UnitData.Name == unitName).Average(a => a.UnitData.GearLevel).ToString("#."),
-                    guildUnits.Where(b => b.UnitData.Name == unitName).Max(a => a.UnitData.GearLevel).ToString(),                    
-                    String.IsNullOrEmpty(guildUnits.Where(b => b.UnitData.Name == unitName).Average(a => a.UnitData.RelicTier).ToString("#.")) ? "0" : guildUnits.Where(b => b.UnitData.Name == unitName).Average(a => a.UnitData.RelicTier).ToString("#."),
-                    guildUnits.Where(b => b.UnitData.Name == unitName).Max(a => a.UnitData.RelicTier).ToString(),
-                }));
-
-                detailedUnitDataStatsStringBuilder.AppendLine(HTMLConstructor.AddTableData(new string[]
-                {
-                    unitName,                    
-                    guildUnits.Where(b => b.UnitData.Name == unitName).Average(a => a.UnitData.UnitStats.Health).ToString("#."),
-                    guildUnits.Where(b => b.UnitData.Name == unitName).Max(a => a.UnitData.UnitStats.Health).ToString(),
-                    guildUnits.Where(b => b.UnitData.Name == unitName).Average(a => a.UnitData.UnitStats.Protection).ToString("#."),
-                    guildUnits.Where(b => b.UnitData.Name == unitName).Max(a => a.UnitData.UnitStats.Protection).ToString(),
-                    guildUnits.Where(b => b.UnitData.Name == unitName).Average(a => a.UnitData.UnitStats.Speed).ToString("#."),
-                    guildUnits.Where(b => b.UnitData.Name == unitName).Max(a => a.UnitData.UnitStats.Speed).ToString(),
-                    guildUnits.Where(b => b.UnitData.Name == unitName).Average(a => a.UnitData.UnitStats.PhysicalOffense).ToString("#."),
-                    guildUnits.Where(b => b.UnitData.Name == unitName).Max(a => a.UnitData.UnitStats.PhysicalOffense).ToString(),
-                    guildUnits.Where(b => b.UnitData.Name == unitName).Average(a => a.UnitData.UnitStats.SpecialOffense).ToString("#."),
-                    guildUnits.Where(b => b.UnitData.Name == unitName).Max(a => a.UnitData.UnitStats.SpecialOffense).ToString(),
-                }));
-            }
-
-            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Toon", "Avg GP", "Max GP", "Avg Gear Lvl", "Max Gear Lvl", "Avg Relic Tier", "Max Relic Tier" }, detailedUnitDataStringBuilder.ToString()));
-            sb.AppendLine("</div>");
-            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Toon", "Avg Health", "Max Health", "Avg Prot.", "Max Prot.", "Avg Speed", "Max Speed", "Avg PO", "Max PO", "Avg SO", "Max SO" }, detailedUnitDataStatsStringBuilder.ToString()));
-
-            sb.AppendLine("</div>");
-
-            m_detailedData = sb.ToString();
-
-            await Task.CompletedTask;
-        }
-
-        /// <summary>
-        /// Takes the top X toons of a stat and returns the result
-        /// </summary>
-        /// <param name="amount">Amount of results to return</param>
-        /// <param name="stat">Stat to compare against</param>
-        /// <param name="properties">Properties of the reflected object to pull data from</param>
-        /// <param name="toonName">Character name to find data against</param>
-        /// <returns>Table of data found for the passed in params</returns>
-        private string TakeTopXOfStatAndReturnTableData(int amount, string stat, string toonName = null)
-        {
-            StringBuilder sb = new StringBuilder();
-
-            IEnumerable<PlayerUnit> units;
-
-            var guildUnits = m_dataBuilder.NewGuildData.Players.SelectMany(x => x.PlayerUnits);
-
-            if (!String.IsNullOrEmpty(toonName))
-                units = guildUnits.Where(b => b.UnitData.Name == toonName).OrderByDescending(a => a.UnitData.UnitStats.GetType().GetProperty(stat).GetValue(a.UnitData.UnitStats, null)).Take(amount);
-            else
-                units = guildUnits.OrderByDescending(a => a.UnitData.UnitStats.GetType().GetProperty(stat).GetValue(a.UnitData.UnitStats, null)).Take(amount);
-
-            foreach (PlayerUnit unit in units)
+            foreach (UnitData unit in unitDatas)
             {
                 List<string> propertyValues = new List<string>();
 
-                propertyValues.Add(PLAYERNAMEFUCK);
-
-                if(toonName == null)
-                    propertyValues.Add(unit.UnitData.Name);
-
-                propertyValues.Add(unit.UnitData.UnitStats.GetType().GetProperty(stat).GetValue(unit.UnitData.UnitStats, null).ToString());
+                propertyValues.Add(unit.PlayerName);
+                propertyValues.Add(unit.Name);
+                propertyValues.Add(unit.UnitStats.GetType().GetProperty(statName).GetValue(unit.UnitStats, null).ToString());
 
                 sb.AppendLine(HTMLConstructor.AddTableData(propertyValues.ToArray()));
             }
 
             return sb.ToString();
-        }
-
-        /// <summary>
-        /// Gets all of the toons of a given gear level
-        /// </summary>
-        /// <param name="gearLevel">Gear level to search for</param>
-        /// <returns>Table of characters at a gear level</returns>
-        private string GetAllToonsOfGearLevelDifference(int gearLevel)
-        {
-            StringBuilder sb = new StringBuilder();
-
-            foreach (UnitDifference unitDifference in m_dataBuilder.DifferencesGuildData.Players.SelectMany(x => x.Units).OrderBy(a => a.PlayerName))
-            {
-                if (unitDifference.OldGearLevel < gearLevel && unitDifference.NewGearLevel == gearLevel)
-                {
-                    sb.AppendLine(HTMLConstructor.AddTableData(new string[] { unitDifference.PlayerName, unitDifference.Name }));
-                    if (gearLevel == 13)
-                        m_reportSummary.TotalGearThirteenToons++;
-                    else if (gearLevel == 12)
-                        m_reportSummary.TotalGearTwelveToons++;
-                }
-            }
-
-            return sb.ToString();
-        }
-
-        /// <summary>
-        /// Searches through a list of players for those who are part of a gold team
-        /// </summary>
-        /// <param name="potentialPlayers">List of players to go through</param>
-        /// <param name="count">Number of characters that meet the requirement</param>
-        /// <returns>List of players that meet the requirement of the gold member</returns>
-        private List<string> FindGoldTeamPlayers(IEnumerable<IGrouping<string, string>> potentialPlayers, int count)
-        {
-            List<string> players = new List<string>();
-
-            foreach (var player in potentialPlayers)
-                if (player.Count() == count)
-                    players.Add(player.Key);
-
-            return players;
         }
 
         /// <summary>
@@ -1464,37 +1195,42 @@ div {
         {
             StringBuilder topMods = new StringBuilder();
 
-            var theList = new List<KeyValuePair<int, decimal>>();
-            var filteredModList = new List<Mod>();
-            var modList = m_dataBuilder.UnitData.SelectMany(b => b.Mods).ToList();
+            var filteredModList = m_dataBuilder.NewGuildData.Players
+                .SelectMany(x => x.Mods)
+                .Where(x => x.SecondaryStats.Any(y => y.Name == stat))
+                .OrderByDescending(x => x.SecondaryStats.Where(y => y.Name == stat))
+                .Take(returnCount);
 
-            theList.AddRange(modList.Where(a => a.ModSecondaryOneName == stat).ToDictionary(x => x.Id, x => x.ModSecondaryOne).ToList());
-            theList.AddRange(modList.Where(a => a.ModSecondaryTwoName == stat).ToDictionary(x => x.Id, x => x.ModSecondaryTwo).ToList());
-            theList.AddRange(modList.Where(a => a.ModSecondaryThreeName == stat).ToDictionary(x => x.Id, x => x.ModSecondaryThree).ToList());
-            theList.AddRange(modList.Where(a => a.ModSecondaryFourName == stat).ToDictionary(x => x.Id, x => x.ModSecondaryFour).ToList());
-
-            var topOfTheList = theList.OrderByDescending(a => a.Value).Take(returnCount).Select(b => b.Key);
-
-            foreach (var topItemKey in topOfTheList)
-                filteredModList.Add(modList.FirstOrDefault(a => a.Id == topItemKey));
-            
             //Bold highlighted stat, add mod slot(shape)
             foreach(var topMod in filteredModList)
                 topMods.AppendLine(HTMLConstructor.AddTableData(new string[] 
                 { 
                     topMod.PlayerName, 
                     topMod.UnitName, 
-                    topMod.ModRarity, 
-                    topMod.ModShape,
-                    topMod.ModSet, 
-                    topMod.ModPrimaryName, 
-                    topMod.ModSecondaryOneName == stat ? $"<b>({topMod.ModSecondaryOneRoll}) {topMod.ModSecondaryOneName} {topMod.ModSecondaryOne}</b>" : $"({topMod.ModSecondaryOneRoll}) {topMod.ModSecondaryOneName} {topMod.ModSecondaryOne}",
-                    topMod.ModSecondaryTwoName == stat ? $"<b>({topMod.ModSecondaryTwoRoll}) {topMod.ModSecondaryTwoName} {topMod.ModSecondaryTwo}</b>" : $"({topMod.ModSecondaryTwoRoll}) {topMod.ModSecondaryTwoName} {topMod.ModSecondaryTwo}",
-                    topMod.ModSecondaryThreeName == stat ? $"<b>({topMod.ModSecondaryThreeRoll}) {topMod.ModSecondaryThreeName} {topMod.ModSecondaryThree}</b>" : $"({topMod.ModSecondaryThreeRoll}) {topMod.ModSecondaryThreeName} {topMod.ModSecondaryThree}",
-                    topMod.ModSecondaryFourName == stat ? $"<b>({topMod.ModSecondaryFourRoll}) {topMod.ModSecondaryFourName} {topMod.ModSecondaryFour}</b>" : $"({topMod.ModSecondaryFourRoll}) {topMod.ModSecondaryFourName} {topMod.ModSecondaryFour}",
+                    topMod.Rarity, 
+                    topMod.Slot,
+                    topMod.Set, 
+                    topMod.PrimaryModData.Name,
+                    GetModSecondaryRowData(topMod.SecondaryStats, stat, 0),
+                    GetModSecondaryRowData(topMod.SecondaryStats, stat, 1),
+                    GetModSecondaryRowData(topMod.SecondaryStats, stat, 2),
+                    GetModSecondaryRowData(topMod.SecondaryStats, stat, 3)
                 }));
 
             return topMods.ToString();
+        }
+
+        private string GetModSecondaryRowData(List<ModDetails> secondaryStats, string stat, int position)
+        {
+            if (secondaryStats.Count() < position + 1)
+                return "";
+
+            var secondaryStat = secondaryStats[position];
+
+            return secondaryStat.Name == stat ? $"<b>({secondaryStat.Roll}) {secondaryStat.Name} {secondaryStat.Value}</b>" :
+                $"({secondaryStat.Roll}) {secondaryStat.Name} {secondaryStat.Value}" == stat ?
+                    $"<b>({secondaryStat.Roll}) {secondaryStat.Name} {secondaryStat.Value}</b>" :
+                    $"({secondaryStat.Roll}) {secondaryStat.Name} {secondaryStat.Value}";
         }
 
         /// <summary>

@@ -65,20 +65,35 @@ namespace SWGOHReportBuilder
                 NewGuildData = (Guild)serializer.Deserialize(file, typeof(Guild));
             }
 
-            CleanData();
+            PrettyUpData();
             BuildComparisonData();
         }
 
-        private void CleanData()
+        private void PrettyUpData()
         {
-            NewGuildData.Players.SelectMany(x => x.PlayerUnits).Select(y => y.UnitData.UnitStats.PhysicalDefense == Math.Round(y.UnitData.UnitStats.PhysicalDefense, 2));
-            NewGuildData.Players.SelectMany(x => x.PlayerUnits).Select(y => y.UnitData.UnitStats.SpeicalDefense == Math.Round(y.UnitData.UnitStats.SpeicalDefense, 2));
-            NewGuildData.Players.SelectMany(x => x.PlayerUnits).Select(y => y.UnitData.UnitStats.PhysicalCriticalChance == Math.Round(y.UnitData.UnitStats.PhysicalCriticalChance, 2));
-            NewGuildData.Players.SelectMany(x => x.PlayerUnits).Select(y => y.UnitData.UnitStats.SpecialCriticalChance == Math.Round(y.UnitData.UnitStats.SpecialCriticalChance, 2));
-            NewGuildData.Players.SelectMany(x => x.PlayerUnits).Select(y => y.UnitData.UnitStats.Potency == Math.Round(y.UnitData.UnitStats.Potency * 100, 2));
-            NewGuildData.Players.SelectMany(x => x.PlayerUnits).Select(y => y.UnitData.UnitStats.Tenacity == Math.Round(y.UnitData.UnitStats.Tenacity * 100, 2));
-            NewGuildData.Players.SelectMany(x => x.PlayerUnits).Select(y => y.UnitData.RelicTier = y.UnitData.RelicTier >= 3 ? y.UnitData.RelicTier - 2 : 0);
-            OldGuildData.Players.SelectMany(x => x.PlayerUnits).Select(y => y.UnitData.RelicTier = y.UnitData.RelicTier >= 3 ? y.UnitData.RelicTier - 2 : 0);
+            var unitDictionary = new Dictionary<string, string>();
+
+            foreach(var playerUnit in NewGuildData.Players.SelectMany(x => x.PlayerUnits))
+            {
+                if (!unitDictionary.ContainsKey(playerUnit.UnitData.UnitId))
+                    unitDictionary.Add(playerUnit.UnitData.UnitId, playerUnit.UnitData.Name);
+            }
+
+            Parallel.ForEach(NewGuildData.Players, new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount }, (player) =>
+            {
+                player.PlayerUnits.ForEach(x => x.UnitData.PlayerName = player.PlayerData.Name);
+                player.Datacrons.ForEach(x => x.PlayerName = player.PlayerData.Name);
+                player.Mods.ForEach(x => x.PlayerName = player.PlayerData.Name);
+                player.Mods.ForEach(x => x.UnitName = unitDictionary[x.ToonId]);
+                player.PlayerUnits.ForEach(x => x.UnitData.UnitStats.PhysicalDefense = Math.Round(x.UnitData.UnitStats.PhysicalDefense, 2));
+                player.PlayerUnits.ForEach(x => x.UnitData.UnitStats.SpecialDefense = Math.Round(x.UnitData.UnitStats.SpecialDefense, 2));
+                player.PlayerUnits.ForEach(x => x.UnitData.UnitStats.PhysicalCriticalChance = Math.Round(x.UnitData.UnitStats.PhysicalCriticalChance, 2));
+                player.PlayerUnits.ForEach(x => x.UnitData.UnitStats.SpecialCriticalChance = Math.Round(x.UnitData.UnitStats.SpecialCriticalChance, 2));
+                player.PlayerUnits.ForEach(x => x.UnitData.UnitStats.Potency = Math.Round(x.UnitData.UnitStats.Potency * 100, 2));
+                player.PlayerUnits.ForEach(x => x.UnitData.UnitStats.Tenacity = Math.Round(x.UnitData.UnitStats.Tenacity * 100, 2));
+                player.PlayerUnits.ForEach(x => x.UnitData.RelicTier = x.UnitData.RelicTier >= 3 ? x.UnitData.RelicTier - 2 : 0);
+                player.PlayerUnits.ForEach(x => x.UnitData.RelicTier = x.UnitData.RelicTier >= 3 ? x.UnitData.RelicTier - 2 : 0);
+            });
         }
 
         private void BuildComparisonData()

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using Newtonsoft.Json;
 
 
@@ -10,7 +6,9 @@ namespace SWGOHInterface
 {
     public class Mod
     {
-        public int PlayerId { get; set; }
+        public string PlayerName { get; set; }
+
+        public string UnitName { get; set; }
 
         [JsonProperty("id")]
         public string ModId { get; set; }

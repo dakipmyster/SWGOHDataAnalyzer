@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
 namespace SWGOHInterface
 {
     public class UnitStats
     {
+        public double Thickness => Health + Protection;
+
         [JsonProperty("1")]
         public double Health { get; set; }
 
@@ -28,7 +25,7 @@ namespace SWGOHInterface
         public double PhysicalDefense { get; set; }
 
         [JsonProperty("9")]
-        public double SpeicalDefense { get; set; }
+        public double SpecialDefense { get; set; }
 
         [JsonProperty("14")]
         public double PhysicalCriticalChance { get; set; }
