@@ -181,7 +181,7 @@ div {
                 sb.AppendLine("<div>");
                 sb.AppendLine(HTMLConstructor.ReportTitle(
                     m_dataBuilder.NewGuildData.GuildName, 
-                    $"{m_dataBuilder.NewGuildData.SnapshotDate.ToString("d")} - {m_dataBuilder.OldGuildData.SnapshotDate.ToString("d")}"
+                    $"{m_dataBuilder.OldGuildData.SnapshotDate.ToString("d")} - {m_dataBuilder.NewGuildData.SnapshotDate.ToString("d")}"
                 ));
                 sb.AppendLine("<p/>");
                 sb.AppendLine("<p/>");
@@ -197,7 +197,7 @@ div {
                 sb.AppendLine("<div>");
                 sb.AppendLine(HTMLConstructor.ReportTitle(
                     m_dataBuilder.NewGuildData.GuildName,
-                    $"{m_dataBuilder.NewGuildData.SnapshotDate.ToString("d")} - {m_dataBuilder.OldGuildData.SnapshotDate.ToString("d")}"
+                    $"{m_dataBuilder.OldGuildData.SnapshotDate.ToString("d")} - {m_dataBuilder.NewGuildData.SnapshotDate.ToString("d")}"
                 ));
                 sb.AppendLine("<p/>");
                 sb.AppendLine("<p/>");
@@ -261,7 +261,11 @@ div {
 
             StringBuilder unitGPDiff = new StringBuilder();
             
-            foreach (UnitDifference unit in m_dataBuilder.DifferencesGuildData.Players.SelectMany(x => x.Units).OrderByDescending(a => a.GPDifference).Take(50))            
+            foreach (UnitDifference unit in m_dataBuilder.DifferencesGuildData.Players
+                .SelectMany(x => x.Units)
+                .Where(x => x.UnitType == CombatType.Toon)
+                .OrderByDescending(a => a.GPDifference)
+                .Take(50))            
                 unitGPDiff.AppendLine(HTMLConstructor.AddTableData(new string[] { unit.PlayerName, unit.Name, unit.OldGP.ToString(), unit.NewGP.ToString(), unit.GPDifference.ToString() }));
 
             sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Toon", "Old Power", "New Power", "Power Increase" }, unitGPDiff.ToString()));
@@ -669,7 +673,7 @@ div {
             string ninth = CalculatePercentProgressForGL(player.PlayerUnits.FirstOrDefault(a => a.UnitData.Name == "Ninth Sister"), GLProgressScore.RelicSeven, out progressList, progressList);
             string gi = CalculatePercentProgressForGL(player.PlayerUnits.FirstOrDefault(a => a.UnitData.Name == "Grand Inquisitor"), GLProgressScore.RelicSeven, out progressList, progressList);
 
-            return HTMLConstructor.AddTableData(new string[] { player.PlayerData.Name, second, fifth, seventh, eighth, ninth });
+            return HTMLConstructor.AddTableData(new string[] { player.PlayerData.Name, second, fifth, seventh, eighth, ninth, gi });
         }
 
         /// <summary>
@@ -774,7 +778,7 @@ div {
                     rarityPoints = 21;
                     break;
                 case 7:
-                    rarityPoints = 28;
+                    rarityPoints = 35;
                     break;
             }
 
@@ -782,10 +786,10 @@ div {
 
             //-1 because we want to count the number of gear pieces equipped not the current gear level ie Gear 1 if not the -1 would award 6 points
             int points = ((playerUnit.UnitData.GearLevel-1) * 6) 
-                + playerUnit.UnitData.GearLevel == 13 ? 6 : 0 //Bonus 6 for getting to relic level
-                + relicPoints
-                + playerUnit.UnitData.UnitType == CombatType.Ship ? 0 : playerUnit.UnitData.Gear.Count()
-                + rarityPoints;
+                + (playerUnit.UnitData.GearLevel == 13 ? 6 : 0) //adjusts for all G12 equipped gear
+                + (relicPoints)
+                + (playerUnit.UnitData.UnitType == CombatType.Ship ? 0 : playerUnit.UnitData.Gear.Where(x => x.IsObtained && x.Id != "9999").Count())
+                + (rarityPoints);
 
             progressList.Add(Math.Round(Decimal.Divide(points, maxPoints) * 100, 2) > 100 ? 100 : Math.Round(Decimal.Divide(points, maxPoints) * 100, 2));
             return Math.Round(Decimal.Divide(points, maxPoints) * 100, 2) > 100 ? "100" : Math.Round(Decimal.Divide(points, maxPoints) * 100, 0).ToString();
@@ -1053,7 +1057,8 @@ div {
             {
                 var datacronsWithStat = guildDatacrons
                     .Where(x => x.Tiers.Any(y => y.StatName == statName))
-                    .OrderByDescending(x => x.Tiers.Sum(y => y.StatValue));
+                    .OrderByDescending(x => x.Tiers.Where(y => y.StatName == statName).Sum(y => y.StatValue))
+                    .Take(25);
 
                 sb.Append(HTMLConstructor.AddTable(new string[] { "Player Name", "Datacron Name", "Value" }, GenerateTopStatForDatacronsTable(statName, datacronsWithStat), statName));
 
@@ -1066,7 +1071,7 @@ div {
                 {
                     sb.AppendLine(HTMLConstructor.TableGroupEnd());
                     sb.AppendLine(HTMLConstructor.TableGroupStart());
-                    makeNextGroup = false;
+                    makeNextGroup = true;
                 }
             }
 
@@ -1114,9 +1119,8 @@ div {
                 .Where(x => x.OldRarity < 7 && x.NewRarity == 7 && x.UnitType == CombatType.Ship)
                 .OrderBy(a => a.PlayerName))
             {
-                units.AppendLine(HTMLConstructor.AddTableData(new string[] { unit.PlayerName, unit.Name }));
+                ships.AppendLine(HTMLConstructor.AddTableData(new string[] { unit.PlayerName, unit.Name }));
                 m_reportSummary.TotalSevenStarShips++;
-                
             }
             
             sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Ship" }, ships.ToString()));
@@ -1294,11 +1298,11 @@ div {
             var filteredModList = m_dataBuilder.NewGuildData.Players
                 .SelectMany(x => x.Mods)
                 .Where(x => x.SecondaryStats.Any(y => y.Name == stat))
-                .OrderByDescending(x => x.SecondaryStats.Where(y => y.Name == stat))
+                .OrderByDescending(x => x.SecondaryStats.Where(y => y.Name == stat).Max(y => y.Value))
                 .Take(returnCount);
 
             //Bold highlighted stat, add mod slot(shape)
-            foreach(var topMod in filteredModList)
+            foreach (var topMod in filteredModList)
                 topMods.AppendLine(HTMLConstructor.AddTableData(new string[] 
                 { 
                     topMod.PlayerName, 
@@ -1323,10 +1327,10 @@ div {
 
             var secondaryStat = secondaryStats[position];
 
-            return secondaryStat.Name == stat ? $"<b>({secondaryStat.Roll}) {secondaryStat.Name} {secondaryStat.Value}</b>" :
-                $"({secondaryStat.Roll}) {secondaryStat.Name} {secondaryStat.Value}" == stat ?
-                    $"<b>({secondaryStat.Roll}) {secondaryStat.Name} {secondaryStat.Value}</b>" :
-                    $"({secondaryStat.Roll}) {secondaryStat.Name} {secondaryStat.Value}";
+            return secondaryStat.Name == stat ? $"<b>({secondaryStat.Roll}) {secondaryStat.Name} {secondaryStat.DisplayValue}</b>" :
+                $"({secondaryStat.Roll}) {secondaryStat.Name} {secondaryStat.DisplayValue}" == stat ?
+                    $"<b>({secondaryStat.Roll}) {secondaryStat.Name} {secondaryStat.DisplayValue}</b>" :
+                    $"({secondaryStat.Roll}) {secondaryStat.Name} {secondaryStat.DisplayValue}";
         }
 
         /// <summary>

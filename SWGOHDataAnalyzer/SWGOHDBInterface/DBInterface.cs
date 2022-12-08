@@ -173,9 +173,9 @@ namespace SWGOHDBInterface
                 if (secondaryDetails == null)
                     continue;
 
-                if (!String.IsNullOrEmpty(secondaryDetails.Value) 
+                if (!String.IsNullOrEmpty(secondaryDetails.DisplayValue) 
                     && !String.IsNullOrEmpty(secondaryDetails.Name) 
-                    && secondaryDetails.Value.Contains("%") 
+                    && secondaryDetails.DisplayValue.Contains("%") 
                     && !secondaryDetails.Name.Contains("Potency") 
                     && !secondaryDetails.Name.Contains("Critical Chance") 
                     && !secondaryDetails.Name.Contains("Tenacity"))
