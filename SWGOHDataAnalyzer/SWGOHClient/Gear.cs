@@ -14,5 +14,9 @@ namespace SWGOHInterface
 
         [JsonProperty("is_obtained")]
         public bool IsObtained { get; set; }
+
+        [JsonProperty("base_id")]
+        public string Id { get; set; }
+        
     }
 }

@@ -26,5 +26,11 @@ namespace SWGOHInterface
 
         [JsonProperty("tier_max")]
         public int TierMax { get; set; }
+
+        [JsonProperty("has_omicron_learned")]
+        public bool HasOmicronLearned { get; set; }
+
+        [JsonProperty("has_zeta_learned")]
+        public bool HasZetaLearned { get; set; }
     }
 }

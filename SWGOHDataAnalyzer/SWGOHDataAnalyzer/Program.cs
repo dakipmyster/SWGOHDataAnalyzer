@@ -64,8 +64,7 @@ namespace SWGOHDataAnalyzer
         {
             ReportBuilder builder = new ReportBuilder();
 
-            if (builder.CanRunReport())
-                await builder.CompileReport();
+            await builder.CompileReport();
         }
 
         /// <summary>
@@ -88,7 +87,7 @@ namespace SWGOHDataAnalyzer
             {
                 SWGOHMessageSystem.OutputMessage("Data pull complete, writing to snapshot.");
 
-                dBInterface.WriteDataToDB(client.Guild, false);
+                //dBInterface.WriteDataToJsonFile(client.Guild, false);
             }
             else
             {
@@ -116,7 +115,9 @@ namespace SWGOHDataAnalyzer
             {
                 SWGOHMessageSystem.OutputMessage("Data pull complete, writing to snapshot.");
 
-                dBInterface.WriteDataToDB(client.Guild, true);
+                dBInterface.WriteDataToJsonFile(client.Guild);                
+
+                SWGOHMessageSystem.OutputMessage("Snapshot complete.");
             }
             else
             {
@@ -143,7 +144,7 @@ namespace SWGOHDataAnalyzer
 
             ReportBuilder builder = new ReportBuilder(fileName, characterName);
                         
-            await builder.CompileSimpleReport(client.Guild);
+            //await builder.CompileSimpleReport(client.Guild);
         }
 
         private static async Task OmegasLeft()

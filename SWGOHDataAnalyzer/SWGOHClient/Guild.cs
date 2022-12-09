@@ -1,18 +1,18 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
 
 namespace SWGOHInterface
 {
     public class Guild
     {
+        [JsonProperty("guild_name")]
+        public string GuildName { get; set; }
+
+        [JsonProperty("snapshot_date")]
+        public DateTime SnapshotDate { get; set; }
+
         [JsonProperty("players")]
         public List<Player> Players { get; set; }
-
-        [JsonProperty("data")]
-        public GuildData GuildData { get; set; }
     }
 }

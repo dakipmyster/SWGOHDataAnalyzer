@@ -2,9 +2,9 @@
 
 namespace SWGOHInterface
 {
-    public class PlayerUnit
+    public class SWGOHGuild
     {
         [JsonProperty("data")]
-        public UnitData UnitData { get; set; }
+        public GuildData GuildData { get; set; }
     }
 }
