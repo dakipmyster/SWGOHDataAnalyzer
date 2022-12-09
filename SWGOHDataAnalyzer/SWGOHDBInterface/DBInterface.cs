@@ -166,21 +166,17 @@ namespace SWGOHDBInterface
                     break;
             }
 
-            for(int secondaryStatPosition = 0; secondaryStatPosition >= 4; secondaryStatPosition++)
+            foreach(var secondaryStat in modData.SecondaryStats)
             {
-                var secondaryDetails = modData.SecondaryStats.ElementAtOrDefault(secondaryStatPosition);
-
-                if (secondaryDetails == null)
+                if (secondaryStat == null)
                     continue;
 
-                if (!String.IsNullOrEmpty(secondaryDetails.DisplayValue) 
-                    && !String.IsNullOrEmpty(secondaryDetails.Name) 
-                    && secondaryDetails.DisplayValue.Contains("%") 
-                    && !secondaryDetails.Name.Contains("Potency") 
-                    && !secondaryDetails.Name.Contains("Critical Chance") 
-                    && !secondaryDetails.Name.Contains("Tenacity"))
+                if (secondaryStat.DisplayValue.Contains("%") &&
+                    (  !secondaryStat.Name.Contains("Potency") 
+                    || !secondaryStat.Name.Contains("Critical Chance") 
+                    || !secondaryStat.Name.Contains("Tenacity")))
                 {
-                    secondaryDetails.Name = $"{secondaryDetails.Name} %";
+                    secondaryStat.Name = $"{secondaryStat.Name} %";
                 }   
             }
         }
