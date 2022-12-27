@@ -18,6 +18,7 @@ namespace SWGOHReportBuilder
         public string Exec { get; set; }
         public string Profundity { get; set; }
         public string StarKiller { get; set; }
+        public string Aphra { get; set; }
         public string PlayerName { get; set; }
     }
 }

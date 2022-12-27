@@ -19,7 +19,8 @@ namespace SWGOHReportBuilder
         private Dictionary<string, string> m_datacronNames => new Dictionary<string, string>()
         {
             { "datacron_set_4_base","Security Primer" },
-            { "datacron_set_5_base","Projecting Power" }
+            { "datacron_set_5_base","Projecting Power" },
+            { "datacron_set_6_base","Dangerous Prototypes" }
         };
         internal GuildDifference DifferencesGuildData { get; private set; }
         internal Guild NewGuildData { get; private set; }
