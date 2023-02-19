@@ -84,7 +84,7 @@ namespace SWGOHInterface
         /// <returns></returns>
         public async Task GetGuildData()
         {            
-            var response = await m_httpClient.GetAsync($"http://api.swgoh.gg/guild/{m_GuildId}");
+            var response = await m_httpClient.GetAsync($"http://api.swgoh.gg/guild-profile/{m_GuildId}");
 
             if (response.StatusCode == HttpStatusCode.OK)
                 m_guild = JsonConvert.DeserializeObject<SWGOHGuild>(await response.Content.ReadAsStringAsync());

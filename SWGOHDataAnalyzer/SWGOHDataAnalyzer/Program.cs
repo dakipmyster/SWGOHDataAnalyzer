@@ -101,7 +101,7 @@ namespace SWGOHDataAnalyzer
         /// <returns></returns>
         private static async Task GetGuildData()
         {
-            SWGOHClient client = new SWGOHClient(SWGOHMessageSystem.InputMessage("Enter in the SWGOH.GG Guild Id.  The Guild Id can be found in the URL, example being https://swgoh.gg/g/20799/mdndalorian-vdnguard/.  The 20799 in the URL is the Guild Id"));
+            SWGOHClient client = new SWGOHClient(SWGOHMessageSystem.InputMessage("Enter in the SWGOH.GG Guild Id.  The Guild Id can be found in the URL, example being https://swgoh.gg/g/X/.  The X in the URL is the Guild Id"));
 
             Task dataPullTask = client.GetGuildData();
 

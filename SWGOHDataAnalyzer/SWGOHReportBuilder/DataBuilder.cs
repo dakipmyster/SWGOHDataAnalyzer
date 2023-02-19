@@ -20,7 +20,8 @@ namespace SWGOHReportBuilder
         {
             { "datacron_set_4_base","Security Primer" },
             { "datacron_set_5_base","Projecting Power" },
-            { "datacron_set_6_base","Dangerous Prototypes" }
+            { "datacron_set_6_base","Dangerous Prototypes" },
+            { "datacron_set_7_base","Defiance Rising" }
         };
         internal GuildDifference DifferencesGuildData { get; private set; }
         internal Guild NewGuildData { get; private set; }

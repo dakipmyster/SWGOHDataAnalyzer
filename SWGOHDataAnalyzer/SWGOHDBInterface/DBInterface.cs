@@ -57,7 +57,7 @@ namespace SWGOHDBInterface
 
         public void WriteDataToJsonFile(Guild guild)
         {
-            Parallel.ForEach(guild.Players.AsEnumerable(), new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount }, (player) =>
+            Parallel.ForEach(guild.Players.Where(x => x.PlayerData != null), new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount }, (player) =>
             {
                 SWGOHMessageSystem.OutputMessage($"Sanitizing mods for player {player.PlayerData.Name}");
 
