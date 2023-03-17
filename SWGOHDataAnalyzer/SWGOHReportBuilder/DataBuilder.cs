@@ -66,12 +66,14 @@ namespace SWGOHReportBuilder
             {
                 JsonSerializer serializer = new JsonSerializer();
                 OldGuildData = (Guild)serializer.Deserialize(file, typeof(Guild));
+                OldGuildData.Players = OldGuildData.Players.Where(x => x.PlayerData != null).ToList();
             }
 
             using (StreamReader file = File.OpenText($"{m_folderPath}\\{m_newSnapshotName}.json"))
             {
                 JsonSerializer serializer = new JsonSerializer();
                 NewGuildData = (Guild)serializer.Deserialize(file, typeof(Guild));
+                NewGuildData.Players = NewGuildData.Players.Where(x => x.PlayerData != null).ToList();
             }
 
             PrettyUpData();
