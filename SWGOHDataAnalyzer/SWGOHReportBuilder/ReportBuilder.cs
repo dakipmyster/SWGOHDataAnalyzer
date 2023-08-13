@@ -297,7 +297,9 @@ div {
             StringBuilder exec = new StringBuilder();
             StringBuilder sk = new StringBuilder();
             StringBuilder jabba = new StringBuilder();
+            StringBuilder leia = new StringBuilder();
             StringBuilder prof = new StringBuilder();
+            StringBuilder lev = new StringBuilder();
             StringBuilder dr = new StringBuilder();
             StringBuilder overall = new StringBuilder();            
             m_glCharacterProgressList = new List<GLCharacterProgress>();
@@ -317,8 +319,10 @@ div {
                 kenobi.AppendLine(GetGLKenobiProgressForPlayer(player));
                 lv.AppendLine(GetGLVaderProgressForPlayer(player));
                 jabba.AppendLine(GetGLJabbaProgressForPlayer(player));
+                leia.AppendLine(GetGLLeiaProgressForPlayer(player));
                 exec.AppendLine(GetExecProgressForPlayer(player));
                 prof.AppendLine(GetProfProgressForPlayer(player));
+                lev.AppendLine(GetLevProgressForPlayer(player));
                 sk.AppendLine(GetStarKillerProgressForPlayer(player));
                 dr.AppendLine(GetAphraProgressForPlayer(player));
                 overall.AppendLine(GetOverallGLProgressForPlayer(player));
@@ -360,6 +364,11 @@ div {
             sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Krrs", "Han", "Gredo", "Pig", "Outr", "Lando", "Luke", "Jawa", "URR", "C3P0", "Leia", "Sing", "Fenn", "Boba", "Mob" }, jabba.ToString()));
 
             sb.AppendLine("</p>");
+            sb.AppendLine("<b>Leia:</b>");
+
+            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Rex", "Kne", "Wik", "Lando", "Acbr", "Scout", "R2", "CSolo", "ROLO", "Chrp", "Leia", "Drog", "CLS", "CHWP", "Lobot" }, leia.ToString()));
+
+            sb.AppendLine("</p>");
             sb.AppendLine("<b>Executor:</b>");
 
             sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Vader", "Piett", "Boba", "Dengar", "IG-88", "Bossk", "TFP", "TIE A", "Bomber", "HT", "SI", "IG2K", "TIEF", "RC" }, exec.ToString()));
@@ -368,6 +377,11 @@ div {
             sb.AppendLine("<b>Profundity:</b>");
 
             sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Rad", "Cass", "Dash", "Mon", "Bis", "Jyn", "Hera", "Outrider", "Cass U", "Bis U", "Wedge X", "Biggs X", "Rebel Y", "Ghost" }, prof.ToString()));
+
+            sb.AppendLine("</p>");
+            sb.AppendLine("<b>Leviathan:</b>");
+
+            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Rev", "Malk", "SET", "ST", "Maul", "HK", "Bast", "50RT", "SAss", "Fury", "MK4", "Dag", "Bomb", "Scim", "Sfigt", "Ebon" }, lev.ToString()));
 
             sb.AppendLine("</p>");
             sb.AppendLine("<b>Starkiller:</b>");
@@ -382,7 +396,7 @@ div {
             sb.AppendLine("</p>");
             sb.AppendLine("<b>Overall Progress:</b>");
 
-            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Rey", "SLKR", "JML", "SEE", "JMK", "LV", "Jabba", "Exec", "Prof", "SK" }, overall.ToString()));
+            sb.AppendLine(HTMLConstructor.AddTable(new string[] { "Player Name", "Rey", "SLKR", "JML", "SEE", "JMK", "LV", "Jabba", "Leia", "Exec", "Prof", "Levi", "SK", "Aphra" }, overall.ToString()));
 
             sb.AppendLine("<p/></div>");
 
@@ -592,9 +606,13 @@ div {
                 playerProgress.GLKenobiProgress, 
                 playerProgress.GLVaderProgress, 
                 playerProgress.GLJabbaProgress,
+                playerProgress.GLLeiaProgress,
                 playerProgress.Exec, 
                 playerProgress.Profundity,
-                playerProgress.StarKiller });
+                playerProgress.Leviathan,
+                playerProgress.StarKiller,
+                playerProgress.Aphra
+            });
         }
 
 
@@ -729,6 +747,35 @@ div {
             return "";
         }
 
+        private string GetGLLeiaProgressForPlayer(Player player)
+        {
+            List<decimal> progressList = new List<decimal>();
+            string rex = CalculatePercentProgressForToon(player.PlayerUnits.FirstOrDefault(a => a.UnitData.Name == "Captain Rex"), GLProgressScore.RelicSeven, out progressList, progressList);
+            string knee = CalculatePercentProgressForToon(player.PlayerUnits.FirstOrDefault(a => a.UnitData.Name == "Princess Kneesaa"), GLProgressScore.RelicSeven, out progressList, progressList);
+            string wic = CalculatePercentProgressForToon(player.PlayerUnits.FirstOrDefault(a => a.UnitData.Name == "Wicket"), GLProgressScore.RelicThree, out progressList, progressList);
+            string lando = CalculatePercentProgressForToon(player.PlayerUnits.FirstOrDefault(a => a.UnitData.Name == "Lando Calrissian"), GLProgressScore.RelicFive, out progressList, progressList);
+            string ackbar = CalculatePercentProgressForToon(player.PlayerUnits.FirstOrDefault(a => a.UnitData.Name == "Admiral Ackbar"), GLProgressScore.RelicThree, out progressList, progressList);
+            string scout = CalculatePercentProgressForToon(player.PlayerUnits.FirstOrDefault(a => a.UnitData.Name == "Scout Trooper"), GLProgressScore.SevenStar, out progressList, progressList);
+            string r2 = CalculatePercentProgressForToon(player.PlayerUnits.FirstOrDefault(a => a.UnitData.Name == "R2-D2"), GLProgressScore.RelicEight, out progressList, progressList);
+            string captsolo = CalculatePercentProgressForToon(player.PlayerUnits.FirstOrDefault(a => a.UnitData.Name == "Captain Han Solo"), GLProgressScore.RelicFive, out progressList, progressList);
+            string rolo = CalculatePercentProgressForToon(player.PlayerUnits.FirstOrDefault(a => a.UnitData.Name == "Rebel Officer Leia Organa"), GLProgressScore.RelicFive, out progressList, progressList);
+            string chirpa = CalculatePercentProgressForToon(player.PlayerUnits.FirstOrDefault(a => a.UnitData.Name == "Chief Chirpa"), GLProgressScore.RelicThree, out progressList, progressList);
+            string leia = CalculatePercentProgressForToon(player.PlayerUnits.FirstOrDefault(a => a.UnitData.Name == "Boushh (Leia Organa)"), GLProgressScore.RelicFive, out progressList, progressList);
+            string drogan = CalculatePercentProgressForToon(player.PlayerUnits.FirstOrDefault(a => a.UnitData.Name == "Captain Drogan"), GLProgressScore.RelicSeven, out progressList, progressList);
+            string cls = CalculatePercentProgressForToon(player.PlayerUnits.FirstOrDefault(a => a.UnitData.Name == "Commander Luke Skywalker"), GLProgressScore.RelicSeven, out progressList, progressList);
+            string chewpio = CalculatePercentProgressForToon(player.PlayerUnits.FirstOrDefault(a => a.UnitData.Name == "Threepio & Chewie"), GLProgressScore.RelicSeven, out progressList, progressList);
+            string lobot = CalculatePercentProgressForToon(player.PlayerUnits.FirstOrDefault(a => a.UnitData.Name == "Lobot"), GLProgressScore.RelicThree, out progressList, progressList);
+
+            var averageProgress = Math.Round(progressList.Average(), 2);
+
+            m_glCharacterProgressList.FirstOrDefault(a => a.PlayerName == player.PlayerData.Name).GLLeiaProgress = averageProgress.ToString();
+
+            if (averageProgress != 100)
+                return HTMLConstructor.AddTableData(new string[] { player.PlayerData.Name, rex, knee, wic, lando, ackbar, scout, r2, captsolo, rolo, chirpa, leia, drogan, cls, chewpio, lobot });
+
+            return "";
+        }
+
         private string GetGLJabbaProgressForPlayer(Player player)
         {
             List<decimal> progressList = new List<decimal>();
@@ -783,6 +830,37 @@ div {
 
             if(averageProgress != 100)
                 return HTMLConstructor.AddTableData(new string[] { player.PlayerData.Name, vader, piett, boba, dengar, ig88, bossk, tfp, advanced, bomber, ht, slave, ig2000, tie, rc });
+
+            return "";
+        }
+
+        private string GetLevProgressForPlayer(Player player)
+        {
+            List<decimal> progressList = new List<decimal>();
+            string revan = CalculatePercentProgressForToon(player.PlayerUnits.FirstOrDefault(a => a.UnitData.Name == "Darth Revan"), GLProgressScore.RelicNine, out progressList, progressList);
+            string malak = CalculatePercentProgressForToon(player.PlayerUnits.FirstOrDefault(a => a.UnitData.Name == "Darth Malak"), GLProgressScore.RelicNine, out progressList, progressList);
+            string set = CalculatePercentProgressForToon(player.PlayerUnits.FirstOrDefault(a => a.UnitData.Name == "Sith Empire Trooper"), GLProgressScore.RelicSeven, out progressList, progressList);
+            string trooper = CalculatePercentProgressForToon(player.PlayerUnits.FirstOrDefault(a => a.UnitData.Name == "Sith Trooper"), GLProgressScore.RelicSeven, out progressList, progressList);
+            string maul = CalculatePercentProgressForToon(player.PlayerUnits.FirstOrDefault(a => a.UnitData.Name == "Darth Maul"), GLProgressScore.RelicSeven, out progressList, progressList);
+            string hk47 = CalculatePercentProgressForToon(player.PlayerUnits.FirstOrDefault(a => a.UnitData.Name == "HK-47"), GLProgressScore.RelicSeven, out progressList, progressList);
+            string bastilla = CalculatePercentProgressForToon(player.PlayerUnits.FirstOrDefault(a => a.UnitData.Name == "Bastila Shan"), GLProgressScore.RelicSeven, out progressList, progressList);
+            string sort = CalculatePercentProgressForToon(player.PlayerUnits.FirstOrDefault(a => a.UnitData.Name == "50R-T"), GLProgressScore.RelicFive, out progressList, progressList);
+            string ass = CalculatePercentProgressForToon(player.PlayerUnits.FirstOrDefault(a => a.UnitData.Name == "Sith Assassin"), GLProgressScore.RelicFive, out progressList, progressList);
+
+            string fury = CalculatePercentProgressForToon(player.PlayerUnits.FirstOrDefault(a => a.UnitData.Name == "Fury-class Interceptor"), GLProgressScore.SevenStar, out progressList, progressList);
+            string mk4 = CalculatePercentProgressForToon(player.PlayerUnits.FirstOrDefault(a => a.UnitData.Name == "Mark VI Interceptor"), GLProgressScore.SevenStar, out progressList, progressList);
+            string dagger = CalculatePercentProgressForToon(player.PlayerUnits.FirstOrDefault(a => a.UnitData.Name == "TIE Dagger"), GLProgressScore.SevenStar, out progressList, progressList);
+            string bomber = CalculatePercentProgressForToon(player.PlayerUnits.FirstOrDefault(a => a.UnitData.Name == "B-28 Extinction-class Bomber"), GLProgressScore.SevenStar, out progressList, progressList);
+            string scimitar = CalculatePercentProgressForToon(player.PlayerUnits.FirstOrDefault(a => a.UnitData.Name == "Scimitar"), GLProgressScore.SevenStar, out progressList, progressList);
+            string sithf = CalculatePercentProgressForToon(player.PlayerUnits.FirstOrDefault(a => a.UnitData.Name == "Sith Fighter"), GLProgressScore.SevenStar, out progressList, progressList);
+            string ebon = CalculatePercentProgressForToon(player.PlayerUnits.FirstOrDefault(a => a.UnitData.Name == "Ebon Hawk"), GLProgressScore.SevenStar, out progressList, progressList);
+
+            var averageProgress = Math.Round(progressList.Average(), 2);
+
+            m_glCharacterProgressList.FirstOrDefault(a => a.PlayerName == player.PlayerData.Name).Leviathan = averageProgress.ToString();
+
+            if (averageProgress != 100)
+                return HTMLConstructor.AddTableData(new string[] { player.PlayerData.Name, revan, malak, set, trooper, maul, hk47, bastilla, sort, ass, fury, mk4, dagger, bomber, scimitar, sithf, ebon });
 
             return "";
         }
@@ -1140,6 +1218,12 @@ div {
                 a.Name == "Lord Vader" ||
                 a.Name == "Chimaera" ||
                 a.Name == "Han's Millennium Falcon" ||
+                a.Name == "Profundity" ||
+                a.Name == "Leviathan" ||
+                a.Name == "Starkiller" ||
+                a.Name == "Jabba" ||
+                a.Name == "Jedi Knight Cal Kestis" ||
+                a.Name == "Dr. Aphra" ||
                 a.Name == "Executor"
             ));
 
