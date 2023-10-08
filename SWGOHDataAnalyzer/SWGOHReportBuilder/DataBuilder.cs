@@ -24,7 +24,8 @@ namespace SWGOHReportBuilder
             { "datacron_set_7_base","Defiance Rising" },
             { "datacron_set_8_base","Wandering Wisdom" },
             { "datacron_set_9_base","Archaic Rites" },
-            { "datacron_set_10_base","Steadfast Resolve" }
+            { "datacron_set_10_base","Steadfast Resolve" },
+            { "datacron_set_11_base","Arcane Visions Datacron" }
         };
         internal GuildDifference DifferencesGuildData { get; private set; }
         internal Guild NewGuildData { get; private set; }
