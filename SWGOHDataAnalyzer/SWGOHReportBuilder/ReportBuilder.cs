@@ -42,23 +42,11 @@ namespace SWGOHReportBuilder
         /// <summary>
         /// Constructor
         /// </summary>
-        public ReportBuilder()
+        public ReportBuilder(List<Datacron> datacrons)
         {
-            m_dataBuilder = new DataBuilder();
+            m_dataBuilder = new DataBuilder(datacrons);
             m_isSimpleReport = false;
             m_reportSummary = new ReportSummary();
-        }
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="fileName">Filename of the report</param>
-        /// <param name="characterName">Character to highlight</param>
-        public ReportBuilder(string fileName, string characterName)
-        {
-            m_dataBuilder = new DataBuilder();
-            m_fileName = fileName;
-            m_isSimpleReport = true;
         }
 
         /// <summary>
@@ -163,9 +151,9 @@ div {
 
             string folderPath = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\\SWGOHDataAnalyzer\\{m_fileName}.pdf";
             string folderPathHTML = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}\\SWGOHDataAnalyzer\\{m_fileName}.html";
-
+            
             using (FileStream fs = File.Open(folderPath, FileMode.OpenOrCreate))
-                HtmlConverter.ConvertToPdf(pdfString.ToString(),fs, new ConverterProperties());
+                HtmlConverter.ConvertToPdf(pdfString.ToString(),fs, new ConverterProperties().SetCharset("Unicode"));
 
 #if DEBUG
             using (StreamWriter sw = new StreamWriter(folderPathHTML))

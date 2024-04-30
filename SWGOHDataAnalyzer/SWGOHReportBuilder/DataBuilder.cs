@@ -28,19 +28,21 @@ namespace SWGOHReportBuilder
             { "datacron_set_11_base","Arcane Visions" },
             { "datacron_set_12_base","Scorching Ambition" }
         };
+        private List<Datacron> m_datacrons;
         internal GuildDifference DifferencesGuildData { get; private set; }
         internal Guild NewGuildData { get; private set; }
         internal Guild OldGuildData { get; set; }
 
         private List<string> Snapshots { get; set; }
 
-        public DataBuilder()
+        public DataBuilder(List<Datacron> datacrons)
         {
             Snapshots = Directory.GetFiles(m_folderPath, "*.json")
                 .Select(x => x.Replace($"{m_folderPath}\\", ""))
                 .Select(x => x.Replace($".json", ""))
                 .ToList();
             DifferencesGuildData = new GuildDifference();
+            m_datacrons = datacrons;
         }
 
         /// <summary>
@@ -99,7 +101,7 @@ namespace SWGOHReportBuilder
             {
                 player.PlayerUnits.ForEach(x => x.UnitData.PlayerName = player.PlayerData.Name);
                 player.Datacrons.ForEach(x => x.PlayerName = player.PlayerData.Name);
-                player.Datacrons.ForEach(x => x.Name = m_datacronNames[x.Name]);
+                player.Datacrons.ForEach(x => x.Name = m_datacrons.FirstOrDefault(y => y.Id == x.SetId).Name);
                 player.Mods.ForEach(x => x.PlayerName = player.PlayerData.Name);
                 player.Mods.ForEach(x => x.UnitName = unitDictionary[x.ToonId]);
                 player.PlayerUnits.ForEach(x => x.UnitData.UnitStats.PhysicalDefense = Math.Round(x.UnitData.UnitStats.PhysicalDefense, 2));

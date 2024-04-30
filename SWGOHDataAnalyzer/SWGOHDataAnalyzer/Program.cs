@@ -62,8 +62,10 @@ namespace SWGOHDataAnalyzer
         /// <returns></returns>
         private static async Task CompareSnapshots()
         {
-            ReportBuilder builder = new ReportBuilder();
+            SWGOHClient client = new SWGOHClient();
+            await client.GetDatacrons();
 
+            ReportBuilder builder = new ReportBuilder(client.Datacrons);
             await builder.CompileReport();
         }
 
@@ -136,13 +138,12 @@ namespace SWGOHDataAnalyzer
             Task dataPullTask = client.GetGuildData();
 
             string fileName = SWGOHMessageSystem.InputMessage("Enter in the filename for the report");
-            string characterName = SWGOHMessageSystem.InputMessage("Enter in the toon to highlight for the report. Multiple toons can be added via comma delimited. If there is not a toon you wish to highlight, press enter to continue");
 
             SWGOHMessageSystem.OutputMessage("Pulling down guild data...");
 
             await dataPullTask;
 
-            ReportBuilder builder = new ReportBuilder(fileName, characterName);
+            //ReportBuilder builder = new ReportBuilder(fileName);
                         
             //await builder.CompileSimpleReport(client.Guild);
         }

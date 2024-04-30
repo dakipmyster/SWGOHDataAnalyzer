@@ -10,14 +10,20 @@ namespace SWGOHInterface
         [JsonProperty("tier")]
         public decimal Tier { get; set; }
 
-        [JsonProperty("template_base_id")]
+        [JsonProperty("display_name")]
         public string Name { get; set; }
+
+        [JsonProperty("template_base_id")]
+        public string TemplateId { get; set; }
 
         [JsonProperty("reroll_count")]
         public decimal RerollCount { get; set; }
 
         [JsonProperty("id")]
-        public string DataCronId { get; set; }
+        public string Id { get; set; }
+
+        [JsonProperty("set_id")]
+        public string SetId { get; set; }
 
         [JsonProperty("tiers")]
         public List<DatacronTier> Tiers { get; set; }

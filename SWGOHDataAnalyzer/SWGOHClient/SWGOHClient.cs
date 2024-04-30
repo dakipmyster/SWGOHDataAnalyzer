@@ -17,6 +17,7 @@ namespace SWGOHInterface
 
         public Guild Guild;        
         public List<Player> Players;
+        public List<Datacron> Datacrons;
         public HttpStatusCode ResponseCode;
 
         /// <summary>
@@ -28,6 +29,12 @@ namespace SWGOHInterface
             m_GuildId = guildId;
             m_httpClient = new HttpClient();
             Players = new List<Player>();
+        }
+
+        public SWGOHClient()
+        {
+            m_httpClient = new HttpClient();
+            Datacrons = new List<Datacron>();
         }
 
         /// <summary>
@@ -118,5 +125,12 @@ namespace SWGOHInterface
             ResponseCode = response.StatusCode;
         }
 
+        public async Task GetDatacrons()
+        {
+            var datacronResponse = await m_httpClient.GetAsync($"http://api.swgoh.gg/datacron-sets/");
+
+            if (datacronResponse.StatusCode == HttpStatusCode.OK)
+                Datacrons = JsonConvert.DeserializeObject<List<Datacron>>(await datacronResponse.Content.ReadAsStringAsync());
+        }
     }
 }
